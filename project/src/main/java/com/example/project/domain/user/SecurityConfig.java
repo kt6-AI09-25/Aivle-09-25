@@ -42,4 +42,9 @@ public class SecurityConfig {
     public CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return new CustomAuthenticationSuccessHandler(userRepository);
     }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }
