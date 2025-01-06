@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #74ebd5, #acb6e5);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 40px 50px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .form-container h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #4b79a1;
+        }
+
+        .form-container input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-container input[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            background: #4b79a1;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .form-container input[type="submit"]:hover {
+            background: #3b5d8c;
+        }
+
+        .form-container p {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h1>병원 추천 요청</h1>
+    <form action="recommend_hospital" enctype="application/x-www-form-urlencoded">
+        <input type="text" name="request" placeholder="문제를 입력하세요" value="교통사고가 났어요 머리에 피가 많이나고 있습니다. 숨이 잘 안쉬어져요">
+        <input type="text" name="latitude" placeholder="위도" value="37.538435245262626">
+        <input type="text" name="longitude" placeholder="경도" value="126.98982802695484">
+        <input type="submit" value="요청 보내기">
+    </form>
+    <p>정확한 위치와 문제를 입력해주세요.</p>
+</div>
+</body>
+</html>

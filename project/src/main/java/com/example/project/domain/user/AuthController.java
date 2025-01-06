@@ -35,7 +35,7 @@ public class AuthController {
         newUser.setPassword(passwordEncoder.encode(password));
         newUser.setLogin_type(0);
         newUser.setNickname(nickname);
-        newUser.setRole("ROLE_USER");
+        newUser.setRole("USER");
         newUser.setLast_login(LocalDateTime.now());
         newUser.setDate_join(LocalDateTime.now());
         newUser.setState(1);
