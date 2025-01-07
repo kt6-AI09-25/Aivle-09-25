@@ -31,10 +31,13 @@ public class CommentService {
 
     @Transactional
     public CommentDTO.Response addComment(CommentDTO.Request request) {
+        // 현재 로그인한 사용자 가져오기
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User commenter = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("현재 사용자를 찾을 수 없습니다."));
+
         NoticeBoard post = noticeBoardRepository.findById(request.getPostId())
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-        User commenter = userRepository.findById(request.getCommenterId())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         Comment comment = new Comment();
         comment.setPost(post);

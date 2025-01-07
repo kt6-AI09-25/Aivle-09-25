@@ -12,17 +12,6 @@ public class CommentDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class Request {
-        private Long postId;
-        private Long commenterId;
-        private String comment;
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
     public static class Response {
         private Long commentId;
         private Long postId;
@@ -31,5 +20,15 @@ public class CommentDTO {
         private String comment;
         private LocalDateTime dateComment;
         private Boolean isEdited;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class Request {
+        private Long postId;
+        private String comment;
     }
 }
