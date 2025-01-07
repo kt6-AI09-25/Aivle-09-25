@@ -1,0 +1,150 @@
+<!-- navbar.html -->
+<nav>
+  <a href="/" class="logo">로고</a>
+  <ul>
+    <li><a href="/test" class="protected">발표하기</a></li>
+    <li><a href="/result" class="protected">분석 결과</a></li>
+    <li><a href="/board" class="protected">게시판</a></li>
+  </ul>
+  <div class="auth-buttons"> <!-- 로그인과 회원가입 버튼을 감싸는 div -->
+    <span id="nickname" style="display: none; font-weight: bold; margin-right: 10px;"></span> <!-- 닉네임 표시 -->
+    <button id="logoutBtn" style="display: none;">로그아웃</button> <!-- 로그아웃 버튼 -->
+    <a href="#" class="signup-button" id="signupBtn">회원가입</a>
+    <a href="#" class="login-button" id="loginBtn">로그인</a>
+  </div>
+</nav>
+
+<!-- 로그인 모달 -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeLogin">&times;</span>
+    <h2>로그인 모달</h2>
+    <form id="loginForm">
+      <input type="text" placeholder="아이디" required>
+      <input type="password" placeholder="비밀번호" required>
+      <button type="button" id="socialLogin">소셜로그인</button>
+      <button type="submit">로그인</button>
+      <button type="button" id="goToSignup">회원가입</button>
+    </form>
+  </div>
+</div>
+
+<!-- 회원가입 모달 -->
+<div id="signupModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close" id="closeSignup">&times;</span>
+    <h2>회원가입 모달</h2>
+    <form id="signupForm">
+      <input type="text" placeholder="이름" required>
+      <input type="text" placeholder="아이디" required>
+      <input type="password" placeholder="비밀번호" required>
+      <button type="submit">회원가입</button>
+      <button type="button" id="goToLogin">로그인</button>
+    </form>
+  </div>
+</div>
+
+
+<!-- JavaScript 코드 추가 -->
+<script>
+  var signupModal = document.getElementById("signupModal");
+  var loginModal = document.getElementById("loginModal");
+  var isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true"; // 로그인 상태를 세션 스토리지에서 가져오기
+
+  // 페이지 로드 시 로그인 상태 확인
+  if (isLoggedIn) {
+      var nickname = sessionStorage.getItem("nickname"); // 세션 스토리지에서 닉네임 가져오기
+      document.getElementById("nickname").innerText = nickname; // 닉네임 표시
+      document.getElementById("nickname").style.display = "inline"; // 닉네임 보이기
+      document.getElementById("logoutBtn").style.display = "inline"; // 로그아웃 버튼 보이기
+      document.querySelector(".signup-button").style.display = "none"; // 회원가입 버튼 숨기기
+      document.querySelector(".login-button").style.display = "none"; // 로그인 버튼 숨기기
+  }
+
+  // 회원가입 버튼 클릭 시 모달 열기
+  document.getElementById("signupBtn").onclick = function() {
+      signupModal.style.display = "block";
+  }
+
+  // 로그인 버튼 클릭 시 모달 열기
+  document.getElementById("loginBtn").onclick = function() {
+      loginModal.style.display = "block";
+  }
+
+  // 모달 닫기
+  document.getElementById("closeSignup").onclick = function() {
+      signupModal.style.display = "none";
+  }
+
+  document.getElementById("closeLogin").onclick = function() {
+      loginModal.style.display = "none";
+  }
+
+  window.onclick = function(event) {
+      if (event.target == signupModal) {
+          signupModal.style.display = "none";
+      }
+      if (event.target == loginModal) {
+          loginModal.style.display = "none";
+      }
+  }
+
+  // 모든 보호된 링크 클릭 시 로그인 요구
+  document.querySelectorAll('.protected').forEach(function(link) {
+      link.onclick = function(event) {
+          if (!isLoggedIn) {
+              event.preventDefault(); // 기본 링크 동작 방지
+              alert("로그인 후 이용해 주세요."); // 로그인 필요 알림
+              loginModal.style.display = "block"; // 로그인 모달 열기
+          }
+      }
+  });
+
+  // 회원가입 폼 제출 처리
+  document.getElementById("signupForm").onsubmit = function(event) {
+      event.preventDefault(); // 기본 제출 이벤트 방지
+      var nickname = document.getElementById("signupNickname").value; // 입력된 닉네임 가져오기
+
+      // 회원가입 완료 메시지 표시
+      alert("회원가입이 완료되었습니다.");
+
+      // 모달 닫기 및 로그인 모달 열기
+      signupModal.style.display = "none";
+      loginModal.style.display = "block"; // 로그인 모달 열기
+
+      // 세션 스토리지에 닉네임 저장
+      sessionStorage.setItem("nickname", nickname);
+  }
+
+  // 로그인 폼 제출 처리
+  document.getElementById("loginForm").onsubmit = function(event) {
+      event.preventDefault(); // 기본 제출 이벤트 방지
+
+      // 로그인 처리 로직 추가 (예: AJAX 요청)
+      // 예시: 로그인 성공 시
+      isLoggedIn = true; // 로그인 상태 업데이트
+      sessionStorage.setItem("isLoggedIn", "true"); // 세션 스토리지에 로그인 상태 저장
+
+      // 예시 닉네임 (실제 구현 시 서버에서 받아온 닉네임으로 변경)
+      var nickname = sessionStorage.getItem("nickname") || "사용자닉네임";
+      document.getElementById("nickname").innerText = nickname; // 닉네임 표시
+      document.getElementById("nickname").style.display = "inline"; // 닉네임 보이기
+      document.getElementById("logoutBtn").style.display = "inline"; // 로그아웃 버튼 보이기
+      document.querySelector(".signup-button").style.display = "none"; // 회원가입 버튼 숨기기
+      document.querySelector(".login-button").style.display = "none"; // 로그인 버튼 숨기기
+
+      // 로그인 모달 닫기
+      loginModal.style.display = "none";
+  }
+
+  // 로그아웃 버튼 클릭 처리
+  document.getElementById("logoutBtn").onclick = function() {
+      isLoggedIn = false; // 로그인 상태를 false로 변경
+      sessionStorage.removeItem("isLoggedIn"); // 세션 스토리지에서 로그인 상태 삭제
+      sessionStorage.removeItem("nickname"); // 세션 스토리지에서 닉네임 삭제
+      document.getElementById("nickname").style.display = "none"; // 닉네임 숨기기
+      document.getElementById("logoutBtn").style.display = "none"; // 로그아웃 버튼 숨기기
+      document.querySelector(".signup-button").style.display = "inline"; // 회원가입 버튼 보이기
+      document.querySelector(".login-button").style.display = "inline"; // 로그인 버튼 보이기
+  }
+</script>
