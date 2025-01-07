@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Comment</title>
+</head>
+<body>
+<h1>Edit Comment</h1>
+<form th:action="@{/posts/{postId}/comments/{commentId}(postId=${postId}, commentId=${comment.commentId})}" method="post">
+  <textarea name="comment" th:text="${comment.comment}" required></textarea>
+  <button type="submit">Update</button>
+</form>
+<a th:href="@{/posts/{postId}(postId=${postId})}">Back</a>
+</body>
+</html>

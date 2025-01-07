@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notice Board</title>
+</head>
+<body>
+<h1>Notice Board</h1>
+<a href="/noticeboard/new">Create New Post</a>
+<table>
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>Writer</th>
+    <th>View Count</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="post : ${posts}">
+    <td><a th:href="@{/noticeboard/{id}(id=${post.postId})}" th:text="${post.title}"></a></td>
+    <td th:text="${post.writerName}"></td>
+    <td th:text="${post.viewCount}"></td>
+    <td>
+      <a th:href="@{/noticeboard/{id}/edit(id=${post.postId})}">Edit</a> |
+      <form th:action="@{/noticeboard/{id}/delete(id=${post.postId})}" method="post" style="display:inline;">
+        <button type="submit">Delete</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

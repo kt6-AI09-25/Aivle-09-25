@@ -4,11 +4,14 @@ import com.example.project.domain.noticeboard.NoticeBoardDTO;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,8 +31,14 @@ public class NoticeBoardService {
     public NoticeBoardDTO.Response getPostById(Long id) {
         NoticeBoard post = noticeBoardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-        post.setViewCount(post.getViewCount() + 1); // 조회수 증가
-        noticeBoardRepository.save(post);
+        increaseViewCount(post);
+        return convertToResponseDTO(post);
+    }
+
+    public NoticeBoardDTO.Response getEditablePost(Long id) {
+        NoticeBoard post = noticeBoardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        checkPermission(post.getWriter().getUsername());
         return convertToResponseDTO(post);
     }
 
@@ -51,6 +60,7 @@ public class NoticeBoardService {
     public NoticeBoardDTO.Response updatePost(Long id, NoticeBoardDTO.Request request) {
         NoticeBoard post = noticeBoardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        checkPermission(post.getWriter().getUsername());
 
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
@@ -63,10 +73,22 @@ public class NoticeBoardService {
 
     @Transactional
     public void deletePost(Long id) {
-        if (!noticeBoardRepository.existsById(id)) {
-            throw new RuntimeException("게시글을 찾을 수 없습니다.");
+        NoticeBoard post = noticeBoardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        checkPermission(post.getWriter().getUsername());
+        noticeBoardRepository.delete(post);
+    }
+
+    private void increaseViewCount(NoticeBoard post) {
+        post.setViewCount(post.getViewCount() + 1);
+        noticeBoardRepository.save(post);
+    }
+
+    private void checkPermission(String writerUsername) {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!Objects.equals(currentUsername, writerUsername)) {
+            throw new RuntimeException("권한이 없습니다.");
         }
-        noticeBoardRepository.deleteById(id);
     }
 
     private NoticeBoardDTO.Response convertToResponseDTO(NoticeBoard post) {

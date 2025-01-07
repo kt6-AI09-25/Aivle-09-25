@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Compose Letter</title>
+</head>
+<body>
+<h1>Compose Letter</h1>
+<form th:action="@{/letters}" method="post">
+  <label for="receiverId">To:</label>
+  <input type="text" id="receiverId" name="receiverId" placeholder="Receiver ID" required>
+  <br>
+  <label for="letterContent">Content:</label>
+  <textarea id="letterContent" name="letterContent" placeholder="Write your letter..." required></textarea>
+  <br>
+  <button type="submit">Send</button>
+</form>
+<a href="/letters/received">Cancel</a>
+</body>
+</html>

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/posts/{postId}/comments") // 게시글과 댓글 관계를 명확히
+@RequestMapping("/posts/{postId}/comments")
 public class CommentController {
 
     private final CommentService commentService;
@@ -19,13 +19,13 @@ public class CommentController {
     public String getCommentsByPost(@PathVariable Long postId, Model model) {
         List<CommentDTO.Response> comments = commentService.getCommentsByPostId(postId);
         model.addAttribute("comments", comments);
-        return "comments/list"; // 댓글 리스트 뷰
+        return "comments/list"; // 댓글 리스트
     }
 
     /** 댓글 작성 */
     @PostMapping
     public String addComment(@PathVariable Long postId, @ModelAttribute CommentDTO.Request request) {
-        request.setPostId(postId); // 요청 객체에 게시글 ID 설정
+        request.setPostId(postId);
         commentService.addComment(request);
         return "redirect:/posts/" + postId; // 게시글 상세보기로 리다이렉트
     }
@@ -34,7 +34,7 @@ public class CommentController {
     @PostMapping("/{commentId}/edit")
     public String updateComment(@PathVariable Long postId, @PathVariable Long commentId,
                                 @ModelAttribute CommentDTO.Request request) {
-        request.setPostId(postId); // 요청 객체에 게시글 ID 설정
+        request.setPostId(postId);
         commentService.updateComment(commentId, request);
         return "redirect:/posts/" + postId; // 게시글 상세보기로 리다이렉트
     }

@@ -17,14 +17,6 @@ public class NoticeBoardController {
 
     private final NoticeBoardService noticeBoardService;
 
-    private String getCurrentUserRole() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && !authentication.getAuthorities().isEmpty()) {
-            return authentication.getAuthorities().iterator().next().getAuthority();
-        }
-        return null;
-    }
-
     // 게시글 목록
     @GetMapping
     public String list(Model model) {
@@ -57,15 +49,9 @@ public class NoticeBoardController {
     // 게시글 수정
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        NoticeBoardDTO.Response post = noticeBoardService.getPostById(id);
-
-        if (Objects.equals(username, post.getWriterName()) || Objects.equals(getCurrentUserRole(), "ROLE_ADMIN")) {
-            model.addAttribute("post", post);
-            return "noticeboard/edit";
-        } else {
-            return "noticeboard/refuse";
-        }
+        NoticeBoardDTO.Response post = noticeBoardService.getEditablePost(id);
+        model.addAttribute("post", post);
+        return "noticeboard/edit";
     }
 
     @PostMapping("/{id}")

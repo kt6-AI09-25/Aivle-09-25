@@ -5,11 +5,13 @@ import com.example.project.domain.noticeboard.NoticeBoardRepository;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +50,8 @@ public class CommentService {
     public CommentDTO.Response updateComment(Long commentId, CommentDTO.Request request) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+        checkPermission(comment.getCommenter().getUsername());
+
         comment.setComment(request.getComment());
         comment.setIsEdited(true);
         commentRepository.save(comment);
@@ -56,7 +60,18 @@ public class CommentService {
 
     @Transactional
     public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+        checkPermission(comment.getCommenter().getUsername());
+
         commentRepository.deleteById(commentId);
+    }
+
+    private void checkPermission(String commenterUsername) {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!Objects.equals(currentUsername, commenterUsername)) {
+            throw new RuntimeException("권한이 없습니다.");
+        }
     }
 
     private CommentDTO.Response convertToResponseDTO(Comment comment) {

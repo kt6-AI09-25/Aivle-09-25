@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Comments</title>
+</head>
+<body>
+<h1>Comments</h1>
+
+<!-- 댓글 작성 폼 -->
+<form th:action="@{/posts/{postId}/comments(postId=${postId})}" method="post">
+  <textarea name="comment" placeholder="Write a comment..." required></textarea>
+  <button type="submit">Add Comment</button>
+</form>
+<hr>
+
+<!-- 댓글 리스트 -->
+<table>
+  <thead>
+  <tr>
+    <th>Comment</th>
+    <th>Commenter</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="comment : ${comments}">
+    <td th:text="${comment.comment}"></td>
+    <td th:text="${comment.commenterName}"></td>
+    <td>
+      <a th:href="@{/posts/{postId}/comments/{commentId}/edit(postId=${postId}, commentId=${comment.commentId})}">Edit</a> |
+      <form th:action="@{/posts/{postId}/comments/{commentId}/delete(postId=${postId}, commentId=${comment.commentId})}" method="post" style="display:inline;">
+        <button type="submit">Delete</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<a th:href="@{/noticeboard}">Back to Notice Board</a>
+</body>
+</html>
