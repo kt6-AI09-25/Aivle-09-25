@@ -44,8 +44,10 @@ public class NoticeBoardService {
 
     @Transactional
     public NoticeBoardDTO.Response createPost(NoticeBoardDTO.Request request) {
-        User writer = userRepository.findById(request.getWriterId())
-                .orElseThrow(() -> new RuntimeException("작성자를 찾을 수 없습니다."));
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User writer = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("현재 사용자를 찾을 수 없습니다."));
+
 
         NoticeBoard post = new NoticeBoard();
         post.setTitle(request.getTitle());
@@ -55,6 +57,7 @@ public class NoticeBoardService {
         NoticeBoard savedPost = noticeBoardRepository.save(post);
         return convertToResponseDTO(savedPost);
     }
+
 
     @Transactional
     public NoticeBoardDTO.Response updatePost(Long id, NoticeBoardDTO.Request request) {

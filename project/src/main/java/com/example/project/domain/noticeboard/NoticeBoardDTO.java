@@ -31,6 +31,5 @@ public class NoticeBoardDTO {
     public static class Request {
         private String title;
         private String content;
-        private Long writerId;
     }
 }

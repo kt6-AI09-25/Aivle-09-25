@@ -1,14 +1,14 @@
 package com.example.project.domain.noticeboard;
 
+import com.example.project.domain.comment.CommentDTO;
+import com.example.project.domain.comment.CommentService;
 import com.example.project.domain.noticeboard.NoticeBoardDTO.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -16,6 +16,7 @@ import java.util.Objects;
 public class NoticeBoardController {
 
     private final NoticeBoardService noticeBoardService;
+    private final CommentService commentService;
 
     // 게시글 목록
     @GetMapping
@@ -41,8 +42,14 @@ public class NoticeBoardController {
     // 게시글 상세 보기
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
+        // 게시글 데이터
         NoticeBoardDTO.Response post = noticeBoardService.getPostById(id);
         model.addAttribute("post", post);
+
+        // 댓글 데이터
+        List<CommentDTO.Response> comments = commentService.getCommentsByPostId(id);
+        model.addAttribute("comments", comments);
+
         return "noticeboard/detail";
     }
 
@@ -65,5 +72,28 @@ public class NoticeBoardController {
     public String deletePost(@PathVariable Long id) {
         noticeBoardService.deletePost(id);
         return "redirect:/noticeboard";
+    }
+
+    // 댓글 작성
+    @PostMapping("/{id}/comments")
+    public String addComment(@PathVariable Long id, @ModelAttribute CommentDTO.Request request) {
+        request.setPostId(id);
+        commentService.addComment(request);
+        return "redirect:/noticeboard/" + id;
+    }
+
+    // 댓글 수정
+    @PostMapping("/{id}/comments/{commentId}/edit")
+    public String updateComment(@PathVariable Long id, @PathVariable Long commentId, @ModelAttribute CommentDTO.Request request) {
+        request.setPostId(id);
+        commentService.updateComment(commentId, request);
+        return "redirect:/noticeboard/" + id;
+    }
+
+    // 댓글 삭제
+    @PostMapping("/{id}/comments/{commentId}/delete")
+    public String deleteComment(@PathVariable Long id, @PathVariable Long commentId) {
+        commentService.deleteComment(commentId);
+        return "redirect:/noticeboard/" + id;
     }
 }
