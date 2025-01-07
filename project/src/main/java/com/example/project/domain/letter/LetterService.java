@@ -18,14 +18,14 @@ public class LetterService {
     private final UserRepository userRepository;
 
     public List<LetterDTO.Response> getReceivedLetters(Long receiverId) {
-        return letterRepository.findByReceiver_UserId(receiverId)
+        return letterRepository.findByReceiver_Id(receiverId)
                 .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
     public List<LetterDTO.Response> getSentLetters(Long senderId) {
-        return letterRepository.findBySender_UserId(senderId)
+        return letterRepository.findBySender_Id(senderId)
                 .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
