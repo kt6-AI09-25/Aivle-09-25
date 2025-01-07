@@ -42,9 +42,11 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true) // 세션 무효화
+                        .deleteCookies("JSESSIONID") // 쿠키 삭제
                 )
                 .sessionManagement(session -> session
-                        .maximumSessions(1) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지)
+                        .maximumSessions(2) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지)
                         .sessionRegistry(sessionRegistry) // SessionRegistry 설정
                 );
         return http.build();
