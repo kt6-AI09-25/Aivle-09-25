@@ -2,17 +2,17 @@ package com.example.project.domain.user;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
+@NoArgsConstructor
 @Table(name="user")
 @Getter
 @Setter
 public class User {
-    @Setter
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
