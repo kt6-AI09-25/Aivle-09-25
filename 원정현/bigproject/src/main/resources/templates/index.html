@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>메인 페이지</title>
-    <link rel="stylesheet" href="/style.css"> <!-- CSS 파일 링크 -->
+    <link rel="stylesheet" href="css/style.css"> <!-- CSS 파일 링크 -->
     <style>
         .modal {
             display: none; /* 기본적으로 숨김 */
@@ -30,12 +30,15 @@
 <body>
 <div th:replace="navbar.html"></div> <!-- 네비게이션 바 포함 -->
 
-<h1>AI 발표분석 서비스입니다!</h1>
-<p>지금 당장 발표를 해보세요</p>
-<button id="startButton" style="padding: 10px 20px; font-size: 16px;">시작하기</button>
+<div style="text-align: center; height: 100vh;">
+    <img src="/image/image1.jpg" alt="AI 발표분석 서비스 이미지" style="max-width: 100%; height: auto; margin-bottom: 20px;">
+    <h1>AI 발표분석 서비스입니다!</h1>
+    <p>지금 당장 s발표를 해보세요</p>
+    <button id="startButton" style="padding: 5px 10px; font-size: 14px; width: 100px;">시작하기</button>
+</div>
 
 <!-- 로그인 모달 -->
-<div id="loginModal" class="modal" style="display: none;">
+<div id="loginModal" class="modal">
     <div class="modal-content">
         <span class="close" id="closeLogin">&times;</span>
         <h2>로그인</h2>
@@ -50,11 +53,11 @@
 </div>
 
 <!-- 회원가입 모달 -->
-<div id="signupModal" class="modal" style="display: none;">
+<div id="signupModal" class="modal">
     <div class="modal-content">
         <span class="close" id="closeSignup">&times;</span>
         <h2>회원가입</h2>
-        <form id="signupForm">
+        <form id="signupForm"> <!-- ID 변경 -->
             <input type="text" placeholder="닉네임" required>
             <input type="text" placeholder="아이디" required>
             <input type="password" placeholder="비밀번호" required>
@@ -85,7 +88,7 @@
     }
 
     // 회원가입 모달에서 회원가입 버튼 클릭 시
-    document.getElementById("signupForm").onsubmit = function(event) {
+    document.getElementById("signupForm").onsubmit = function(event) { // ID 수정
         event.preventDefault(); // 기본 제출 이벤트 방지
         alert("회원가입이 완료되었습니다."); // 알림 표시
         document.getElementById("signupModal").style.display = "none"; // 회원가입 모달 닫기
