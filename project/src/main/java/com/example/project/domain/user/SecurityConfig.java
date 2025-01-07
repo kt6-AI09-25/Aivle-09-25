@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register").permitAll()
+                        .requestMatchers("/").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -46,7 +47,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID") // 쿠키 삭제
                 )
                 .sessionManagement(session -> session
-                        .maximumSessions(2) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지)
+                        .maximumSessions(1) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지)
                         .sessionRegistry(sessionRegistry) // SessionRegistry 설정
                 );
         return http.build();
