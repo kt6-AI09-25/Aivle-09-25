@@ -3,6 +3,7 @@ package com.example.project.domain.user;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,6 +25,7 @@ public class SecurityConfig {
         return new SessionRegistryImpl();
     }
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
         http
@@ -32,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/register").permitAll()
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll()// 정적 리소스 허용
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
