@@ -27,39 +27,36 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register").permitAll()
                         .requestMatchers("/").permitAll()
+                        .requestMatchers("/login").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll()// 정적 리소스 허용
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")
-                        .permitAll()
-                        .successHandler(customAuthenticationSuccessHandler())
+                        .loginProcessingUrl("/login")
+                        .successHandler(new CustomAuthenticationSuccessHandler(userRepository))
                         .failureHandler(new CustomAuthenticationFailureHandler())
+                        .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/")
                         .invalidateHttpSession(true) // 세션 무효화
                         .deleteCookies("JSESSIONID") // 쿠키 삭제
                 )
                 .sessionManagement(session -> session
                         .maximumSessions(1) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지)
-                        .sessionRegistry(sessionRegistry) // SessionRegistry 설정
+                        .sessionRegistry(sessionRegistry()) // SessionRegistry 설정
                 );
         return http.build();
     }
 
-    @Bean
-    public CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-        return new CustomAuthenticationSuccessHandler(userRepository);
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
