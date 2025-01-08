@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시판</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/css/style.css">
     <style>
         .modal {
             display: none; /* 기본적으로 숨김 */
@@ -25,11 +25,207 @@
             width: 80%; /* 기본 너비 */
             max-width: 400px; /* 최대 너비 */
         }
+        .tabs button {
+          padding: 10px 20px;
+          margin-right: 10px;
+          border: none;
+          cursor: pointer;
+          background-color: lightgray;
+          color: white;
+        }
+        .tabs button.active {
+          background-color: blue;
+        }
+        .search-bar {
+          margin-bottom: 20px;
+        }
+        .search-bar input {
+          padding: 10px;
+          width: 300px;
+        }
+        .search-bar button {
+          padding: 10px 20px;
+          margin-left: 10px;
+          cursor: pointer;
+        }
+        .post {
+          padding: 10px;
+          border-bottom: 1px solid #ccc;
+        }
+        .post a {
+          text-decoration: none;
+          color: #333;
+        }
+        .post a:hover {
+          text-decoration: underline;
+        }
+        .pagination button {
+          padding: 5px 10px;
+          margin-right: 5px;
+          border: none;
+          cursor: pointer;
+          background-color: lightgray;
+        }
+        .pagination button.active {
+          background-color: blue;
+          color: white;
+        }
     </style>
 </head>
 <body>
 <div th:replace="navbar.html"></div>
 <h1>게시판</h1>
 <p>여기는 게시판 구현입니다.</p>
+<div class="tabs">
+    <button class="active" data-tab="후기">사용후기</button>
+    <button data-tab="질문">질문게시판</button>
+    <button data-tab="문의">1:1문의</button>
+    <button data-tab="공지">공지사항</button>
+</div>
+
+<!-- 검색 + 글쓰기 -->
+<div class="search-bar">
+    <input type="text" id="search" placeholder="검색어를 입력하세요" />
+    <!-- 글쓰기 페이지로 이동 -->
+    <button onclick="location.href='write.html'">글쓰기</button>
+</div>
+
+<!-- 게시글 목록 -->
+<div id="posts"></div>
+
+<!-- 페이지네이션 -->
+<div class="pagination" id="pagination"></div>
+
+<script>
+    // localStorage에서 posts 데이터 로드
+    // 구조 예시: {
+    //   후기: [
+    //     { id: 123, title: "후기 글 제목", content: "내용", createdAt: "..." },
+    //     ...
+    //   ],
+    //   질문: [...],
+    //   문의: [...],
+    //   공지: [...]
+    // }
+    function loadPosts() {
+      let stored = localStorage.getItem("posts");
+      if (!stored) {
+        // 없으면 기본 구조 생성
+        stored = {
+          후기: [],
+          질문: [],
+          문의: [],
+          공지: [],
+        };
+        localStorage.setItem("posts", JSON.stringify(stored));
+        return stored;
+      }
+      return JSON.parse(stored);
+    }
+
+    let postsData = loadPosts();
+
+    let activeTab = "후기";
+    let currentPage = 1;
+    const postsPerPage = 5;
+
+    // 탭 버튼 클릭 이벤트
+    document.querySelectorAll(".tabs button").forEach((button) => {
+      button.addEventListener("click", () => {
+        document
+          .querySelectorAll(".tabs button")
+          .forEach((btn) => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        activeTab = button.getAttribute("data-tab");
+        currentPage = 1;
+        renderPosts();
+      });
+    });
+
+    // 검색 이벤트
+    document.getElementById("search").addEventListener("input", () => {
+      currentPage = 1;
+      renderPosts();
+    });
+
+    // 게시글 목록 렌더링
+    function renderPosts() {
+      // 매번 로컬스토리지에서 최신 데이터 다시 로드
+      postsData = loadPosts();
+
+      const postsContainer = document.getElementById("posts");
+      const searchTerm = document.getElementById("search").value.toLowerCase();
+
+      // 해당 탭의 모든 게시글(객체 배열)
+      const allPosts = postsData[activeTab] || [];
+
+      // **** 여기서 수정됨: post는 객체 { title, content, ... }이므로
+      // title, content 중 하나라도 검색어가 포함되면 필터
+      const filteredPosts = allPosts.filter((post) => {
+        // 혹시 post가 문자열로 남아있다면 대비용 (필요 없으면 제거 가능)
+        if (typeof post === "string") {
+          return post.toLowerCase().includes(searchTerm);
+        }
+        // post가 객체라면 title/content 검색
+        const titleMatch = post.title.toLowerCase().includes(searchTerm);
+        const contentMatch = post.content.toLowerCase().includes(searchTerm);
+        return titleMatch || contentMatch;
+      });
+
+      // 페이지네이션 계산
+      const startIndex = (currentPage - 1) * postsPerPage;
+      const currentPosts = filteredPosts.slice(startIndex, startIndex + postsPerPage);
+
+      // 게시글 목록 렌더링
+      postsContainer.innerHTML = currentPosts.length
+        ? currentPosts
+            .map(
+              (post) => `
+                <div class="post">
+                  <a href="read.html?board=${encodeURIComponent(
+                    activeTab
+                  )}&id=${post.id}">
+                    [${post.title}]
+                  </a>
+                  <div style="font-size: 0.9em; color:#666;">
+                    ${new Date(post.createdAt).toLocaleString()}
+                  </div>
+                </div>
+              `
+            )
+            .join("")
+        : `<p>검색 결과가 없습니다.</p>`;
+
+      // 페이지 버튼 렌더링
+      renderPagination(filteredPosts.length);
+    }
+
+    function renderPagination(totalPosts) {
+      const totalPages = Math.ceil(totalPosts / postsPerPage);
+      const paginationContainer = document.getElementById("pagination");
+
+      let html = "";
+      for (let i = 1; i <= totalPages; i++) {
+        html += `
+          <button
+            class="${i === currentPage ? "active" : ""}"
+            onclick="goToPage(${i})"
+          >
+            ${i}
+          </button>
+        `;
+      }
+      paginationContainer.innerHTML = html;
+    }
+
+    function goToPage(page) {
+      currentPage = page;
+      renderPosts();
+    }
+
+    // 페이지 로드 시 초기 렌더링
+    renderPosts();
+</script>
 </body>
 </html>
