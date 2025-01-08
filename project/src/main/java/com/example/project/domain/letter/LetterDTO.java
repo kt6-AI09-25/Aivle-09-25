@@ -13,7 +13,7 @@ public class LetterDTO {
     @AllArgsConstructor
     @Builder
     public static class Request {
-        private Long receiverId;
+        private String receiverUsername;
         private String letterContent;
     }
 
@@ -26,6 +26,8 @@ public class LetterDTO {
         private Long letterId;
         private Long senderId;
         private String senderName;
+        private Long receiverId;
+        private String receiverUsername;
         private String letterContent;
         private LocalDateTime dateSend;
         private Boolean state;
