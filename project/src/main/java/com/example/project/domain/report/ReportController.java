@@ -4,10 +4,7 @@ package com.example.project.domain.report;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,6 +27,13 @@ public class ReportController {
     @PostMapping
     public String createReport(@ModelAttribute ReportDto.Request request) {
         reportService.createReport(request);
-        return "redirect:/admin/report/list";
+        return "redirect:/admin/report";
+    }
+
+    @PostMapping("/{id}/update")
+    public String updateReport(@PathVariable Long id,
+                               @RequestParam ReportProcessTypes reportProcessType) {
+        reportService.updateReportProcessTypeAndState(id, reportProcessType);
+        return "redirect:/admin/report";
     }
 }

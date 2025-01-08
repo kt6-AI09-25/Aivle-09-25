@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ public class ReportService {
     public List<ReportDto.Response> getAllReports() {
         List<ReportDto.Response> reports = reportRepository.findAll()
                 .stream()
+                .sorted(Comparator.comparingInt(Report::getProcessing_state))
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
         return reports;
@@ -41,9 +43,23 @@ public class ReportService {
         newReport.setReporter(reporter);
         newReport.setReport_type(1);
         newReport.setProcessing_state(0);
+        newReport.setReport_process_type(ReportProcessTypes.처리대기);
 
         Report savedReport = reportRepository.save(newReport);
         return convertToResponseDTO(savedReport);
+    }
+
+    @Transactional
+    public void updateReportProcessTypeAndState(Long reportId, ReportProcessTypes processType) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        // Update fields
+        report.setReport_process_type(processType);
+        report.setProcessing_state(1); // Mark as processed
+
+        // Save updated report
+        reportRepository.save(report);
     }
 
     private ReportDto.Response convertToResponseDTO(Report report) {
@@ -55,6 +71,7 @@ public class ReportService {
                 .processing_state(report.getProcessing_state())
                 .date_processing(report.getDate_processing())
                 .report_details(report.getReport_details())
+                .report_process_type(report.getReport_process_type())
                 .build();
     }
 }

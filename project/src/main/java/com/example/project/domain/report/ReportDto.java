@@ -20,6 +20,7 @@ public class ReportDto {
         private Integer processing_state;
         private LocalDateTime date_processing;
         private ReportDetails report_details;
+        private ReportProcessTypes report_process_type;
     }
 
     @Getter
