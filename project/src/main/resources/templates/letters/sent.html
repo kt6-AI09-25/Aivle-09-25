@@ -8,7 +8,7 @@
 <h1>Sent Letters</h1>
 <ul>
   <li th:each="letter : ${letters}">
-    <p><strong>To:</strong> <span th:text="${letter.receiverName}"></span></p>
+    <p><strong>To:</strong> <span th:text="${letter.receiverUsername}"></span></p>
     <p><strong>Content:</strong> <span th:text="${letter.letterContent}"></span></p>
     <p><strong>Sent At:</strong> <span th:text="${letter.dateSend}"></span></p>
     <hr>

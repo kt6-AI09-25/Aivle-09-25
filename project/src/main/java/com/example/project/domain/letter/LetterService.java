@@ -3,6 +3,7 @@ package com.example.project.domain.letter;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,14 +19,14 @@ public class LetterService {
     private final UserRepository userRepository;
 
     public List<LetterDTO.Response> getReceivedLetters(Long receiverId) {
-        return letterRepository.findByReceiver_Id(receiverId)
+        return letterRepository.findByReceiver_Id(receiverId, Sort.by(Sort.Direction.DESC, "dateSend"))
                 .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
     public List<LetterDTO.Response> getSentLetters(Long senderId) {
-        return letterRepository.findBySender_Id(senderId)
+        return letterRepository.findBySender_Id(senderId, Sort.by(Sort.Direction.DESC, "dateSend"))
                 .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
@@ -33,8 +34,10 @@ public class LetterService {
 
     @Transactional
     public LetterDTO.Response sendLetter(LetterDTO.Request request, Long senderId) {
-        User receiver = userRepository.findById(request.getReceiverId())
-                .orElseThrow(() -> new RuntimeException("수신자를 찾을 수 없습니다."));
+        // username을 기반으로 수신자 조회
+        User receiver = userRepository.findByUsername(request.getReceiverUsername())
+                .orElseThrow(() -> new RuntimeException("수신자를 찾을 수 없습니다: " + request.getReceiverUsername()));
+
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new RuntimeException("발신자를 찾을 수 없습니다."));
 
@@ -53,7 +56,9 @@ public class LetterService {
         return LetterDTO.Response.builder()
                 .letterId(letter.getLetterId())
                 .senderId(letter.getSender().getId())
-                .senderName(letter.getSender().getUsername())
+                .senderName(letter.getSender().getUsername()) // Sender username
+                .receiverId(letter.getReceiver().getId()) // Receiver ID
+                .receiverUsername(letter.getReceiver().getUsername()) // Receiver username 추가
                 .letterContent(letter.getLetterContent())
                 .dateSend(letter.getDateSend())
                 .state(letter.getState())
