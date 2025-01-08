@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>메인 페이지</title>
-    <link rel="stylesheet" href="/style.css"> <!-- CSS 파일 링크 -->
+    <link rel="stylesheet" href="/css/style.css"> <!-- CSS 파일 링크 -->
     <style>
         .modal {
             display: none; /* 기본적으로 숨김 */
@@ -44,8 +44,8 @@
         <span class="close" id="closeLogin">&times;</span>
         <h2>로그인</h2>
         <form id="loginForm">
-            <input type="text" placeholder="아이디" required>
-            <input type="password" placeholder="비밀번호" required>
+            <input type="text" id="username" name="username" placeholder="아이디" required>
+            <input type="password" id="password" name="password" placeholder="비밀번호" required>
             <button type="button" id="socialLogin">소셜로그인</button>
             <button type="submit">로그인</button>
             <button type="button" id="goToSignup">회원가입</button>
@@ -59,9 +59,9 @@
         <span class="close" id="closeSignup">&times;</span>
         <h2>회원가입</h2>
         <form id="signupForm"> <!-- ID 변경 -->
-            <input type="text" placeholder="닉네임" required>
-            <input type="text" placeholder="아이디" required>
-            <input type="password" placeholder="비밀번호" required>
+            <input type="text" id="nickname" name="nickname" placeholder="닉네임" required>
+            <input type="text" id="username" name="username" placeholder="아이디" required>
+            <input type="password" id="password" name="password" placeholder="비밀번호" required>
             <button type="submit">가입완료</button>
         </form>
     </div>
@@ -70,8 +70,22 @@
 
 <!-- JavaScript 코드 추가 -->
 <script>
-    // 로그인 상태 변수
-    var isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true"; // 세션 스토리지에서 로그인 상태 가져오기
+    var isLoggedIn = false;
+
+    // 백엔드에서 로그인 상태 동기화
+    fetch('/auth/status')
+        .then(response => response.json())
+        .then(data => {
+            isLoggedIn = data.isLoggedIn;
+            if (isLoggedIn) {
+                document.getElementById("nickname").innerText = data.username;
+                document.getElementById("nickname").style.display = "inline";
+                document.getElementById("logoutBtn").style.display = "inline";
+                document.querySelector(".signup-button").style.display = "none";
+                document.querySelector(".login-button").style.display = "none";
+            }
+        });
+
 
     // "시작하기" 버튼 클릭 시 페이지 이동 처리
     document.getElementById("startButton").onclick = function() {
@@ -89,13 +103,46 @@
         document.getElementById("signupModal").style.display = "block"; // 회원가입 모달 열기
     }
 
-  // 회원가입 모달에서 회원가입 버튼 클릭 시
-    document.getElementById("signupForm").onsubmit = function(event) { // ID 수정
-    event.preventDefault(); // 기본 제출 이벤트 방지
-    alert("회원가입이 완료되었습니다."); // 알림 표시
-    document.getElementById("signupModal").style.display = "none"; // 회원가입 모달 닫기
-    document.getElementById("loginModal").style.display = "block"; // 로그인 모달 열기
-}
+  // 회원가입 처리
+    document.getElementById("signupForm").onsubmit = function (event) {
+        event.preventDefault();
+        const data = {
+            username: document.querySelector('#signupForm [name="username"]').value,
+            password: document.querySelector('#signupForm [name="password"]').value,
+            nickname: document.querySelector('#signupForm [name="nickname"]').value,
+        };
+
+        fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        })
+        .then((response) => {
+            if (response.ok) {
+                alert("회원가입 성공!");
+                document.getElementById("signupModal").style.display = "none";
+                document.getElementById("loginModal").style.display = "block";
+            } else {
+                alert("회원가입 실패. 아이디가 이미 존재합니다.");
+            }
+        });
+    };
+
+    // 로그인 처리
+    document.getElementById("loginForm").onsubmit = function (event) {
+        event.preventDefault();
+        const data = new FormData(document.getElementById("loginForm"));
+
+        fetch('/login', { method: 'POST', body: data })
+        .then((response) => {
+            if (response.ok) {
+                alert("로그인 성공!");
+                window.location.href = "/";
+            } else {
+                alert("로그인 실패. 아이디 또는 비밀번호를 확인하세요.");
+            }
+        });
+    };
 
     // 모달 닫기
     document.getElementById("closeLogin").onclick = function() {
@@ -119,3 +166,4 @@
 
 </body>
 </html>
+

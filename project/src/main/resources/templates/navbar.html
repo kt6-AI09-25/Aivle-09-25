@@ -19,8 +19,8 @@
     <span class="close" id="closeLogin">&times;</span>
     <h2>로그인 모달</h2>
     <form id="loginForm">
-      <input type="text" placeholder="아이디" required autocomplete="off"> <!-- autocomplete 추가 -->
-      <input type="password" placeholder="비밀번호" required autocomplete="off"> <!-- autocomplete 추가 -->
+      <input type="text" id="username" name="username" placeholder="아이디" required autocomplete="off"> <!-- autocomplete 추가 -->
+      <input type="password" id="password" name="password" placeholder="비밀번호" required autocomplete="off"> <!-- autocomplete 추가 -->
       <button type="button" id="socialLogin">소셜로그인</button>
       <button type="submit">로그인</button>
       <button type="button" id="goToSignup">회원가입</button>
@@ -34,9 +34,9 @@
     <span class="close" id="closeSignup">&times;</span>
     <h2>회원가입 모달</h2>
     <form id="signupForm">
-      <input type="text" placeholder="이름" required autocomplete="off"> <!-- autocomplete 추가 -->
-      <input type="text" placeholder="아이디" required autocomplete="off"> <!-- autocomplete 추가 -->
-      <input type="password" placeholder="비밀번호" required autocomplete="off"> <!-- autocomplete 추가 -->
+      <input type="text" id="nickname" name="nickname" placeholder="닉네임" required autocomplete="off"> <!-- autocomplete 추가 -->
+      <input type="text" id="username" name="username" placeholder="아이디" required autocomplete="off"> <!-- autocomplete 추가 -->
+      <input type="password" id="password" name="password" placeholder="비밀번호" required autocomplete="off"> <!-- autocomplete 추가 -->
       <button type="submit">가입완료</button>
     </form>
   </div>
@@ -46,17 +46,21 @@
 <script>
   var signupModal = document.getElementById("signupModal");
   var loginModal = document.getElementById("loginModal");
-  var isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true"; // 로그인 상태를 세션 스토리지에서 가져오기
+  var isLoggedIn = false;
 
-  // 페이지 로드 시 로그인 상태 확인
-  if (isLoggedIn) {
-      var nickname = sessionStorage.getItem("nickname"); // 세션 스토리지에서 닉네임 가져오기
-      document.getElementById("nickname").innerText = nickname; // 닉네임 표시
-      document.getElementById("nickname").style.display = "inline"; // 닉네임 보이기
-      document.getElementById("logoutBtn").style.display = "inline"; // 로그아웃 버튼 보이기
-      document.querySelector(".signup-button").style.display = "none"; // 회원가입 버튼 숨기기
-      document.querySelector(".login-button").style.display = "none"; // 로그인 버튼 숨기기
-  }
+    // 백엔드에서 로그인 상태 동기화
+    fetch('/auth/status')
+        .then(response => response.json())
+        .then(data => {
+            isLoggedIn = data.isLoggedIn;
+            if (isLoggedIn) {
+                document.getElementById("nickname").innerText = data.username;
+                document.getElementById("nickname").style.display = "inline";
+                document.getElementById("logoutBtn").style.display = "inline";
+                document.querySelector(".signup-button").style.display = "none";
+                document.querySelector(".login-button").style.display = "none";
+            }
+        });
 
   // 회원가입 버튼 클릭 시 모달 열기
   document.getElementById("signupBtn").onclick = function() {

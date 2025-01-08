@@ -23,6 +23,11 @@ public class IndexController {
     @GetMapping("/admin")
     public String admin() {return "admin";}
 
+    @GetMapping("/test")
+    public String testPage() {
+        return "test"; // templates/test.html을 렌더링
+    }
+
 }
 
 
