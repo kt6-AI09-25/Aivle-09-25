@@ -1,9 +1,11 @@
 package com.example.project.domain.user;
 
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalDateTime;
@@ -22,7 +24,9 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     @PostMapping("/register")
+    @CrossOrigin(origins = "http://localhost:8080")
     public ResponseEntity<?> registerUser(@RequestBody Map<String, String> request) {
         String username = request.get("username");
         String password = request.get("password");
@@ -39,6 +43,9 @@ public class AuthController {
         newUser.setRole("USER");
         newUser.setLast_login(LocalDateTime.now());
         newUser.setDate_join(LocalDateTime.now());
+        newUser.setLogin_type(0); // 로그인 타입 기본값
+        newUser.setState(1); // 상태 기본값
+        newUser.setLetter_state(0);
         userRepository.save(newUser);
 
         return ResponseEntity.ok("User registered successfully");
