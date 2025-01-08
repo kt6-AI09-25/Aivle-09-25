@@ -28,6 +28,16 @@ public class IndexController {
         return "test"; // templates/test.html을 렌더링
     }
 
+    @GetMapping("/result")
+    public String result() {
+        return "result"; // result.html 반환
+    }
+
+
+    @GetMapping("/board")  // test.html로 가는 경로 추가
+    public String board() {
+        return "board"; // test.html 반환
+    }
 }
 
 

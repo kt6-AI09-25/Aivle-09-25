@@ -8,6 +8,13 @@ h1 {
     margin-top: 20px; /* 상단 여백 */
 }
 
+.container {
+    max-width: 800px; /* 최대 너비 설정 */
+    margin: 0 auto; /* 중앙 정렬 */
+    padding: 20px; /* 내부 여백 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+}
+
 nav {
     background-color: white; /* 배경 색상 흰색 */
     padding: 10px;
@@ -45,33 +52,60 @@ nav ul li:last-child {
 }
 
 nav ul li a {
-    color: #333; /* 기본 글자색 */
+    color: #777; /* 기본 글자색 */
     text-decoration: none; /* 밑줄 없애기 */
     padding: 14px 20px;
 }
 
 /* 버튼 중앙 정렬 */
 nav ul li a:hover {
-    background-color: #575757;
-    color: white; /* 호버 시 글자색 */
+    background-color: transparent; /* 호버 시 배경색 없음 */
+    color: black; /* 호버 시 글자색 변경 */
 }
 
 /* 버튼 스타일 */
 button {
-    width: 100%; /* 버튼 너비 100% */
+    width: 150px; /* 버튼 너비를 고정 값으로 설정 */
     padding: 10px;
     margin: 10px 0; /* 상하 여백 */
     border: none; /* 테두리 없음 */
     background-color: #007bff; /* 버튼 배경색 */
-    color: white; /* 글자색 */
+    color: white; /* 기본 글자색 */
     border-radius: 4px; /* 모서리 둥글게 */
     cursor: pointer; /* 커서 포인터 */
-    transition: background-color 0.3s; /* 배경색 전환 효과 */
+    transition: color 0.3s; /* 글자색 전환 효과 */
 }
 
-button:hover {
-    background-color: #0056b3; /* 호버 시 배경색 */
+/* 사용법 및 설명 박스 스타일 */
+.feature1, .feature2, .feature3 {
+    display: inline-block; /* 인라인 블록으로 설정 */
+    background-color: #f0f0f0;
+    padding: 10px; /* 패딩 줄이기 */
+    margin: 5px; /* 마진 줄이기 */
+    border-radius: 8px;
+    box-sizing: border-box; /* 박스 사이즈 계산 방식 설정 */
 }
+
+/* feature1 크기 조정 */
+.feature1 {
+    width: calc(30% - 10px); /* 화면 비율에 맞게 너비 조정 */
+    height: 150px; /* 박스 높이 줄이기 */
+}
+
+/* feature2 크기 조정 */
+.feature2 {
+    width: calc(100% - 10px); /* 화면 비율에 맞게 너비 조정 */
+    height: 150px; /* 박스 높이 줄이기 */
+}
+
+/* feature3 크기 조정 */
+.feature3 {
+    width: calc(45% - 10px); /* 화면 비율에 맞게 너비 조정 */
+    height: 200px; /* 박스 높이 줄이기 */
+}
+
+/* 제목과 시작하기 버튼 간격 줄이기 */
+
 
 /* 모달 스타일 */
 .modal {
@@ -97,7 +131,7 @@ button:hover {
     display: flex; /* Flexbox 사용 */
     flex-direction: column; /* 세로 정렬 */
     position: absolute; /* 절대 위치 */
-    top: 17%; /* 수직 중앙 */
+    top: 50%; /* 수직 중앙 */
     left: 50%; /* 수평 중앙 */
     transform: translate(-50%, -50%); /* 중앙 정렬 */
 }
@@ -125,3 +159,11 @@ input[type="text"], input[type="password"] {
     border-radius: 4px; /* 모서리 둥글게 */
 }
 
+/* 푸터 스타일 */
+.footer {
+    margin-top: 20px;
+    padding: 20px; /* 푸터 두께 증가 */
+    background-color: white;
+    text-align: center;
+    font-size: 18px; /* 글자 크기 조정 */
+}

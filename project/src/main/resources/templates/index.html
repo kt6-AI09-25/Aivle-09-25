@@ -6,37 +6,125 @@
     <title>메인 페이지</title>
     <link rel="stylesheet" href="/css/style.css"> <!-- CSS 파일 링크 -->
     <style>
+        /* 추가적인 스타일 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px; /* h1과 다른 요소 사이의 간격 조정 */
+        }
+
+        h2 {
+            margin-top: 30px;
+            margin-bottom: 15px; /* h2와 다른 요소 사이의 간격 조정 */
+        }
+
+        .feature1, .feature2, .feature3 {
+            background-color: #f0f0f0;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            width: 200px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .feature1 {
+            margin-right: 15px;
+        }
+
+        #startButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            text-align: center;
+        }
+
+        /* 로그인 및 회원가입 모달 스타일 */
         .modal {
-            display: none; /* 기본적으로 숨김 */
+            display: none;
             position: fixed;
             z-index: 1;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4); /* 반투명 배경 */
+            background-color: rgba(0, 0, 0, 0.4);
         }
+
         .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto; /* 중앙 배치 */
+            background-color: white;
             padding: 20px;
-            border: 1px solid #888;
-            width: 80%; /* 기본 너비 */
-            max-width: 400px; /* 최대 너비 */
+            margin: 15% auto;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 <div th:replace="navbar.html"></div> <!-- 네비게이션 바 포함 -->
 
+<div class="container">
+    <h1>AI 발표분석 서비스입니다!</h1>
+    <p>서비스 소개 및 간단한 설명</p>
 
-<h1>AI 발표분석 서비스입니다!</h1>
-<p>지금 당장 발표를 해보세요</p>
-<div style="text-align: center; height: 100vh;">
-    <button id="startButton" style="padding: 5px 10px; font-size: 14px; width: 100px;">시작하기</button>
+    <div style="text-align: center;">
+        <button id="startButton">시작하기</button>
+    </div>
+
+    <h2>왜 이용해야 하는지 설명</h2>
+    <div>
+        <div class="feature1">발표능력을 AI를 통해 분석해보세요!</div>
+        <div class="feature1">객관적인 나의 발표실력을 알 수 있어요!</div>
+        <div class="feature1">사용방법이 편리해요</div>
+    </div>
+
+    <h2>아래 사용법에 대한 설명</h2>
+    <div class="feature2">사용법</div>
+
+    <h2>사용법 예시</h2>
+    <div>
+        <div class="feature3">사용법 예시</div>
+        <div class="feature3">접수 예시</div>
+    </div>
 </div>
 
+<div class="footer">
+    <p>footer</p>
+</div>
 
 <!-- 로그인 모달 -->
 <div id="loginModal" class="modal">
@@ -58,7 +146,7 @@
     <div class="modal-content">
         <span class="close" id="closeSignup">&times;</span>
         <h2>회원가입</h2>
-        <form id="signupForm"> <!-- ID 변경 -->
+        <form id="signupForm">
             <input type="text" id="nickname" name="nickname" placeholder="닉네임" required>
             <input type="text" id="username" name="username" placeholder="아이디" required>
             <input type="password" id="password" name="password" placeholder="비밀번호" required>
@@ -66,7 +154,6 @@
         </form>
     </div>
 </div>
-
 
 <!-- JavaScript 코드 추가 -->
 <script>
@@ -86,7 +173,6 @@
             }
         });
 
-
     // "시작하기" 버튼 클릭 시 페이지 이동 처리
     document.getElementById("startButton").onclick = function() {
         if (isLoggedIn) {
@@ -103,7 +189,7 @@
         document.getElementById("signupModal").style.display = "block"; // 회원가입 모달 열기
     }
 
-  // 회원가입 처리
+    // 회원가입 처리
     document.getElementById("signupForm").onsubmit = function (event) {
         event.preventDefault();
         const data = {
@@ -166,4 +252,3 @@
 
 </body>
 </html>
-
