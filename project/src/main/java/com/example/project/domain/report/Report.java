@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Getter
@@ -15,7 +17,7 @@ import lombok.Setter;
 public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long reportId;
+    private Long report_id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id", nullable = false)
@@ -29,6 +31,9 @@ public class Report {
 
     @Column(nullable = false, columnDefinition = "TINYINT(1)")
     private Integer processing_state;
+
+    @Column(nullable = true)
+    private LocalDateTime date_processing;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

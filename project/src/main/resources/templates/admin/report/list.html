@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>신고내역 페이지</title>
+</head>
+<body>
+<h1>report list</h1>
+<table>
+  <thead>
+  <tr>
+    <th>신고물</th>
+    <th>신고자</th>
+    <th>신고사유</th>
+    <th>처리상태</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="report : ${reports}">
+    <td><a th:href="@{/noticeboard/{id}(id=${report.reported_id})}" th:text="${report.reported_id}"></a></td>
+    <td th:text="${report.reporter_name}"></td>
+    <td th:text="${report.report_details}"></td>
+    <td th:text="${report.processing_state}"></td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>
