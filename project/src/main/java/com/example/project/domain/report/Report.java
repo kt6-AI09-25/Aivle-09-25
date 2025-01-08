@@ -38,4 +38,8 @@ public class Report {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReportDetails report_details;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private ReportProcessTypes report_process_type;
 }
