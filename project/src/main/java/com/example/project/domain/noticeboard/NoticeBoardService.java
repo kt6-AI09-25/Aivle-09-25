@@ -90,7 +90,9 @@ public class NoticeBoardService {
 
     private void checkPermission(String writerUsername) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!Objects.equals(currentUsername, writerUsername)) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserRole = auth.getAuthorities().iterator().next().getAuthority();
+        if ((!Objects.equals(currentUsername, writerUsername))&&(!Objects.equals(currentUserRole, "ROLE_ADMIN"))) {
             throw new RuntimeException("권한이 없습니다.");
         }
     }
