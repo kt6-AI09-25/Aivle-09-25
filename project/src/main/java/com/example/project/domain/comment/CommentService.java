@@ -5,6 +5,7 @@ import com.example.project.domain.noticeboard.NoticeBoardRepository;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,7 +88,9 @@ public class CommentService {
 
     private void checkPermission(String commenterUsername) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!Objects.equals(currentUsername, commenterUsername)) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserRole = auth.getAuthorities().iterator().next().getAuthority();
+        if ((!Objects.equals(currentUsername, commenterUsername))&&(!Objects.equals(currentUserRole, "ROLE_ADMIN"))) {
             throw new RuntimeException("권한이 없습니다.");
         }
     }
