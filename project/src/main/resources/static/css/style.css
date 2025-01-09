@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
+    margin: -20;
 }
 
 h1 {
@@ -10,18 +10,18 @@ h1 {
 
 .container {
     max-width: 800px; /* 최대 너비 설정 */
-    margin: 0 auto; /* 중앙 정렬 */
+    margin: 40; /* 중앙 정렬 */
     padding: 20px; /* 내부 여백 */
     text-align: center; /* 텍스트 중앙 정렬 */
 }
 
 nav {
     background-color: white; /* 배경 색상 흰색 */
-    padding: 10px;
+    padding: 0px;
     display: flex;
     align-items: center; /* 세로 정렬 */
-    border: 1px solid #d3d3d3; /* 연한 회색 테두리 */
-    border-radius: 10px; /* 둥근 모서리 */
+    border-radius: 0px; /* 둥근 모서리 */
+    min-height: 60px; /* 최소 높이 설정 */
 }
 
 /* 로고 왼쪽 정렬 */
@@ -44,7 +44,7 @@ nav ul {
 }
 
 nav ul li {
-    margin-right: 20px; /* 버튼 간격 */
+    margin-right: 10px; /* 버튼 간격 */
 }
 
 nav ul li:last-child {
@@ -55,6 +55,7 @@ nav ul li a {
     color: #777; /* 기본 글자색 */
     text-decoration: none; /* 밑줄 없애기 */
     padding: 14px 20px;
+    min-width: 100px; /* 최소 너비 설정 */
 }
 
 /* 버튼 중앙 정렬 */
@@ -80,32 +81,32 @@ button {
 .feature1, .feature2, .feature3 {
     display: inline-block; /* 인라인 블록으로 설정 */
     background-color: #f0f0f0;
-    padding: 10px; /* 패딩 줄이기 */
-    margin: 5px; /* 마진 줄이기 */
+    padding: 20px; /* 패딩 줄이기 */
+    margin: 10px; /* 마진 줄이기 */
     border-radius: 8px;
     box-sizing: border-box; /* 박스 사이즈 계산 방식 설정 */
 }
 
 /* feature1 크기 조정 */
 .feature1 {
-    width: calc(30% - 10px); /* 화면 비율에 맞게 너비 조정 */
-    height: 150px; /* 박스 높이 줄이기 */
+    padding 20px;
+    width: 350px; /* 화면 비율에 맞게 너비 조정 */
+    height: 300px; /* 박스 높이 줄이기 */
 }
 
 /* feature2 크기 조정 */
 .feature2 {
-    width: calc(100% - 10px); /* 화면 비율에 맞게 너비 조정 */
-    height: 150px; /* 박스 높이 줄이기 */
+    padding 20px;
+    width: 1090px; /* 화면 비율에 맞게 너비 조정 */
+    height: 100px; /* 박스 높이 줄이기 */
 }
 
 /* feature3 크기 조정 */
 .feature3 {
-    width: calc(45% - 10px); /* 화면 비율에 맞게 너비 조정 */
-    height: 200px; /* 박스 높이 줄이기 */
+    padding 20px;
+    width: 300px; /* 화면 비율에 맞게 너비 조정 */
+    height: 300px; /* 박스 높이 줄이기 */
 }
-
-/* 제목과 시작하기 버튼 간격 줄이기 */
-
 
 /* 모달 스타일 */
 .modal {
@@ -131,7 +132,7 @@ button {
     display: flex; /* Flexbox 사용 */
     flex-direction: column; /* 세로 정렬 */
     position: absolute; /* 절대 위치 */
-    top: 50%; /* 수직 중앙 */
+    top: 20%; /* 수직 중앙 */
     left: 50%; /* 수평 중앙 */
     transform: translate(-50%, -50%); /* 중앙 정렬 */
 }
@@ -166,4 +167,26 @@ input[type="text"], input[type="password"] {
     background-color: white;
     text-align: center;
     font-size: 18px; /* 글자 크기 조정 */
+}
+
+/* 로그인 및 회원가입 버튼 스타일 */
+.auth-buttons {
+    margin-left: auto; /* 오른쪽으로 밀어내기 */
+    display: flex; /* 플렉스 박스 사용 */
+    align-items: center; /* 세로 정렬 */
+}
+
+.auth-buttons a {
+    display: inline-block; /* 인라인 블록으로 설정 */
+    padding: 10px 20px; /* 패딩 */
+    margin-left: 10px; /* 간격 */
+    background-color: #007bff; /* 버튼 배경색 */
+    color: white; /* 기본 글자색 */
+    border-radius: 25px; /* 동그란 모서리 */
+    text-decoration: none; /* 밑줄 없애기 */
+    transition: background-color 0.3s; /* 배경색 전환 효과 */
+}
+
+.auth-buttons a:hover {
+    background-color: #0056b3; /* 호버 시 배경색 변경 */
 }
