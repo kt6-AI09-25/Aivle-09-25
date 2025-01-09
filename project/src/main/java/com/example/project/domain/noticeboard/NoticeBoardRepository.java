@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NoticeBoardRepository extends JpaRepository<NoticeBoard, Long> {
+    NoticeBoard findByPostId(Long postId);
 }

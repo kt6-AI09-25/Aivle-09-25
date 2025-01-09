@@ -46,21 +46,28 @@ public class ReportController {
         return "redirect:/admin/report";
     }
 
-    @GetMapping("/comment/{report_type}/{reported_id}")
+    @GetMapping("/{report_type}/{reported_id}")
     public String commentDetail(@PathVariable Integer report_type, @PathVariable Long reported_id, Model model) {
-        if (report_type == 1){
-            Long a = 22L;
-
-
-            // 게시글 데이터
+        if (report_type == 1) {
             NoticeBoardDTO.Response post = noticeBoardService.getPostById(reported_id);
             model.addAttribute("post", post);
 
-            // 댓글 데이터
             List<CommentDTO.Response> comments = commentService.getCommentsByPostId(reported_id);
             model.addAttribute("comments", comments);
 
-            model.addAttribute("selectedCommentId", a);
+            return "admin/report/post";
+        } else if (report_type == 2){
+            Long postId = commentService.getPostIdByCommentId(reported_id);
+
+            // 게시글 데이터
+            NoticeBoardDTO.Response post = noticeBoardService.getPostById(postId);
+            model.addAttribute("post", post);
+
+            // 댓글 데이터
+            List<CommentDTO.Response> comments = commentService.getCommentsByPostId(postId);
+            model.addAttribute("comments", comments);
+
+            model.addAttribute("selectedCommentId", reported_id);
 
             return "admin/report/comment";
         } else {
