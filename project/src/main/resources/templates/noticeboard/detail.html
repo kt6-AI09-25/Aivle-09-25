@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notice Detail</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 <!-- 게시글 정보 -->
@@ -42,12 +48,19 @@
     </thead>
     <tbody>
     <tr th:each="comment : ${comments}">
-        <td th:text="${comment.comment}"></td>
+        <td>
+            <span th:text="${comment.comment}" class="comment-text"></span>
+            <form class="edit-comment-form hidden"
+                  th:action="@{/noticeboard/{postId}/comments/{commentId}/edit(postId=${post.postId}, commentId=${comment.commentId})}"
+                  method="post">
+                <textarea name="comment" th:text="${comment.comment}" required></textarea>
+                <button type="submit">Save</button>
+                <button type="button" class="cancel-edit-btn">Cancel</button>
+            </form>
+        </td>
         <td th:text="${comment.commenterName}"></td>
         <td>
-            <!-- 댓글 수정 -->
-            <a th:href="@{/noticeboard/{postId}/comments/{commentId}/edit(postId=${post.postId}, commentId=${comment.commentId})}">Edit</a>
-            <!-- 댓글 삭제 -->
+            <button type="button" class="edit-comment-btn">Edit</button>
             <form th:action="@{/noticeboard/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" method="post" style="display:inline;">
                 <button type="submit">Delete</button>
             </form>
@@ -55,5 +68,32 @@
     </tr>
     </tbody>
 </table>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 모든 Edit 버튼에 이벤트 리스너 추가
+        document.querySelectorAll('.edit-comment-btn').forEach((editButton) => {
+            editButton.addEventListener('click', () => {
+                const row = editButton.closest('tr');
+                const commentText = row.querySelector('.comment-text');
+                const editForm = row.querySelector('.edit-comment-form');
+
+                // 기존 댓글 숨기고 수정 폼 보여줌
+                commentText.style.display = 'none';
+                editForm.classList.remove('hidden');
+                editForm.style.display = 'block';
+
+                // Cancel 버튼 동작 추가
+                const cancelBtn = editForm.querySelector('.cancel-edit-btn');
+                cancelBtn.addEventListener('click', () => {
+                    // 수정 폼 숨기고 기존 댓글 표시
+                    editForm.style.display = 'none';
+                    editForm.classList.add('hidden');
+                    commentText.style.display = 'inline';
+                });
+            });
+        });
+    });
+</script>
 </body>
 </html>
