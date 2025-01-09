@@ -21,6 +21,7 @@
     <th>신고자</th>
     <th>신고사유</th>
     <th>처리상태</th>
+    <th>처리 일자</th> <!-- 처리 일자 추가 -->
     <th>Action</th>
   </tr>
   </thead>
@@ -31,15 +32,14 @@
     <td th:text="${report.reporter_name}"></td>
     <td th:text="${report.report_details}"></td>
     <td th:text="${report.processing_state == 0 ? '처리 안됨' : '처리 완료'}"></td>
+    <td th:text="${report.date_processing != null ? #temporals.format(report.date_processing, 'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
     <td>
-      <!-- Process Type Dropdown -->
       <form th:action="@{/admin/report/{id}/update(id=${report.report_id})}" method="post">
         <select name="reportProcessType">
           <option th:each="type : ${T(com.example.project.domain.report.ReportProcessTypes).values()}"
                   th:value="${type}" th:text="${type}"
                   th:selected="${type} == ${report.report_process_type}"></option>
         </select>
-        <!-- Confirm Button -->
         <button type="submit">확인</button>
       </form>
     </td>
