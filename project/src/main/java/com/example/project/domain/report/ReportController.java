@@ -71,7 +71,7 @@ public class ReportController {
 
             return "admin/report/comment";
         } else {
-            return "admin/list";
+            return "admin/report/list";
         }
     }
 }

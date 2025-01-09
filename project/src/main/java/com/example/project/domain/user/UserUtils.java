@@ -22,4 +22,20 @@ public class UserUtils {
         }
         return null; // 비로그인 상태
     }
+
+    public static String getCurrentUsername() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getPrincipal() instanceof CustomUserDetails) {
+            return ((CustomUserDetails) auth.getPrincipal()).getUsername();
+        }
+        return null; // 비로그인
+    }
+
+    public static String getCurrentUserRole() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getPrincipal() instanceof CustomUserDetails) {
+            return ((CustomUserDetails) auth.getPrincipal()).getAuthorities().toString();
+        }
+        return null; // 비로그인 상태
+    }
 }
