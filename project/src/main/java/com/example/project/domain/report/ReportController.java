@@ -1,16 +1,24 @@
 package com.example.project.domain.report;
 
 
+import com.example.project.domain.comment.CommentDTO;
+import com.example.project.domain.comment.CommentService;
+import com.example.project.domain.noticeboard.NoticeBoardDTO;
+import com.example.project.domain.noticeboard.NoticeBoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin/report")
 public class ReportController {
     private final ReportService reportService;
+    private final NoticeBoardService noticeBoardService;
+    private final CommentService commentService;
 
     @GetMapping
     public String list(Model model) {
@@ -24,6 +32,7 @@ public class ReportController {
         return "admin/report/createform";
     }
 
+
     @PostMapping
     public String createReport(@ModelAttribute ReportDto.Request request) {
         reportService.createReport(request);
@@ -35,5 +44,27 @@ public class ReportController {
                                @RequestParam ReportProcessTypes reportProcessType) {
         reportService.updateReportProcessTypeAndState(id, reportProcessType);
         return "redirect:/admin/report";
+    }
+
+    @GetMapping("/comment/{report_type}/{reported_id}")
+    public String commentDetail(@PathVariable Integer report_type, @PathVariable Long reported_id, Model model) {
+        if (report_type == 1){
+            Long a = 22L;
+
+
+            // 게시글 데이터
+            NoticeBoardDTO.Response post = noticeBoardService.getPostById(reported_id);
+            model.addAttribute("post", post);
+
+            // 댓글 데이터
+            List<CommentDTO.Response> comments = commentService.getCommentsByPostId(reported_id);
+            model.addAttribute("comments", comments);
+
+            model.addAttribute("selectedCommentId", a);
+
+            return "admin/report/comment";
+        } else {
+            return "admin/list";
+        }
     }
 }
