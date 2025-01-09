@@ -28,6 +28,9 @@ public class NoticeBoardController {
     // 게시글 작성 폼
     @GetMapping("/new")
     public String createForm(Model model) {
+        //=============================2025-01-09 15:55 박청하=====================================
+        noticeBoardService.checkBan();
+        //=============================2025-01-09 15:55 박청하=====================================
         model.addAttribute("post", new NoticeBoardDTO.Request());
         return "noticeboard/createform";
     }
@@ -56,6 +59,9 @@ public class NoticeBoardController {
     // 게시글 수정
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
+        //=============================2025-01-09 15:55 박청하=====================================
+        noticeBoardService.checkBan();
+        //=============================2025-01-09 15:55 박청하=====================================
         NoticeBoardDTO.Response post = noticeBoardService.getEditablePost(id);
         model.addAttribute("post", post);
         return "noticeboard/edit";
@@ -70,6 +76,9 @@ public class NoticeBoardController {
     // 게시글 삭제
     @PostMapping("/{id}/delete")
     public String deletePost(@PathVariable Long id) {
+        //=============================2025-01-09 15:55 박청하=====================================
+        noticeBoardService.checkBan();
+        //=============================2025-01-09 15:55 박청하=====================================
         noticeBoardService.deletePost(id);
         return "redirect:/noticeboard";
     }
@@ -77,6 +86,9 @@ public class NoticeBoardController {
     // 댓글 작성
     @PostMapping("/{id}/comments")
     public String addComment(@PathVariable Long id, @ModelAttribute CommentDTO.Request request) {
+        //=============================2025-01-09 15:55 박청하=====================================
+        noticeBoardService.checkBan();
+        //=============================2025-01-09 15:55 박청하=====================================
         request.setPostId(id);
         commentService.addComment(request);
         return "redirect:/noticeboard/" + id;
@@ -85,6 +97,9 @@ public class NoticeBoardController {
     // 댓글 수정
     @PostMapping("/{id}/comments/{commentId}/edit")
     public String updateComment(@PathVariable Long id, @PathVariable Long commentId, @ModelAttribute CommentDTO.Request request) {
+        //=============================2025-01-09 15:55 박청하=====================================
+        noticeBoardService.checkBan();
+        //=============================2025-01-09 15:55 박청하=====================================
         request.setPostId(id);
         commentService.updateComment(commentId, request);
         return "redirect:/noticeboard/" + id;
@@ -93,6 +108,9 @@ public class NoticeBoardController {
     // 댓글 삭제
     @PostMapping("/{id}/comments/{commentId}/delete")
     public String deleteComment(@PathVariable Long id, @PathVariable Long commentId) {
+        //=============================2025-01-09 15:55 박청하=====================================
+        noticeBoardService.checkBan();
+        //=============================2025-01-09 15:55 박청하=====================================
         commentService.deleteComment(commentId);
         return "redirect:/noticeboard/" + id;
     }
