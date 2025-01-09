@@ -23,7 +23,7 @@
 <p><strong>Writer:</strong> <span th:text="${post.writerName}"></span></p>
 <p><strong>Views:</strong> <span th:text="${post.viewCount}"></span></p>
 <p><strong>Content:</strong></p>
-<p th:text="${post.content}"></p>
+<p class="highlight" th:text="${post.content}"></p>
 
 <!-- 게시글 수정 및 삭제 -->
 <a th:href="@{/noticeboard/{id}/edit(id=${post.postId})}">Edit</a>

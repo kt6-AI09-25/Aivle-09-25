@@ -30,6 +30,7 @@ public class ReportDto {
     @Builder
     public static class Request {
         private Long reported_id;
+        private Integer report_type;
         private ReportDetails report_details;
     }
 }

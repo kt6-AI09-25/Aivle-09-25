@@ -1,10 +1,14 @@
 package com.example.project.domain.report;
 
+import com.example.project.domain.comment.CommentService;
+import com.example.project.domain.noticeboard.NoticeBoard;
 import com.example.project.domain.noticeboard.NoticeBoardRepository;
+import com.example.project.domain.noticeboard.NoticeBoardService;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +23,9 @@ import java.util.stream.Collectors;
 public class ReportService {
 
     private final ReportRepository reportRepository;
-    private final NoticeBoardRepository noticeBoardRepository;
     private final UserRepository userRepository;
+    private final NoticeBoardService noticeBoardService;
+    private final CommentService commentService;
 
     public List<ReportDto.Response> getAllReports() {
         List<ReportDto.Response> reports = reportRepository.findAll()
@@ -42,7 +47,7 @@ public class ReportService {
         newReport.setReported_id(request.getReported_id());
         newReport.setReport_details(request.getReport_details());
         newReport.setReporter(reporter);
-        newReport.setReport_type(1);
+        newReport.setReport_type(request.getReport_type());
         newReport.setProcessing_state(0);
         newReport.setReport_process_type(ReportProcessTypes.처리대기);
 
@@ -50,10 +55,38 @@ public class ReportService {
         return convertToResponseDTO(savedReport);
     }
 
+    private void processReportedUser(User user, ReportProcessTypes processType) {
+        user.setState(0);
+
+        if (processType == ReportProcessTypes.삼일_작성정지) {
+            user.setBan_end_time(LocalDateTime.now().plusMinutes(3));
+        } else if (processType == ReportProcessTypes.일주일_작성정지) {
+            user.setBan_end_time(LocalDateTime.now().plusMinutes(7));
+        } else if (processType == ReportProcessTypes.계정삭제) {
+            user.setBan_end_time(LocalDateTime.now().plusMinutes(30));
+        } else {
+            throw new IllegalArgumentException("Unknown ReportProcessType");
+        }
+
+        userRepository.save(user);
+    }
+
     @Transactional
     public void updateReportProcessTypeAndState(Long reportId, ReportProcessTypes processType) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        User reportedUser;
+
+        if (report.getReport_type() == 1) {
+            reportedUser = noticeBoardService.getWriterByPostId(report.getReported_id());
+        } else if (report.getReport_type() == 2) {
+            reportedUser = commentService.getWriterByCommentId(report.getReported_id());
+        } else {
+            throw new IllegalArgumentException("Unknown report type: " + report.getReport_type());
+        }
+
+        processReportedUser(reportedUser, processType);
 
         // Update fields
         report.setDate_processing(LocalDateTime.now());
@@ -69,6 +102,7 @@ public class ReportService {
                 .report_id(report.getReport_id())
                 .reporter_id(report.getReporter().getId())
                 .reporter_name(report.getReporter().getUsername())
+                .report_type(report.getReport_type())
                 .reported_id(report.getReported_id())
                 .processing_state(report.getProcessing_state())
                 .date_processing(report.getDate_processing())

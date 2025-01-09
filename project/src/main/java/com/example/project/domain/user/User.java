@@ -45,4 +45,7 @@ public class User {
 
     @Column(nullable = false, columnDefinition = "TINYINT(1)")
     private Integer letter_state;
+
+    @Column(nullable = true)
+    private LocalDateTime ban_end_time;
 }

@@ -1,5 +1,6 @@
 package com.example.project.domain.noticeboard;
 
+import com.example.project.domain.comment.Comment;
 import com.example.project.domain.noticeboard.NoticeBoardDTO;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
@@ -106,4 +107,18 @@ public class NoticeBoardService {
                 .isEdited(post.getIsEdited())
                 .build();
     }
+
+    //=============================2025-01-09 11:25 박청하=====================================
+    public User getWriterByPostId(Long postId) {
+        // commentId로 Comment 엔티티 조회
+        NoticeBoard post = noticeBoardRepository.findByPostId(postId);
+
+        if (post == null) {
+            throw new IllegalArgumentException("Post with ID " + postId + " not found");
+        }
+
+        // 관련된 postId 반환
+        return post.getWriter();
+    }
+    //=============================2025-01-09 11:25 박청하=====================================
 }

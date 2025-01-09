@@ -23,13 +23,13 @@ public class Report {
     @JoinColumn(name = "reporter_id", nullable = false)
     private User reporter;
 
-    @Column(nullable = false, columnDefinition = "TINYINT(1)")
+    @Column(nullable = false, columnDefinition = "TINYINT")
     private Integer report_type;
 
     @Column(nullable = false)
     private Long reported_id;
 
-    @Column(nullable = false, columnDefinition = "TINYINT(1)")
+    @Column(nullable = false, columnDefinition = "TINYINT")
     private Integer processing_state;
 
     @Column(nullable = true)

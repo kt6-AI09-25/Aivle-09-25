@@ -28,6 +28,21 @@ public class CommentService {
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
     }
+    //=============================2025-01-09 11:25 박청하=====================================
+    public Long getPostIdByCommentId(Long commentId) {
+        // commentId로 Comment 엔티티 조회
+        Comment comment = commentRepository.findByCommentId(commentId);
+
+        if (comment == null) {
+            throw new IllegalArgumentException("Comment with ID " + commentId + " not found");
+        }
+
+        // 관련된 postId 반환
+        NoticeBoard post = comment.getPost();
+        return post.getPostId();
+    }
+    //=============================2025-01-09 11:25 박청하=====================================
+
 
     @Transactional
     public CommentDTO.Response addComment(CommentDTO.Request request) {
@@ -88,4 +103,16 @@ public class CommentService {
                 .isEdited(comment.getIsEdited())
                 .build();
     }
+
+    //=============================2025-01-09 11:25 박청하=====================================
+    public User getWriterByCommentId(Long commentId) {
+        Comment comment = commentRepository.findByCommentId(commentId);
+
+        if (comment == null) {
+            throw new IllegalArgumentException("Comment with ID " + commentId + " not found");
+        }
+
+        return comment.getCommenter();
+    }
+    //=============================2025-01-09 11:25 박청하=====================================
 }
