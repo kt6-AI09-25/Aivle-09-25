@@ -100,9 +100,8 @@ public class CommentService {
     private void checkPermission(String commenterUsername) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         //=============================2025-01-09 11:25 박청하=====================================
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserRole = auth.getAuthorities().iterator().next().getAuthority();
-        if ((!Objects.equals(currentUsername, commenterUsername))&&(!Objects.equals(currentUserRole, "ROLE_ADMIN"))) {
+        String currentUserRole = UserUtils.getCurrentUserRole();
+        if ((!Objects.equals(currentUsername, commenterUsername))&&(!Objects.equals(currentUserRole, "[ADMIN]"))) {
             throw new RuntimeException("권한이 없습니다.");
         }
         //=============================2025-01-09 11:25 박청하=====================================

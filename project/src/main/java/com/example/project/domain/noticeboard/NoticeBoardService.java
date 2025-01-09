@@ -101,9 +101,8 @@ public class NoticeBoardService {
     private void checkPermission(String writerUsername) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         //=============================2025-01-09 11:25 박청하=====================================
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserRole = auth.getAuthorities().iterator().next().getAuthority();
-        if ((!Objects.equals(currentUsername, writerUsername))&&(!Objects.equals(currentUserRole, "ROLE_ADMIN"))) {
+        String currentUserRole = UserUtils.getCurrentUserRole();
+        if ((!Objects.equals(currentUsername, writerUsername))&&(!Objects.equals(currentUserRole, "[ADMIN]"))) {
             throw new RuntimeException("권한이 없습니다.");
 
         }
