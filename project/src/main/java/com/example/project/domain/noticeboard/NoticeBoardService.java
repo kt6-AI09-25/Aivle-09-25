@@ -4,6 +4,7 @@ import com.example.project.domain.comment.Comment;
 import com.example.project.domain.noticeboard.NoticeBoardDTO;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
+import com.example.project.domain.user.UserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,6 +49,9 @@ public class NoticeBoardService {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         User writer = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new RuntimeException("현재 사용자를 찾을 수 없습니다."));
+        //=============================2025-01-09 15:29 박청하=====================================
+        checkBan();
+        //=============================2025-01-09 15:29 박청하=====================================
 
 
         NoticeBoard post = new NoticeBoard();
@@ -65,6 +69,9 @@ public class NoticeBoardService {
         NoticeBoard post = noticeBoardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
         checkPermission(post.getWriter().getUsername());
+        //=============================2025-01-09 15:29 박청하=====================================
+        checkBan();
+        //=============================2025-01-09 15:29 박청하=====================================
 
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
@@ -80,6 +87,9 @@ public class NoticeBoardService {
         NoticeBoard post = noticeBoardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
         checkPermission(post.getWriter().getUsername());
+        //=============================2025-01-09 15:29 박청하=====================================
+        checkBan();
+        //=============================2025-01-09 15:29 박청하=====================================
         noticeBoardRepository.delete(post);
     }
 
@@ -90,12 +100,29 @@ public class NoticeBoardService {
 
     private void checkPermission(String writerUsername) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        //=============================2025-01-09 11:25 박청하=====================================
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUserRole = auth.getAuthorities().iterator().next().getAuthority();
         if ((!Objects.equals(currentUsername, writerUsername))&&(!Objects.equals(currentUserRole, "ROLE_ADMIN"))) {
             throw new RuntimeException("권한이 없습니다.");
+
+        }
+        //=============================2025-01-09 11:25 박청하=====================================
+    }
+
+    //=============================2025-01-09 15:29 박청하=====================================
+    public void checkBan() {
+        Integer state = UserUtils.getCurrentUserState();
+        LocalDateTime banEndTime = UserUtils.getCurrentUserBanEndTime();
+        if (state == 0) {
+            if (banEndTime != null) {
+                throw new RuntimeException(String.format("%tY-%<tm-%<td %<tH:%<tM 까지 작성, 수정이 금지된 사용자 입니다.", banEndTime));
+            } else {
+                throw new RuntimeException("작성, 수정이 금지된 사용자 입니다.");
+            }
         }
     }
+    //=============================2025-01-09 15:29 박청하=====================================
 
     private NoticeBoardDTO.Response convertToResponseDTO(NoticeBoard post) {
         return NoticeBoardDTO.Response.builder()

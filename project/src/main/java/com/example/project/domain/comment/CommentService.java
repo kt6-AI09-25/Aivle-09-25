@@ -4,6 +4,7 @@ import com.example.project.domain.noticeboard.NoticeBoard;
 import com.example.project.domain.noticeboard.NoticeBoardRepository;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
+import com.example.project.domain.user.UserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,6 +52,9 @@ public class CommentService {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         User commenter = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new RuntimeException("현재 사용자를 찾을 수 없습니다."));
+        //=============================2025-01-09 11:25 박청하=====================================
+        checkBan();
+        //=============================2025-01-09 11:25 박청하=====================================
 
         NoticeBoard post = noticeBoardRepository.findById(request.getPostId())
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
@@ -70,6 +74,9 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
         checkPermission(comment.getCommenter().getUsername());
+        //=============================2025-01-09 15:29 박청하=====================================
+        checkBan();
+        //=============================2025-01-09 15:29 박청하=====================================
 
         comment.setComment(request.getComment());
         comment.setIsEdited(true);
@@ -82,18 +89,38 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
         checkPermission(comment.getCommenter().getUsername());
+        //=============================2025-01-09 15:29 박청하=====================================
+        checkBan();
+        //=============================2025-01-09 15:29 박청하=====================================
+
 
         commentRepository.deleteById(commentId);
     }
 
     private void checkPermission(String commenterUsername) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        //=============================2025-01-09 11:25 박청하=====================================
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUserRole = auth.getAuthorities().iterator().next().getAuthority();
         if ((!Objects.equals(currentUsername, commenterUsername))&&(!Objects.equals(currentUserRole, "ROLE_ADMIN"))) {
             throw new RuntimeException("권한이 없습니다.");
         }
+        //=============================2025-01-09 11:25 박청하=====================================
     }
+
+    //=============================2025-01-09 15:29 박청하=====================================
+    private void checkBan() {
+        Integer state = UserUtils.getCurrentUserState();
+        LocalDateTime banEndTime = UserUtils.getCurrentUserBanEndTime();
+        if (state == 0) {
+            if (banEndTime != null) {
+                throw new RuntimeException(String.format("%tY-%<tm-%<td %<tH:%<tM 까지 작성, 수정이 금지된 사용자 입니다.", banEndTime));
+            } else {
+                throw new RuntimeException("작성, 수정이 금지된 사용자 입니다.");
+            }
+        }
+    }
+    //=============================2025-01-09 15:29 박청하=====================================
 
     private CommentDTO.Response convertToResponseDTO(Comment comment) {
         return CommentDTO.Response.builder()
