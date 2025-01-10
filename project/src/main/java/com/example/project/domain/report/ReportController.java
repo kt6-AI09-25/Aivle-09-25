@@ -3,6 +3,8 @@ package com.example.project.domain.report;
 
 import com.example.project.domain.comment.CommentDTO;
 import com.example.project.domain.comment.CommentService;
+import com.example.project.domain.letter.LetterDTO;
+import com.example.project.domain.letter.LetterService;
 import com.example.project.domain.noticeboard.NoticeBoardDTO;
 import com.example.project.domain.noticeboard.NoticeBoardService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class ReportController {
     private final ReportService reportService;
     private final NoticeBoardService noticeBoardService;
     private final CommentService commentService;
+    private final LetterService letterService;
 
     @GetMapping
     public String list(Model model) {
@@ -59,17 +62,21 @@ public class ReportController {
         } else if (report_type == 2){
             Long postId = commentService.getPostIdByCommentId(reported_id);
 
-            // 게시글 데이터
             NoticeBoardDTO.Response post = noticeBoardService.getPostById(postId);
             model.addAttribute("post", post);
 
-            // 댓글 데이터
             List<CommentDTO.Response> comments = commentService.getCommentsByPostId(postId);
             model.addAttribute("comments", comments);
 
             model.addAttribute("selectedCommentId", reported_id);
 
             return "admin/report/comment";
+        } else if (report_type == 3) {
+            LetterDTO.Response letter = letterService.getLetterById(reported_id);
+
+            model.addAttribute("letter", letter);
+
+            return "admin/report/letter";
         } else {
             return "admin/report/list";
         }
