@@ -3,6 +3,8 @@ package com.example.project.domain.noticeboard;
 import com.example.project.domain.comment.CommentDTO;
 import com.example.project.domain.comment.CommentService;
 import com.example.project.domain.noticeboard.NoticeBoardDTO.*;
+import com.example.project.domain.report.ReportDto;
+import com.example.project.domain.report.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,9 @@ public class NoticeBoardController {
 
     private final NoticeBoardService noticeBoardService;
     private final CommentService commentService;
+    //=============================2025-01-10 14:41 박청하=====================================
+    private final ReportService reportService;
+    //=============================2025-01-10 14:41 박청하=====================================
 
     // 게시글 목록
     @GetMapping
@@ -80,6 +85,19 @@ public class NoticeBoardController {
         return "redirect:/noticeboard";
     }
 
+    //=============================2025-01-10 14:37 박청하=====================================
+    // 게시글 신고
+    @PostMapping("/{id}/report")
+    public String reportPost(@PathVariable Long id, @ModelAttribute ReportDto.Request request) {
+
+        request.setReport_type(1);
+        request.setReported_id(id);
+        reportService.createReport(request);
+        return "redirect:/noticeboard/" + id;
+    }
+    //=============================2025-01-10 14:37 박청하=====================================
+
+
     // 댓글 작성
     @PostMapping("/{id}/comments")
     public String addComment(@PathVariable Long id, @ModelAttribute CommentDTO.Request request) {
@@ -108,4 +126,16 @@ public class NoticeBoardController {
         commentService.deleteComment(commentId);
         return "redirect:/noticeboard/" + id;
     }
+
+    //=============================2025-01-10 14:37 박청하=====================================
+    // 댓글 신고
+    @PostMapping("/{id}/comments/{commentId}/report")
+    public String reportComment(@PathVariable Long id, @PathVariable Long commentId, @ModelAttribute ReportDto.Request request) {
+
+        request.setReport_type(2);
+        request.setReported_id(commentId);
+        reportService.createReport(request);
+        return "redirect:/noticeboard/" + id;
+    }
+    //=============================2025-01-10 14:37 박청하=====================================
 }
