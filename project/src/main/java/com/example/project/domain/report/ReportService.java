@@ -1,6 +1,7 @@
 package com.example.project.domain.report;
 
 import com.example.project.domain.comment.CommentService;
+import com.example.project.domain.letter.LetterService;
 import com.example.project.domain.noticeboard.NoticeBoard;
 import com.example.project.domain.noticeboard.NoticeBoardRepository;
 import com.example.project.domain.noticeboard.NoticeBoardService;
@@ -26,6 +27,7 @@ public class ReportService {
     private final UserRepository userRepository;
     private final NoticeBoardService noticeBoardService;
     private final CommentService commentService;
+    private final LetterService letterService;
 
     public List<ReportDto.Response> getAllReports() {
         List<ReportDto.Response> reports = reportRepository.findAll()
@@ -56,7 +58,9 @@ public class ReportService {
             reportedUser = noticeBoardService.getWriterByPostId(request.getReported_id());
         } else if (request.getReport_type() == 2) {
             reportedUser = commentService.getWriterByCommentId(request.getReported_id());
-        } else {
+        } else if (request.getReport_type() == 3) {
+            reportedUser = letterService.getSenderByLetterId(request.getReported_id());
+        }else {
             throw new IllegalArgumentException("Unknown report type: " + request.getReport_type());
         }
         newReport.setReported_user(reportedUser);

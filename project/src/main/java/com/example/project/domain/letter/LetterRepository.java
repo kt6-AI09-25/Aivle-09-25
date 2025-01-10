@@ -12,5 +12,7 @@ public interface LetterRepository extends JpaRepository<Letter, Long> {
 
     List<Letter> findBySender_Id(Long senderId, Sort sort);
 
-
+    //=============================2025-01-10 13:35 박청하=====================================
+    Letter findByLetterId(Long letterId);
+    //=============================2025-01-10 13:35 박청하=====================================
 }

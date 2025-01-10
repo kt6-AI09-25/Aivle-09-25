@@ -1,5 +1,6 @@
 package com.example.project.domain.letter;
 
+import com.example.project.domain.noticeboard.NoticeBoard;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -64,4 +65,25 @@ public class LetterService {
                 .state(letter.getState())
                 .build();
     }
+
+
+    //=============================2025-01-10 13:35 박청하=====================================
+    public User getSenderByLetterId(Long letterId) {
+        // letterId로 Letter 엔티티 조회
+        Letter letter = letterRepository.findByLetterId(letterId);
+
+        if (letter == null) {
+            throw new IllegalArgumentException("Letter with ID " + letterId + " not found");
+        }
+
+        // 송신자 반환
+        return letter.getSender();
+    }
+
+    public LetterDTO.Response getLetterById(Long letterId) {
+        Letter letter = letterRepository.findById(letterId)
+                .orElseThrow(() -> new RuntimeException("해당 쪽지를 찾을 수 없습니다: " + letterId));
+        return convertToResponse(letter);
+    }
+    //=============================2025-01-10 13:35 박청하=====================================
 }
