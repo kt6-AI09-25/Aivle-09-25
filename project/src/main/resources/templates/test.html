@@ -10,6 +10,7 @@
         display: block;
         margin: 20px auto;
         border: 2px solid black;
+        position: relative;
     }
     .controls {
         text-align: center;
@@ -30,11 +31,31 @@
         padding-top: 20%;
         font-size: 24px;
     }
+    #audioMeter {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 90%;
+        height: 50px;
+        margin: 20px auto;
+        position: relative;
+    }
+    .bar {
+        width: 3px;
+        margin: 0 1px;
+        height: 20px;
+        background-color: #ff3b3b;
+        display: inline-block;
+        transition: height 0.1s;
+    }
   </style>
 </head>
 <body>
 <!-- 비디오 화면 -->
 <video id="myVideo" width="900" height="500" autoplay playsinline></video>
+
+<!-- 마이크 게이지 -->
+<div id="audioMeter"></div>
 
 <!-- 버튼 컨트롤 -->
 <div class="controls">
@@ -48,21 +69,82 @@
 
 <script>
   let stream;
+  let audioContext;
+  let analyser;
+  let microphone;
+  let audioMeter;
+  const bars = [];
 
-  // 웹캠 스트림 가져오기
+  // 웹캠 및 마이크 스트림 가져오기
   async function startCamera() {
       try {
+          console.log("카메라 접근을 시도합니다.");
           const video = document.getElementById('myVideo');
           stream = await navigator.mediaDevices.getUserMedia({
               video: { width: 900, height: 500 },
-              audio: false
+              audio: true
           });
+          if (stream) {
+              console.log("스트림이 연결되었습니다:", stream);
+          } else {
+              console.error("스트림이 null입니다.");
+          }
           video.srcObject = stream;
-          console.log("카메라가 시작되었습니다.");
+
+          // 비디오 메타데이터 로드 확인
+          video.onloadedmetadata = () => {
+              console.log("비디오 메타데이터가 로드되었습니다.");
+              video.play();
+          };
+
+          // 오디오 분석 초기화
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioContext.createAnalyser();
+          microphone = audioContext.createMediaStreamSource(stream);
+          microphone.connect(analyser);
+
+          // 오디오 레벨 모니터링 시작
+          createAudioBars();
+          monitorAudioLevel();
+
       } catch (error) {
           console.error("카메라 접근 실패:", error);
           alert("카메라에 접근할 수 없습니다: " + error.message);
+          if (error.name === 'NotAllowedError') {
+              alert("카메라 권한을 확인하세요.");
+          } else if (error.name === 'NotFoundError') {
+              alert("카메라 장치를 찾을 수 없습니다.");
+          } else if (error.name === 'OverconstrainedError') {
+              alert("요청한 해상도가 지원되지 않는 카메라입니다.");
+          }
       }
+  }
+
+  // 오디오 레벨 바 생성
+  function createAudioBars() {
+      const audioMeter = document.getElementById('audioMeter');
+      for (let i = 0; i < 40; i++) {
+          const bar = document.createElement('div');
+          bar.classList.add('bar');
+          bars.push(bar);
+          audioMeter.appendChild(bar);
+      }
+  }
+
+  // 오디오 레벨 모니터링
+  function monitorAudioLevel() {
+      const dataArray = new Uint8Array(analyser.fftSize);
+
+      function updateAudioLevel() {
+          analyser.getByteFrequencyData(dataArray);
+          for (let i = 0; i < bars.length; i++) {
+              const barHeight = dataArray[i] / 256 * 50; // 값에 따라 바 크기 조정
+              bars[i].style.height = `${barHeight}px`;
+          }
+          requestAnimationFrame(updateAudioLevel);
+      }
+
+      updateAudioLevel();
   }
 
   // 스트림 중지
@@ -74,6 +156,10 @@
           const video = document.getElementById('myVideo');
           video.srcObject = null;
           console.log("카메라가 중지되었습니다.");
+      }
+      if (audioContext) {
+          audioContext.close();
+          console.log("오디오 컨텍스트가 종료되었습니다.");
       }
   }
 
