@@ -35,7 +35,6 @@ public class ReportController {
         return "admin/report/createform";
     }
 
-
     @PostMapping
     public String createReport(@ModelAttribute ReportDto.Request request) {
         reportService.createReport(request);
@@ -47,6 +46,17 @@ public class ReportController {
                                @RequestParam ReportProcessTypes reportProcessType) {
         reportService.updateReportProcessTypeAndState(id, reportProcessType);
         return "redirect:/admin/report";
+    }
+
+    @GetMapping("/test/{id}")
+    public String reportTest(@PathVariable Long id, Model model) {
+        NoticeBoardDTO.Response post = noticeBoardService.getPostById(id);
+        model.addAttribute("post", post);
+
+        List<CommentDTO.Response> comments = commentService.getCommentsByPostId(id);
+        model.addAttribute("comments", comments);
+
+        return "admin/report/test";
     }
 
     @GetMapping("/{report_type}/{reported_id}")

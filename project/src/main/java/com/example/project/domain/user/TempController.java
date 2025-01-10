@@ -8,13 +8,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-public class AdminController {
+public class TempController {
 
-    private final UserRepository userRepository;
     private final SessionRegistry sessionRegistry;
 
-    public AdminController(UserRepository userRepository, SessionRegistry sessionRegistry) {
-        this.userRepository = userRepository;
+    public TempController(UserRepository userRepository, SessionRegistry sessionRegistry) {
         this.sessionRegistry = sessionRegistry;
     }
     @GetMapping("/active-users")
