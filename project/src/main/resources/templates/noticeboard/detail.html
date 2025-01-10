@@ -5,119 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notice Detail</title>
     <style>
-        /* ===== 기본 스타일 ===== */
-body {
-    font-family: Arial, sans-serif; /* 기본 글꼴 설정 */
-    margin: 0; /* 브라우저 기본 여백 제거 */
-    padding: 0; /* 브라우저 기본 패딩 제거 */
-    background-color: #f5f5f5; /* 페이지 배경색을 연한 회색으로 설정 */
-}
+        /* 기본 스타일 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
 
-.container {
-    max-width: 900px; /* 컨테이너의 최대 너비를 900px로 설정 */
-    margin: 20px auto; /* 위아래 20px, 좌우 중앙 정렬 */
-    padding: 20px; /* 내부 여백 20px */
-    background-color: #fff; /* 컨테이너 배경색을 흰색으로 설정 */
-    border: 1px solid #ddd; /* 얇은 회색 테두리 추가 */
-    border-radius: 5px; /* 둥근 모서리 효과 */
-}
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
 
-/* ===== 게시글 스타일 ===== */
-.post-title {
-    font-size: 24px; /* 제목 글꼴 크기를 24px로 설정 */
-    font-weight: bold; /* 글꼴 굵게 설정 */
-    border-bottom: 1px solid #ddd; /* 제목 아래 얇은 회색 선 추가 */
-    padding-bottom: 10px; /* 제목 아래쪽 여백 10px */
-    margin-bottom: 15px; /* 제목과 다음 요소 사이 간격 15px */
-}
+        /* 게시글 스타일 */
+        .post-title {
+            font-size: 24px;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
 
-.post-meta {
-    font-size: 12px; /* 작성자와 조회수의 글꼴 크기를 12px로 설정 */
-    color: #777; /* 텍스트 색상을 어두운 회색으로 설정 */
-    margin-bottom: 15px; /* 아래 요소와 간격을 15px로 설정 */
-}
+        .post-meta {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 15px;
+        }
 
-.post-content {
-    font-size: 16px; /* 본문 내용 글꼴 크기를 16px로 설정 */
-    line-height: 1.6; /* 줄 간격을 1.6배로 설정 */
-    color: #333; /* 텍스트 색상을 어두운 회색으로 설정 */
-}
+        .post-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
 
-.post-actions {
-    margin-top: 20px; /* 상단 여백 20px 추가 */
-}
+        .post-actions {
+            margin-top: 20px;
+        }
 
-.post-actions a, .post-actions button {
-    margin-right: 10px; /* 오른쪽 여백 10px 추가 */
-    font-size: 14px; /* 글꼴 크기를 14px로 설정 */
-    color: #007bff; /* 링크와 버튼 색상을 파란색으로 설정 */
-    text-decoration: none; /* 텍스트 밑줄 제거 */
-    background: none; /* 버튼의 배경 제거 */
-    border: none; /* 버튼의 기본 테두리 제거 */
-    cursor: pointer; /* 마우스 커서를 클릭 모양으로 변경 */
-}
+        .post-actions a, .post-actions button {
+            margin-right: 10px;
+            font-size: 14px;
+            color: #007bff;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
 
-.post-actions button:hover, .post-actions a:hover {
-    text-decoration: underline; /* 호버 시 밑줄 표시 */
-}
+        .post-actions button:hover, .post-actions a:hover {
+            text-decoration: underline;
+        }
 
-/* ===== 댓글 섹션 ===== */
-.comments-section {
-    margin-top: 30px; /* 상단 여백 30px 추가 */
-}
+        /* 댓글 섹션 */
+        .comments-section {
+            margin-top: 30px;
+        }
 
-.comments-section h2 {
-    font-size: 18px; /* 댓글 섹션 제목 글꼴 크기를 18px로 설정 */
-    margin-bottom: 10px; /* 제목과 다음 요소 간 간격 10px */
-}
+        .comments-section h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
 
-textarea {
-    width: 100%; /* 텍스트 영역 너비를 부모 요소에 맞춤 */
-    padding: 10px; /* 내부 여백 10px */
-    margin-bottom: 10px; /* 아래 요소와 간격 10px 추가 */
-    border: 1px solid #ddd; /* 얇은 회색 테두리 추가 */
-    border-radius: 5px; /* 둥근 모서리 효과 */
-    resize: none; /* 사용자가 크기 조정하지 못하도록 설정 */
-    font-size: 14px; /* 글꼴 크기를 14px로 설정 */
-}
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: none;
+            font-size: 14px;
+        }
 
-/* ===== 댓글 리스트 테이블 ===== */
-table {
-    width: 100%; /* 테이블 너비를 부모 요소에 맞춤 */
-    border-collapse: collapse; /* 테두리 중첩 제거 */
-    margin-top: 10px; /* 상단 여백 10px 추가 */
-}
+        /* 댓글 리스트 테이블 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
 
-table th, table td {
-    border: 1px solid #ddd; /* 셀에 얇은 회색 테두리 추가 */
-    padding: 8px; /* 셀 내부 여백 8px */
-    text-align: left; /* 텍스트를 왼쪽 정렬 */
-    font-size: 14px; /* 글꼴 크기를 14px로 설정 */
-}
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 14px;
+        }
 
-table th {
-    background-color: #f9f9f9; /* 헤더 셀 배경색을 연한 회색으로 설정 */
-    font-weight: bold; /* 헤더 셀 텍스트를 굵게 설정 */
-}
+        table th {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
 
-table tr:hover {
-    background-color: #f1f1f1; /* 행에 마우스를 올릴 때 연한 회색 배경 표시 */
-}
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
 
-/* ===== 댓글 액션 (수정/삭제 버튼) ===== */
-.comment-actions a, .comment-actions button {
-    font-size: 12px; /* 글꼴 크기를 12px로 설정 */
-    color: #007bff; /* 텍스트 색상을 파란색으로 설정 */
-    text-decoration: none; /* 텍스트 밑줄 제거 */
-    margin-right: 5px; /* 오른쪽 여백 5px 추가 */
-    background: none; /* 버튼 배경 제거 */
-    border: none; /* 버튼 기본 테두리 제거 */
-    cursor: pointer; /* 마우스 커서를 클릭 모양으로 변경 */
-}
+        /* 댓글 액션 */
+        .comment-actions button {
+            font-size: 12px;
+            color: #007bff;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
 
-.comment-actions a:hover, .comment-actions button:hover {
-    text-decoration: underline; /* 호버 시 밑줄 표시 */
-}
+        .comment-actions button:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -144,7 +147,6 @@ table tr:hover {
     <!-- 댓글 섹션 -->
     <div class="comments-section">
         <h2>Comments</h2>
-
         <!-- 댓글 작성 -->
         <form th:action="@{/noticeboard/{id}/comments(id=${post.postId})}" method="post">
             <textarea name="comment" placeholder="Write a comment..." required></textarea>
@@ -155,19 +157,26 @@ table tr:hover {
         <table>
             <thead>
             <tr>
-                <th>No.</th>
                 <th>Comment</th>
                 <th>Commenter</th>
                 <th>Actions</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="comment, stat : ${comments}">
-                <td th:text="${stat.index + 1}">1</td>
-                <td th:text="${comment.comment}">This is a comment.</td>
-                <td th:text="${comment.commenterName}">User Name</td>
-                <td class="comment-actions">
-                    <a th:href="@{/noticeboard/{postId}/comments/{commentId}/edit(postId=${post.postId}, commentId=${comment.commentId})}">Edit</a>
+            <tr th:each="comment : ${comments}">
+                <td>
+                    <span th:text="${comment.comment}" class="comment-text"></span>
+                    <form class="edit-comment-form hidden"
+                          th:action="@{/noticeboard/{postId}/comments/{commentId}/edit(postId=${post.postId}, commentId=${comment.commentId})}"
+                          method="post">
+                        <textarea name="comment" th:text="${comment.comment}" required></textarea>
+                        <button type="submit">Save</button>
+                        <button type="button" class="cancel-edit-btn">Cancel</button>
+                    </form>
+                </td>
+                <td th:text="${comment.commenterName}"></td>
+                <td>
+                    <button type="button" class="edit-comment-btn">Edit</button>
                     <form th:action="@{/noticeboard/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" method="post" style="display:inline;">
                         <button type="submit">Delete</button>
                     </form>
@@ -177,5 +186,28 @@ table tr:hover {
         </table>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.edit-comment-btn').forEach((editButton) => {
+            editButton.addEventListener('click', () => {
+                const row = editButton.closest('tr');
+                const commentText = row.querySelector('.comment-text');
+                const editForm = row.querySelector('.edit-comment-form');
+
+                commentText.style.display = 'none';
+                editForm.classList.remove('hidden');
+                editForm.style.display = 'block';
+
+                const cancelBtn = editForm.querySelector('.cancel-edit-btn');
+                cancelBtn.addEventListener('click', () => {
+                    editForm.style.display = 'none';
+                    editForm.classList.add('hidden');
+                    commentText.style.display = 'inline';
+                });
+            });
+        });
+    });
+</script>
 </body>
 </html>
