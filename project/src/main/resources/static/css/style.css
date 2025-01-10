@@ -98,7 +98,7 @@ button {
 .feature2 {
     padding 20px;
     width: 1090px; /* 화면 비율에 맞게 너비 조정 */
-    height: 100px; /* 박스 높이 줄이기 */
+    height: 300px; /* 박스 높이 줄이기 */
 }
 
 /* feature3 크기 조정 */

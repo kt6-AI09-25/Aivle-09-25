@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: -100;
+            margin: 0;
             padding: 0;
             box-sizing: border-box;
             display: flex;
@@ -17,9 +17,9 @@
         }
 
         .container {
-            max-width: 1200px; /* 네비게이션 바 너비에 맞춰 조정 */
+            max-width: 1200px;
             padding: 20px;
-            margin : auto;
+            margin: auto;
             text-align: center;
             flex: 1;
             overflow-y: auto;
@@ -35,22 +35,34 @@
             margin-bottom: 15px;
         }
 
-        /* 가로로 나열하기 위한 스타일 */
         .features {
-            display: flex; /* Flexbox 사용 */
-            justify-content: center; /* 중앙 정렬 */
-            flex-wrap: wrap; /* 줄 바꿈 허용 */
-            margin: 0; /* 좌우 여백 제거 */
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: nowrap;
+            gap: 10px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .feature {
-            background-color: #f0f0f0;
-            padding: 15px;
-            border-radius: 8px;
-            flex: 1; /* 동일한 너비를 갖도록 설정 */
-            min-width: 200px; /* 최소 너비 설정 */
-            text-align: center;
-            margin: 10px; /* 박스 간 간격 조정 */
+        .feature1 {
+            background-color: #f1f8fe;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            flex-shrink: 0;
+        }
+
+        .feature1 h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .feature1 p {
+            font-size: 1rem;
+            color: #333;
         }
 
         #startButton {
@@ -108,42 +120,112 @@
             max-width: 100%;
             height: auto;
         }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+        }
     </style>
 </head>
-<body style="background-color: lightblue;">
+<body>
 <div th:replace="navbar.html"></div>
-<div class="container">
-    <h1>AI 발표분석 서비스입니다!!!</h1>
-    <br>
-    <h1>당신의 발표능력을 향상시켜보세요</h1>
-    <div class="image-container">
-        <img src="image/present1.png" alt="발표 분석 이미지">
+<div class="header" style="background-color: #d2dfff; text-align: center; padding: 50px 20px; display: flex; align-items: center; justify-content: space-around;">
+    <div style="max-width: 600px;">
+        <h1 style="font-size: 2rem; color: #007bff;">AI 발표분석 서비스입니다!!!</h1>
+        <h2 style="font-size: 1.25rem; color: #333; margin-top: 10px;">당신의 발표능력을 향상시켜보세요</h2>
+        <button id="startButton" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; margin-top: 20px;">시작하기</button>
     </div>
-
-    <div style="text-align: center;">
-        <button id="startButton">시작하기</button>
+    <div class="image-container" style="margin: 0;">
+        <img src="images/present1.png" alt="발표 분석 이미지" style="max-width: 400px; width: 100%; height: auto;">
     </div>
+</div>
 
-    <h2>왜 이용해야 하는지 설명</h2>
+</div>
+
+<section style="text-align: center; padding: 50px 20px;">
+    <h2 style="font-size: 1.5rem; margin-bottom: 20px;">왜 이용해야 하는지 설명</h2>
     <div class="features">
-        <div class="feature1">발표능력을 AI를 통해 분석해보세요!</div>
-        <div class="feature1">객관적인 나의 발표실력을 알 수 있어요!</div>
-        <div class="feature1">사용방법이 편리해요</div>
+        <div class="feature1">
+            <h3>발표능력을 분석</h3>
+            <p>AI를 통해 객관적인 발표 분석 결과를 확인하세요.</p>
+        </div>
+        <div class="feature1">
+            <h3>객관적인 평가</h3>
+            <p>나의 발표 실력을 AI 기반으로 평가 받을 수 있어요.</p>
+        </div>
+        <div class="feature1">
+            <h3>편리한 사용</h3>
+            <p>간편하게 사용 가능한 인터페이스로 구성되었습니다.</p>
+        </div>
     </div>
+</section>
 
-    <h2>아래 사용법에 대한 설명</h2>
-    <div class="feature2">사용법</div>
+<section style="text-align: center; padding: 50px 20px;">
+    <h2 style="font-size: 1.5rem; margin-bottom: 20px;">아래 사용법에 대한 설명</h2>
+    <div class="feature2" style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: inline-block;">사용법</div>
+</section>
 
-    <h2>사용법 예시</h2>
-    <div>
-        <div class="feature3">사용법 예시</div>
-        <div class="feature3">접수 예시</div>
+<section style="text-align: center; padding: 50px 20px;">
+    <h2 style="font-size: 1.5rem; margin-bottom: 20px;">사용법 예시</h2>
+    <div style="display: flex; justify-content: space-around; align-items: center; gap: 20px; max-width: 1200px; margin: 0 auto;">
+        <div class="feature3" style="background-color: #f1f8fe; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); width: 45%; min-width: 300px;">사용법 예시</div>
+        <div class="feature3" style="background-color: #f1f8fe; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); width: 45%; min-width: 300px;">접수 예시</div>
     </div>
-</div>
+</section>
 
-<div class="footer">
-    <p>footer</p>
-</div>
+<footer style="background-color: #2c3e50; color: white; padding: 20px 0;">
+    <div style="max-width: 1250px; margin: 0 auto; padding: 0 20px;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+            <!-- About Section -->
+            <div style="flex: 1 1 300px; margin-bottom: 20px;">
+                <h4 style="font-size: 1.2rem; margin-bottom: 10px;">About Us</h4>
+                <p style="line-height: 1.5; font-size: 0.9rem;">
+                    ai발표서비스입니다
+                </p>
+            </div>
+
+            <!-- Useful Links -->
+            <div style="flex: 1 1 300px; margin-bottom: 20px;">
+                <h4 style="font-size: 1.2rem; margin-bottom: 10px;">Useful Links</h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li><a href="/about" style="text-decoration: none; color: #bdc3c7;">About Us</a></li>
+                    <li><a href="/services" style="text-decoration: none; color: #bdc3c7;">Our Services</a></li>
+                    <li><a href="/contact" style="text-decoration: none; color: #bdc3c7;">Contact Us</a></li>
+                    <li><a href="/privacy" style="text-decoration: none; color: #bdc3c7;">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <!-- Social Media Links -->
+            <div style="flex: 1 1 300px; margin-bottom: 20px;">
+                <h4 style="font-size: 1.2rem; margin-bottom: 10px;">Follow Us</h4>
+                <div style="display: flex; gap: 10px;">
+                    <a href="https://facebook.com" style="color: #3498db; font-size: 1.5rem;">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="https://twitter.com" style="color: #1da1f2; font-size: 1.5rem;">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://instagram.com" style="color: #e4405f; font-size: 1.5rem;">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://linkedin.com" style="color: #0077b5; font-size: 1.5rem;">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <hr style="border: none; border-top: 1px solid #7f8c8d; margin: 20px 0;">
+        <div style="text-align: center; font-size: 0.85rem; color: #bdc3c7;">
+            © aivle-09-25.
+        </div>
+    </div>
+</footer>
+
+<!-- Font Awesome for Social Media Icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
 
 <!-- 로그인 모달 -->
 <div id="loginModal" class="modal">
