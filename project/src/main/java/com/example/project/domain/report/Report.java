@@ -29,6 +29,10 @@ public class Report {
     @Column(nullable = false)
     private Long reported_id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reported_user", nullable = false)
+    private User reported_user;
+
     @Column(nullable = false, columnDefinition = "TINYINT")
     private Integer processing_state;
 

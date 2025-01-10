@@ -51,6 +51,17 @@ public class ReportService {
         newReport.setProcessing_state(0);
         newReport.setReport_process_type(ReportProcessTypes.처리대기);
 
+        User reportedUser;
+        if (request.getReport_type() == 1) {
+            reportedUser = noticeBoardService.getWriterByPostId(request.getReported_id());
+        } else if (request.getReport_type() == 2) {
+            reportedUser = commentService.getWriterByCommentId(request.getReported_id());
+        } else {
+            throw new IllegalArgumentException("Unknown report type: " + request.getReport_type());
+        }
+        newReport.setReported_user(reportedUser);
+
+
         Report savedReport = reportRepository.save(newReport);
         return convertToResponseDTO(savedReport);
     }
@@ -76,17 +87,8 @@ public class ReportService {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
 
-        User reportedUser;
 
-        if (report.getReport_type() == 1) {
-            reportedUser = noticeBoardService.getWriterByPostId(report.getReported_id());
-        } else if (report.getReport_type() == 2) {
-            reportedUser = commentService.getWriterByCommentId(report.getReported_id());
-        } else {
-            throw new IllegalArgumentException("Unknown report type: " + report.getReport_type());
-        }
-
-        processReportedUser(reportedUser, processType);
+        processReportedUser(report.getReported_user(), processType);
 
         // Update fields
         report.setDate_processing(LocalDateTime.now());
@@ -108,6 +110,7 @@ public class ReportService {
                 .date_processing(report.getDate_processing())
                 .report_details(report.getReport_details())
                 .report_process_type(report.getReport_process_type())
+                .reported_user(report.getReported_user())
                 .build();
     }
 }
