@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Objects;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -53,5 +54,18 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomUserDetails that = (CustomUserDetails) o;
+        return Objects.equals(this.getUsername(), that.getUsername());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getUsername());
     }
 }

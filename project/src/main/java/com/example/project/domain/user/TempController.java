@@ -25,4 +25,13 @@ public class TempController {
                 })
                 .collect(Collectors.toList());
     }
+
+
+    @GetMapping("/active-sessions")
+    public List<String> getActiveSessions() {
+        return sessionRegistry.getAllPrincipals().stream()
+                .flatMap(principal -> sessionRegistry.getAllSessions(principal, false).stream())
+                .map(session -> "Session ID: " + session.getSessionId() + ", Principal: " + session.getPrincipal())
+                .collect(Collectors.toList());
+    }
 }
