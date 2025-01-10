@@ -76,9 +76,6 @@ public class NoticeBoardController {
     // 게시글 삭제
     @PostMapping("/{id}/delete")
     public String deletePost(@PathVariable Long id) {
-        //=============================2025-01-09 15:55 박청하=====================================
-        noticeBoardService.checkBan();
-        //=============================2025-01-09 15:55 박청하=====================================
         noticeBoardService.deletePost(id);
         return "redirect:/noticeboard";
     }
@@ -108,9 +105,6 @@ public class NoticeBoardController {
     // 댓글 삭제
     @PostMapping("/{id}/comments/{commentId}/delete")
     public String deleteComment(@PathVariable Long id, @PathVariable Long commentId) {
-        //=============================2025-01-09 15:55 박청하=====================================
-        noticeBoardService.checkBan();
-        //=============================2025-01-09 15:55 박청하=====================================
         commentService.deleteComment(commentId);
         return "redirect:/noticeboard/" + id;
     }

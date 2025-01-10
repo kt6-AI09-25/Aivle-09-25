@@ -1,5 +1,6 @@
 package com.example.project.domain.report;
 
+import com.example.project.domain.user.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class ReportDto {
         private LocalDateTime date_processing;
         private ReportDetails report_details;
         private ReportProcessTypes report_process_type;
+        private User reported_user;
     }
 
     @Getter
