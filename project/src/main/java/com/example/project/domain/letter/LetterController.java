@@ -50,7 +50,7 @@ public class LetterController {
         request.setReport_type(3);
         request.setReported_id(id);
         reportService.createReport(request);
-        return "redirect:/letter/received";
+        return "redirect:/letters/received";
     }
     //=============================2025-01-10 14:37 박청하=====================================
 
