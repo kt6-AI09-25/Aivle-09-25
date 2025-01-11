@@ -1,92 +1,209 @@
 <!DOCTYPE html>
+<!--=======================2025-01-11 14:41 박청하=======================================-->
+<!--@@ -2,58 +2,212 @@ (뭔지 모르는데 페이지 상단에 나오길래 주석처리)-->
+<!--=======================2025-01-11 14:41 박청하=======================================-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notice Detail</title>
     <style>
+        /* 기본 스타일 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* 게시글 스타일 */
+        .post-title {
+            font-size: 24px;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .post-meta {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        .post-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .post-actions {
+            margin-top: 20px;
+        }
+
+        .post-actions a, .post-actions button {
+            margin-right: 10px;
+            font-size: 14px;
+            color: #007bff;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .post-actions button:hover, .post-actions a:hover {
+            text-decoration: underline;
+        }
+
+        /* 댓글 섹션 */
+        .comments-section {
+            margin-top: 30px;
+        }
+
+        .comments-section h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: none;
+            font-size: 14px;
+        }
+
+        /* 댓글 리스트 테이블 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        table th {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* 댓글 액션 */
+        .comment-actions button {
+            font-size: 12px;
+            color: #007bff;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .comment-actions button:hover {
+            text-decoration: underline;
+        }
+
         .hidden {
             display: none;
         }
     </style>
 </head>
 <body>
-<!-- 게시글 정보 -->
-<h1 th:text="${post.title}"></h1>
-<p><strong>Writer:</strong> <span th:text="${post.writerName}"></span></p>
-<p><strong>Views:</strong> <span th:text="${post.viewCount}"></span></p>
-<p><strong>Content:</strong></p>
-<p th:text="${post.content}"></p>
+<div class="container">
+    <!-- 게시글 정보 -->
+    <div class="post-title" th:text="${post.title}">Post Title</div>
+    <div class="post-meta">
+        <span><strong>Writer:</strong> <span th:text="${post.writerName}">Writer Name</span></span> |
+        <span><strong>Views:</strong> <span th:text="${post.viewCount}">100</span></span>
+    </div>
+    <div class="post-content" th:text="${post.content}">
+        This is the post content. It can be multiple lines.
+    </div>
 
-<!-- 게시글 수정 및 삭제 -->
-<a th:href="@{/noticeboard/{id}/edit(id=${post.postId})}">Edit</a>
-<form th:action="@{/noticeboard/{id}/delete(id=${post.postId})}" method="post" style="display:inline;">
-    <button type="submit">Delete</button>
-</form>
-<a href="/noticeboard">Back to List</a>
+    <!-- 게시글 수정 및 삭제 -->
+    <div class="post-actions">
+        <a th:href="@{/noticeboard/{id}/edit(id=${post.postId})}">Edit</a>
+        <form th:action="@{/noticeboard/{id}/delete(id=${post.postId})}" method="post" style="display:inline;">
+            <button type="submit">Delete</button>
+        </form>
+        <a href="/noticeboard">Back to List</a>
+    </div>
 
-<hr>
+    <!-- 댓글 섹션 -->
+    <div class="comments-section">
+        <h2>Comments</h2>
+        <!-- 댓글 작성 -->
+        <form th:action="@{/noticeboard/{id}/comments(id=${post.postId})}" method="post">
+            <textarea name="comment" placeholder="Write a comment..." required></textarea>
+            <button type="submit">Add Comment</button>
+        </form>
 
-<!-- 댓글 작성 -->
-<h2>Add Comment</h2>
-<form th:action="@{/noticeboard/{id}/comments(id=${post.postId})}" method="post">
-    <textarea name="comment" placeholder="Write a comment..." required></textarea>
-    <button type="submit">Add Comment</button>
-</form>
-
-<hr>
-
-<!-- 댓글 리스트 -->
-<h2>Comments</h2>
-<table>
-    <thead>
-    <tr>
-        <th>Comment</th>
-        <th>Commenter</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="comment : ${comments}">
-        <td>
-            <span th:text="${comment.comment}" class="comment-text"></span>
-            <form class="edit-comment-form hidden"
-                  th:action="@{/noticeboard/{postId}/comments/{commentId}/edit(postId=${post.postId}, commentId=${comment.commentId})}"
-                  method="post">
-                <textarea name="comment" th:text="${comment.comment}" required></textarea>
-                <button type="submit">Save</button>
-                <button type="button" class="cancel-edit-btn">Cancel</button>
-            </form>
-        </td>
-        <td th:text="${comment.commenterName}"></td>
-        <td>
-            <button type="button" class="edit-comment-btn">Edit</button>
-            <form th:action="@{/noticeboard/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" method="post" style="display:inline;">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-    </tbody>
-</table>
+        <!-- 댓글 리스트 -->
+        <table>
+            <thead>
+            <tr>
+                <th>Comment</th>
+                <th>Commenter</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="comment : ${comments}">
+                <td>
+                    <span th:text="${comment.comment}" class="comment-text"></span>
+                    <form class="edit-comment-form hidden"
+                          th:action="@{/noticeboard/{postId}/comments/{commentId}/edit(postId=${post.postId}, commentId=${comment.commentId})}"
+                          method="post">
+                        <textarea name="comment" th:text="${comment.comment}" required></textarea>
+                        <button type="submit">Save</button>
+                        <button type="button" class="cancel-edit-btn">Cancel</button>
+                    </form>
+                </td>
+                <td th:text="${comment.commenterName}"></td>
+                <td>
+                    <button type="button" class="edit-comment-btn">Edit</button>
+                    <form th:action="@{/noticeboard/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" method="post" style="display:inline;">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // 모든 Edit 버튼에 이벤트 리스너 추가
         document.querySelectorAll('.edit-comment-btn').forEach((editButton) => {
             editButton.addEventListener('click', () => {
                 const row = editButton.closest('tr');
                 const commentText = row.querySelector('.comment-text');
                 const editForm = row.querySelector('.edit-comment-form');
 
-                // 기존 댓글 숨기고 수정 폼 보여줌
                 commentText.style.display = 'none';
                 editForm.classList.remove('hidden');
                 editForm.style.display = 'block';
 
-                // Cancel 버튼 동작 추가
                 const cancelBtn = editForm.querySelector('.cancel-edit-btn');
                 cancelBtn.addEventListener('click', () => {
-                    // 수정 폼 숨기고 기존 댓글 표시
                     editForm.style.display = 'none';
                     editForm.classList.add('hidden');
                     commentText.style.display = 'inline';
