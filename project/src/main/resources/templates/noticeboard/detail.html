@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!--=======================2025-01-11 14:41 박청하=======================================-->
+<!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 14:41 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
 <!--@@ -2,58 +2,212 @@ (뭔지 모르는데 페이지 상단에 나오길래 주석처리)-->
-<!--=======================2025-01-11 14:41 박청하=======================================-->
+<!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 14:41 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -124,9 +124,46 @@
         .hidden {
             display: none;
         }
+        /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal .close {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+
     </style>
 </head>
 <body>
+<!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
+<!-- HTML에서 postId를 숨겨서 전달 -->
+<div id="postContainer" th:data-post-id="${post.postId}"></div>
+<!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
+
 <div class="container">
     <!-- 게시글 정보 -->
     <div class="post-title" th:text="${post.title}">Post Title</div>
@@ -144,8 +181,51 @@
         <form th:action="@{/noticeboard/{id}/delete(id=${post.postId})}" method="post" style="display:inline;">
             <button type="submit">Delete</button>
         </form>
+        <!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
+        <button type="button" id="reportButton">Report</button> <!-- 신고 버튼 -->
+        <!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
         <a href="/noticeboard">Back to List</a>
     </div>
+    <!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
+    <!-- 게시글 신고 모달 -->
+    <div id="reportModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" id="closeReportModal">&times;</span>
+            <h2>Report Post</h2>
+            <form id="reportForm" th:action="@{/noticeboard/{id}/report(id=${post.postId})}" method="post">
+                <label for="reportReason">Select a reason:</label>
+                <select name="report_details" id="reportReason" required>
+                    <option value="" disabled selected>Select reason</option>
+                    <option th:each="reason : ${T(com.example.project.domain.report.ReportDetails).values()}"
+                            th:value="${reason}" th:text="${reason}"></option>
+                </select>
+                <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="submit" style="background-color: #007bff; color: white;">Submit Report</button>
+                    <button type="button" id="cancelReportButton" style="background-color: #f5f5f5; color: #333;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- 댓글 신고 모달 -->
+    <div id="commentReportModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" id="closeCommentReportModal">&times;</span>
+            <h2>Report Comment</h2>
+            <form id="commentReportForm" method="post">
+                <label for="commentReportReason">Select a reason:</label>
+                <select name="report_details" id="commentReportReason" required>
+                    <option value="" disabled selected>Select reason</option>
+                    <option th:each="reason : ${T(com.example.project.domain.report.ReportDetails).values()}"
+                            th:value="${reason}" th:text="${reason}"></option>
+                </select>
+                <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="submit" style="background-color: #007bff; color: white;">Submit Report</button>
+                    <button type="button" id="cancelCommentReportButton" style="background-color: #f5f5f5; color: #333;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
 
     <!-- 댓글 섹션 -->
     <div class="comments-section">
@@ -183,6 +263,10 @@
                     <form th:action="@{/noticeboard/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" method="post" style="display:inline;">
                         <button type="submit">Delete</button>
                     </form>
+                    <!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
+                    <!-- 댓글 신고 버튼 -->
+                    <button type="button" class="report-comment-btn" th:data-comment-id="${comment.commentId}">Report</button>
+                    <!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
                 </td>
             </tr>
             </tbody>
@@ -211,6 +295,70 @@
             });
         });
     });
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    //게시글 신고 모달 스크립트
+    document.addEventListener('DOMContentLoaded', () => {
+        const reportButton = document.getElementById('reportButton');
+        const reportModal = document.getElementById('reportModal');
+        const closeReportModal = document.getElementById('closeReportModal');
+
+        // 모달 열기
+        reportButton.addEventListener('click', () => {
+            reportModal.style.display = 'flex';
+        });
+
+        // 모달 닫기
+        closeReportModal.addEventListener('click', () => {
+            reportModal.style.display = 'none';
+        });
+        // 취소 버튼 클릭 시 모달 닫기
+        cancelReportButton.addEventListener('click', () => {
+            reportModal.style.display = 'none';
+        });
+
+        // 모달 외부 클릭 시 닫기
+        window.addEventListener('click', (event) => {
+            if (event.target === reportModal) {
+                reportModal.style.display = 'none';
+            }
+        });
+    });
+
+    //댓글 신고 모달 스크립트
+    document.addEventListener('DOMContentLoaded', () => {
+        const commentReportModal = document.getElementById('commentReportModal');
+        const closeCommentReportModal = document.getElementById('closeCommentReportModal');
+        const cancelCommentReportButton = document.getElementById('cancelCommentReportButton');
+        const commentReportForm = document.getElementById('commentReportForm');
+        const postId = document.getElementById('postContainer').getAttribute('data-post-id'); // postId 가져오기
+
+        // 댓글 신고 버튼 클릭 시 모달 열기
+        document.querySelectorAll('.report-comment-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const commentId = button.getAttribute('data-comment-id'); // commentId 가져오기
+                // URL 동적으로 설정
+                commentReportForm.setAttribute('action', `/noticeboard/${postId}/comments/${commentId}/report`);
+                commentReportModal.style.display = 'flex';
+            });
+        });
+
+        // 모달 닫기 (x 버튼 및 취소 버튼)
+        closeCommentReportModal.addEventListener('click', () => {
+            commentReportModal.style.display = 'none';
+        });
+
+        cancelCommentReportButton.addEventListener('click', () => {
+            commentReportModal.style.display = 'none';
+        });
+
+        // 모달 외부 클릭 시 닫기
+        window.addEventListener('click', (event) => {
+            if (event.target === commentReportModal) {
+                commentReportModal.style.display = 'none';
+            }
+        });
+    });
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 </script>
 </body>
 </html>
