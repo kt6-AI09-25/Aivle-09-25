@@ -12,12 +12,7 @@
             padding: 0;
             background-color: #f9f9f9;
         }
-        header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-        }
+
         .container {
             max-width: 1200px;
             margin: 20px auto;
@@ -30,14 +25,20 @@
             text-align: center;
             color: #333;
         }
+        .summary {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .summary p {
+            font-size: 1em;
+            color: #555;
+        }
         .layout {
             display: grid;
             grid-template-areas:
-                "chart analysis"
-                "ranking ranking";
+                "chart info";
             grid-template-columns: 1fr 2fr;
             grid-gap: 20px;
-            margin: 20px 0;
         }
         .chart {
             grid-area: chart;
@@ -47,30 +48,23 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
-        .analysis {
-            grid-area: analysis;
+        .info {
+            grid-area: info;
             background: #f4f4f4;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
         }
-        .score-card {
-            background: #ddd;
-            padding: 20px;
-            text-align: center;
-            border-radius: 8px;
-            margin-top: 10px;
-            display: inline-block;
-            width: 50%;
+        .info .score {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
         }
-        .ranking {
-            grid-area: ranking;
-            background: #f4f4f4;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
+        .score .value {
+            font-size: 3em;
+            font-weight: bold;
+            color: #555;
         }
         footer {
             background-color: #4CAF50;
@@ -84,54 +78,52 @@
 <body>
 <div th:replace="navbar.html"></div> <!-- 네비게이션 바 포함 -->
 
-<header>
-    <h1>분석 결과</h1>
-</header>
+
 
 <div class="container">
+    <div class="summary">
+        <p>윤상호님의 면접 합격 가능성은 <strong>38%</strong>입니다. 면접 준비 상태는 <strong>부족</strong>입니다.</p>
+        <p>면접 준비를 강화해 가능성을 높일 수 있습니다.</p>
+    </div>
+
     <div class="layout">
         <div class="chart">
-            <h2>방사형 차트</h2>
+            <h2>합격 가능성</h2>
             <canvas id="radarChart" width="400" height="400"></canvas>
         </div>
-        <div class="analysis">
-            <h2>분석 내용</h2>
-            <div class="score-card">
-                <h3>점수</h3>
-                <p th:text="${result.score}">점수 데이터</p>
+        <div class="info">
+            <div class="score">
+                <div class="value">38%</div>
+                <div>
+                    <p>전체 면접 응시자 중</p>
+                    <p>하위 <strong>13%</strong></p>
+                </div>
             </div>
-        </div>
-        <div class="ranking">
-            <h2>나의 순위</h2>
-            <p th:text="${result.ranking}">순위 데이터</p>
         </div>
     </div>
 </div>
 
-<footer>
-    <p>&copy; 2025 분석 결과 페이지. 모든 권리 보유.</p>
-</footer>
+<div th:replace="footer.html"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const radarCtx = document.getElementById('radarChart').getContext('2d');
     const radarChart = new Chart(radarCtx, {
-        type: 'radar',
+        type: 'doughnut',
         data: {
-            labels: ['A', 'B', 'C', 'D', 'E'],
+            labels: ['합격 가능성', '부족 부분'],
             datasets: [{
-                label: '분석 데이터',
-                data: [20, 30, 40, 50, 60],
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
+                data: [38, 62],
+                backgroundColor: ['#4CAF50', '#FF5733'],
                 borderWidth: 1
             }]
         },
         options: {
-            scales: {
-                r: {
-                    beginAtZero: true
-                }
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
             }
         }
     });

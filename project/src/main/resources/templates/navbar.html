@@ -2,7 +2,7 @@
   <a href="/" class="logo">로고</a>
   <ul>
     <li><a href="/test" class="protected">발표하기</a></li>
-    <li><a href="/result" class="protected">분석 결과</a></li>
+    <li><a href="/myresult" class="protected">분석 결과</a></li>
     <li><a href="/noticeboard" class="protected">게시판</a></li>
 
   </ul>
@@ -49,19 +49,19 @@
   var loginModal = document.getElementById("loginModal");
   var isLoggedIn = false;
 
-    // 백엔드에서 로그인 상태 동기화
-    fetch('/auth/status')
-        .then(response => response.json())
-        .then(data => {
-            isLoggedIn = data.isLoggedIn;
-            if (isLoggedIn) {
-                document.getElementById("nickname").innerText = data.username;
-                document.getElementById("nickname").style.display = "inline";
-                document.getElementById("logoutBtn").style.display = "inline";
-                document.querySelector(".signup-button").style.display = "none";
-                document.querySelector(".login-button").style.display = "none";
-            }
-        });
+  // 백엔드에서 로그인 상태 동기화
+  fetch('/auth/status')
+      .then(response => response.json())
+      .then(data => {
+          isLoggedIn = data.isLoggedIn;
+          if (isLoggedIn) {
+              document.getElementById("nickname").innerText = data.username;
+              document.getElementById("nickname").style.display = "inline";
+              document.getElementById("logoutBtn").style.display = "inline";
+              document.querySelector(".signup-button").style.display = "none";
+              document.querySelector(".login-button").style.display = "none";
+          }
+      });
 
   // 회원가입 버튼 클릭 시 모달 열기
   document.getElementById("signupBtn").onclick = function() {
@@ -84,16 +84,18 @@
       document.getElementById("loginForm").reset(); // 로그인 입력 필드 초기화
   }
 
-  window.onclick = function(event) {
-      if (event.target == signupModal) {
-          signupModal.style.display = "none";
-          document.getElementById("signupForm").reset(); // 회원가입 입력 필드 초기화
+  // 모달 외부 클릭으로 절대 닫히지 않도록 설정
+  signupModal.addEventListener('click', function(event) {
+      if (event.target === signupModal) {
+          event.stopPropagation();
       }
-      if (event.target == loginModal) {
-          loginModal.style.display = "none";
-          document.getElementById("loginForm").reset(); // 로그인 입력 필드 초기화
+  });
+
+  loginModal.addEventListener('click', function(event) {
+      if (event.target === loginModal) {
+          event.stopPropagation();
       }
-  }
+  });
 
   // 모든 보호된 링크 클릭 시 로그인 요구
   document.querySelectorAll('.protected').forEach(function(link) {
@@ -109,7 +111,7 @@
   // 회원가입 폼 제출 처리
   document.getElementById("signupForm").onsubmit = function(event) {
       event.preventDefault(); // 기본 제출 이벤트 방지
-      var nickname = document.getElementById("signupNickname").value; // 입력된 닉네임 가져오기
+      var nickname = document.getElementById("nickname").value; // 입력된 닉네임 가져오기
 
       // 회원가입 완료 메시지 표시
       alert("회원가입이 완료되었습니다.");
@@ -142,6 +144,7 @@
       // 로그인 모달 닫기
       loginModal.style.display = "none";
   }
+
   // 로그아웃 버튼 클릭 처리
   document.getElementById("logoutBtn").onclick = function() {
       // 서버 로그아웃 요청

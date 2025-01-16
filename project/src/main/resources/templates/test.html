@@ -74,6 +74,7 @@
   let microphone;
   let audioMeter;
   const bars = [];
+  let isResultLoading = false; // 로딩 상태를 추적
 
   // 웹캠 및 마이크 스트림 가져오기
   async function startCamera() {
@@ -165,6 +166,9 @@
 
   // 분석 결과 보기 버튼 클릭 시 로딩 화면 표시 후 페이지 이동
   document.getElementById('viewResultsBtn').addEventListener('click', function() {
+      if (isResultLoading) return; // 이미 로딩 중이면 실행하지 않음
+
+      isResultLoading = true;
       document.getElementById('loadingModal').style.display = 'block'; // 로딩 화면 표시
       setTimeout(function() {
           window.location.href = '/result'; // 분석 결과 페이지로 이동
@@ -173,6 +177,7 @@
 
   // 페이지 로드 시 로딩 화면 항상 숨김
   window.onload = function() {
+      isResultLoading = false; // 뒤로가기 시 로딩 상태 초기화
       document.getElementById('loadingModal').style.display = 'none'; // 로딩 화면 숨기기
   };
 
