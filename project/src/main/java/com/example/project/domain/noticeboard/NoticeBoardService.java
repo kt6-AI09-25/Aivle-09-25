@@ -150,15 +150,8 @@ public class NoticeBoardService {
 
 
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 11:05 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    public List<NoticeBoardDTO.Response> searchPostsByTitleKeyword(String keyword) {
-        return noticeBoardRepository.findByTitleContainingIgnoreCase(keyword)
-                .stream()
-                .map(this::convertToResponseDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<NoticeBoardDTO.Response> searchPostsByContentKeyword(String keyword) {
-        return noticeBoardRepository.findByContentContainingIgnoreCase(keyword)
+    public List<NoticeBoardDTO.Response> searchPostsByTitleOrContentKeyword(String keyword) {
+        return noticeBoardRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(keyword, keyword)
                 .stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
