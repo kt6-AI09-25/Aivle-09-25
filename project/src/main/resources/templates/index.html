@@ -128,11 +128,6 @@
             overflow-x: hidden;
         }
     </style>
-    <!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-15 10:31 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-15 10:31 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
-
 </head>
 <body>
 <div th:replace="navbar.html"></div>
@@ -216,7 +211,6 @@
 </div>
 
 <script>
-    let stompClient = null; // WebSocket 클라이언트 설정
     var isLoggedIn = false; // 로그인 상태 플래그
 
     // 백엔드에서 로그인 상태 동기화
@@ -232,10 +226,10 @@
                 document.querySelector(".signup-button").style.display = "none";
                 document.querySelector(".login-button").style.display = "none";
 
-                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-15 10:31 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                // 로그인 상태일 경우 WebSocket 연결 초기화
-                initializeWebSocket(data.username);
-                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-15 10:31 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 14:48 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // SharedWorker에 연결 요청
+                worker.port.postMessage({ type: "connect", username: data.username });
+                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 14:48 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             }
         });
 
@@ -291,7 +285,11 @@
                 if (response.ok) {
                     alert("로그인 성공!");
                     window.location.href = "/"; // 로그인 후 페이지 리프레시
-                    initializeWebSocket(data.username);
+                    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 14:48 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    // SharedWorker에 연결 요청
+                    worker.port.postMessage({ type: "connect", username: data.username });
+                    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 14:48 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
                 } else {
                     alert("로그인 실패. 아이디 또는 비밀번호를 확인하세요.");
                 }
@@ -316,49 +314,29 @@
             document.getElementById("signupModal").style.display = "none";
         }
     };
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-15 10:31 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // WebSocket 연결 초기화
-    function initializeWebSocket(username) {
-        if (stompClient && stompClient.connected) {
-            console.log('WebSocket is already connected');
-            return;
-        }
-
-        console.log('WebSocket connection initializing...');
-        const socket = new SockJS('/ws');
-        stompClient = Stomp.over(socket);
-
-        stompClient.connect({}, () => {
-            console.log('WebSocket connected');
-
-            // 로그인된 사용자 이름을 서버에 전송
-            console.log('Sending username:', username);
-            stompClient.send('/app/status', {}, username);
-
-            // 서버에서 활성 사용자 목록 수신
-            stompClient.subscribe('/topic/status', (message) => {
-                console.log('Received message from server:', message.body);
-                try {
-                    const activeUsers = JSON.parse(message.body);
-                    console.log('Active users:', activeUsers);
-                } catch (error) {
-                    console.error('Error parsing message:', error);
-                }
-            });
-        }, (error) => {
-        console.error('WebSocket connection error:', error);
-        });
-    }
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 14:46 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     // 페이지 종료 시 WebSocket 연결 해제
     window.addEventListener('beforeunload', () => {
-        if (stompClient) {
-            stompClient.disconnect(() => {
-                console.log('WebSocket disconnected');
-            });
-        }
+        worker.port.postMessage({ type: "disconnect" });
+        worker.port.close();
     });
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-15 10:31 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    const worker = new SharedWorker("shared-worker.js");
+
+    worker.port.onmessage = function (event) {
+        const data = event.data;
+
+        if (data.type === "connected") {
+            console.log("WebSocket connected via SharedWorker.");
+        } else if (data.type === "activeUsers") {
+            console.log("Active users received from SharedWorker:", data.data);
+            // 활성 사용자 목록 업데이트
+            updateActiveUsers(data.data);
+        }
+    };
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 14:46 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 </script>
 </body>
 </html>

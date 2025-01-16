@@ -14,6 +14,8 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Objects;
 
@@ -40,7 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register", "/", "/login", "/ws/**").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll()// 정적 리소스 허용
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/shared-worker.js").permitAll()// 정적 리소스 허용
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -85,5 +87,19 @@ public class SecurityConfig {
     public HttpSessionEventPublisher httpSessionEventPublisher() {
         return new HttpSessionEventPublisher();
     }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/shared-worker.js")
+                        .allowedOrigins("http://localhost:8080") // 허용할 클라이언트 도메인
+                        .allowedMethods("GET", "OPTIONS")
+                        .allowCredentials(true);
+            }
+        };
+    }
+
 
 }
