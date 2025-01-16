@@ -67,7 +67,7 @@ public class LetterService {
     }
 
 
-    //=============================2025-01-10 13:35 박청하=====================================
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-10 13:35 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     public User getSenderByLetterId(Long letterId) {
         // letterId로 Letter 엔티티 조회
         Letter letter = letterRepository.findByLetterId(letterId);
@@ -85,5 +85,6 @@ public class LetterService {
                 .orElseThrow(() -> new RuntimeException("해당 쪽지를 찾을 수 없습니다: " + letterId));
         return convertToResponse(letter);
     }
-    //=============================2025-01-10 13:35 박청하=====================================
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-10 13:35 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
