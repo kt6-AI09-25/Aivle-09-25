@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Results</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 300px);
+            gap: 20px;
+        }
+        .section {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .chart canvas {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .feedback {
+            font-size: 0.8rem;
+            color: #555;
+            margin-top: 15px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        footer {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 8px 0;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="navbar.html"></div>
+<div class="container">
+    <h1>내 발표 분석 기록</h1>
+    <div class="grid-layout">
+        <!-- 평균 점수 방사형 차트 -->
+        <div class="section chart" id="averageChartSection">
+            <h2 style="font-size: 1rem;">사용자의 발표 평균 점수</h2>
+            <canvas id="averageRadarChart"></canvas>
+        </div>
+
+        <!-- 선택된 발표 기록 및 피드백 -->
+        <div class="section" id="feedbackSection">
+            <h2 style="font-size: 1rem;">사용자의 발표 기록 및 피드백</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>날짜</th>
+                    <th>세부 점수 보기</th>
+                </tr>
+                </thead>
+                <tbody id="resultsTableBody">
+                <!-- 데이터 행이 동적으로 추가됩니다 -->
+                </tbody>
+            </table>
+            <p class="feedback" id="selectedFeedback">발표를 선택하면 피드백이 여기에 표시됩니다.</p>
+        </div>
+
+        <!-- 전체 순위 -->
+        <div class="section">
+            <h2 style="font-size: 1rem;">전체 순위</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>순위</th>
+                    <th>날짜</th>
+                    <th>점수</th>
+                </tr>
+                </thead>
+                <tbody id="rankingTableBody">
+                <!-- 전체 순위 데이터가 동적으로 추가됩니다 -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 전체 점수 추이 -->
+        <div class="section chart">
+            <h2 style="font-size: 1rem;">사용자의 전체 점수 추이</h2>
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div th:replace="footer.html"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // 샘플 데이터
+    const sampleResults = [
+        { date: '2025-01-01', scores: [80, 85, 75, 90, 88], feedback: '발표가 명확하지만 속도를 조절하세요.' },
+        { date: '2025-01-08', scores: [82, 88, 80, 85, 84], feedback: '논리 구조가 더 필요합니다.' },
+        { date: '2025-01-15', scores: [85, 87, 82, 88, 90], feedback: '청중과의 상호작용이 훌륭합니다.' },
+    ];
+
+    // 평균 점수 계산
+    const labels = ['표현력', '논리력', '발음', '내용 전달', '청중 반응'];
+    const averageScores = labels.map((_, i) => {
+        return (
+            sampleResults.reduce((sum, result) => sum + result.scores[i], 0) / sampleResults.length
+        );
+    });
+
+    // 방사형 차트 렌더링
+    const radarCtx = document.getElementById('averageRadarChart').getContext('2d');
+    new Chart(radarCtx, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '평균 점수',
+                data: averageScores,
+                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                borderColor: '#007bff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                }
+            }
+        }
+    });
+
+    // 선형 차트 데이터 준비
+    const lineLabels = sampleResults.map(result => result.date);
+    const lineData = sampleResults.map(result => result.scores.reduce((a, b) => a + b, 0) / result.scores.length);
+
+    // 선형 차트 렌더링
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    new Chart(lineCtx, {
+        type: 'line',
+        data: {
+            labels: lineLabels,
+            datasets: [{
+                label: '평균 점수 추이',
+                data: lineData,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: '날짜'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: '점수'
+                    },
+                    min: 0,
+                    max: 100
+                }
+            }
+        }
+    });
+
+    // 발표 기록 테이블 렌더링
+    const resultsTableBody = document.getElementById('resultsTableBody');
+    sampleResults.forEach((result, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${result.date}</td>
+            <td><button onclick="showDetails(${index})">보기</button></td>
+        `;
+        resultsTableBody.appendChild(row);
+    });
+
+    // 전체 순위 테이블 렌더링
+    const rankingTableBody = document.getElementById('rankingTableBody');
+    sampleResults
+        .map((result, index) => ({ ...result, rank: index + 1 }))
+        .sort((a, b) => b.scores.reduce((sum, score) => sum + score, 0) - a.scores.reduce((sum, score) => sum + score, 0))
+        .forEach((result, index) => {
+            const row = document.createElement('tr');
+            const totalScore = result.scores.reduce((sum, score) => sum + score, 0);
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${result.date}</td>
+                <td>${totalScore}</td>
+            `;
+            rankingTableBody.appendChild(row);
+        });
+
+    // 선택된 발표 세부 정보 표시
+    function showDetails(index) {
+        const selectedResult = sampleResults[index];
+        const feedbackSection = document.getElementById('selectedFeedback');
+        feedbackSection.textContent = selectedResult.feedback;
+
+        // 선택된 발표의 방사형 차트를 다시 그립니다.
+        const radarCtx = document.getElementById('averageRadarChart').getContext('2d');
+        new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: `${selectedResult.date} 점수`,
+                    data: selectedResult.scores,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                    }
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

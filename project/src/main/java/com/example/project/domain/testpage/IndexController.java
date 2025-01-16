@@ -38,6 +38,11 @@ public class IndexController {
     public String board() {
         return "board"; // test.html 반환
     }
+
+    @GetMapping("/myresult")
+    public String myResult() {
+        return "myresult"; // myresult.html 반환
+    }
 }
 
 
