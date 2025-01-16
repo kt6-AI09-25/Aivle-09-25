@@ -1,12 +1,9 @@
 package com.example.project.domain.noticeboard;
 
-import com.example.project.domain.comment.Comment;
-import com.example.project.domain.noticeboard.NoticeBoardDTO;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import com.example.project.domain.user.UserUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,9 +46,9 @@ public class NoticeBoardService {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         User writer = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new RuntimeException("현재 사용자를 찾을 수 없습니다."));
-        //=============================2025-01-09 15:29 박청하=====================================
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 15:29 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         checkBan();
-        //=============================2025-01-09 15:29 박청하=====================================
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 15:29 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
         NoticeBoard post = new NoticeBoard();
@@ -69,9 +66,9 @@ public class NoticeBoardService {
         NoticeBoard post = noticeBoardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
         checkPermission(post.getWriter().getUsername());
-        //=============================2025-01-09 15:29 박청하=====================================
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 15:29 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         checkBan();
-        //=============================2025-01-09 15:29 박청하=====================================
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 15:29 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
@@ -87,9 +84,9 @@ public class NoticeBoardService {
         NoticeBoard post = noticeBoardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
         checkPermission(post.getWriter().getUsername());
-        //=============================2025-01-09 15:29 박청하=====================================
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 15:29 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         checkBan();
-        //=============================2025-01-09 15:29 박청하=====================================
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 15:29 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         noticeBoardRepository.delete(post);
     }
 
@@ -100,16 +97,17 @@ public class NoticeBoardService {
 
     private void checkPermission(String writerUsername) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        //=============================2025-01-09 11:25 박청하=====================================
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 11:25 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         String currentUserRole = UserUtils.getCurrentUserRole();
         if ((!Objects.equals(currentUsername, writerUsername))&&(!Objects.equals(currentUserRole, "[ADMIN]"))) {
             throw new RuntimeException("권한이 없습니다.");
 
         }
-        //=============================2025-01-09 11:25 박청하=====================================
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 11:25 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     }
 
-    //=============================2025-01-09 15:29 박청하=====================================
+
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 15:29 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     public void checkBan() {
         Integer state = UserUtils.getCurrentUserState();
         LocalDateTime banEndTime = UserUtils.getCurrentUserBanEndTime();
@@ -121,7 +119,7 @@ public class NoticeBoardService {
             }
         }
     }
-    //=============================2025-01-09 15:29 박청하=====================================
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 15:29 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     private NoticeBoardDTO.Response convertToResponseDTO(NoticeBoard post) {
         return NoticeBoardDTO.Response.builder()
@@ -136,7 +134,7 @@ public class NoticeBoardService {
                 .build();
     }
 
-    //=============================2025-01-09 11:25 박청하=====================================
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 11:25 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     public User getWriterByPostId(Long postId) {
         // postId로 NoticeBoard 엔티티 조회
         NoticeBoard post = noticeBoardRepository.findByPostId(postId);
@@ -148,5 +146,29 @@ public class NoticeBoardService {
         // 작성자 반환
         return post.getWriter();
     }
-    //=============================2025-01-09 11:25 박청하=====================================
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 11:25 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 11:05 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    public List<NoticeBoardDTO.Response> searchPostsByTitleKeyword(String keyword) {
+        return noticeBoardRepository.findByTitleContainingIgnoreCase(keyword)
+                .stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<NoticeBoardDTO.Response> searchPostsByContentKeyword(String keyword) {
+        return noticeBoardRepository.findByContentContainingIgnoreCase(keyword)
+                .stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<NoticeBoardDTO.Response> searchPostsByWriterKeyword(String keyword) {
+        return noticeBoardRepository.findByWriter_UsernameContainingIgnoreCase(keyword)
+                .stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 11:05 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

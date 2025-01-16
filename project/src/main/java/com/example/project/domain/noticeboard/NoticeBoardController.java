@@ -19,9 +19,9 @@ public class NoticeBoardController {
 
     private final NoticeBoardService noticeBoardService;
     private final CommentService commentService;
-    //=============================2025-01-10 14:41 박청하=====================================
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-10 14:41 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     private final ReportService reportService;
-    //=============================2025-01-10 14:41 박청하=====================================
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-10 14:41 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     // 게시글 목록
     @GetMapping
@@ -33,9 +33,9 @@ public class NoticeBoardController {
     // 게시글 작성 폼
     @GetMapping("/new")
     public String createForm(Model model) {
-        //=============================2025-01-09 15:55 박청하=====================================
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 15:55 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         noticeBoardService.checkBan();
-        //=============================2025-01-09 15:55 박청하=====================================
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 15:55 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         model.addAttribute("post", new NoticeBoardDTO.Request());
         return "noticeboard/createform";
     }
@@ -64,9 +64,9 @@ public class NoticeBoardController {
     // 게시글 수정
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        //=============================2025-01-09 15:55 박청하=====================================
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 15:55 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         noticeBoardService.checkBan();
-        //=============================2025-01-09 15:55 박청하=====================================
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 15:55 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         NoticeBoardDTO.Response post = noticeBoardService.getEditablePost(id);
         model.addAttribute("post", post);
         return "noticeboard/edit";
@@ -85,7 +85,7 @@ public class NoticeBoardController {
         return "redirect:/noticeboard";
     }
 
-    //=============================2025-01-10 14:37 박청하=====================================
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-10 14:37 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     // 게시글 신고
     @PostMapping("/{id}/report")
     public String reportPost(@PathVariable Long id, @ModelAttribute ReportDto.Request request) {
@@ -95,15 +95,14 @@ public class NoticeBoardController {
         reportService.createReport(request);
         return "redirect:/noticeboard/" + id;
     }
-    //=============================2025-01-10 14:37 박청하=====================================
-
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-10 14:37 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     // 댓글 작성
     @PostMapping("/{id}/comments")
     public String addComment(@PathVariable Long id, @ModelAttribute CommentDTO.Request request) {
-        //=============================2025-01-09 15:55 박청하=====================================
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 15:55 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         noticeBoardService.checkBan();
-        //=============================2025-01-09 15:55 박청하=====================================
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 15:55 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         request.setPostId(id);
         commentService.addComment(request);
         return "redirect:/noticeboard/" + id;
@@ -112,9 +111,9 @@ public class NoticeBoardController {
     // 댓글 수정
     @PostMapping("/{id}/comments/{commentId}/edit")
     public String updateComment(@PathVariable Long id, @PathVariable Long commentId, @ModelAttribute CommentDTO.Request request) {
-        //=============================2025-01-09 15:55 박청하=====================================
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 15:55 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         noticeBoardService.checkBan();
-        //=============================2025-01-09 15:55 박청하=====================================
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 15:55 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         request.setPostId(id);
         commentService.updateComment(commentId, request);
         return "redirect:/noticeboard/" + id;
@@ -127,7 +126,7 @@ public class NoticeBoardController {
         return "redirect:/noticeboard/" + id;
     }
 
-    //=============================2025-01-10 14:37 박청하=====================================
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-10 14:37 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     // 댓글 신고
     @PostMapping("/{id}/comments/{commentId}/report")
     public String reportComment(@PathVariable Long id, @PathVariable Long commentId, @ModelAttribute ReportDto.Request request) {
@@ -137,5 +136,24 @@ public class NoticeBoardController {
         reportService.createReport(request);
         return "redirect:/noticeboard/" + id;
     }
-    //=============================2025-01-10 14:37 박청하=====================================
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-10 14:37 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 11:05 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    @GetMapping("/search/title")
+    public List<NoticeBoardDTO.Response> searchPostsTitle(@RequestParam String keyword) {
+        return noticeBoardService.searchPostsByTitleKeyword(keyword);
+    }
+
+    @GetMapping("/search/content")
+    public List<NoticeBoardDTO.Response> searchPostsContent(@RequestParam String keyword) {
+        return noticeBoardService.searchPostsByContentKeyword(keyword);
+    }
+
+    @GetMapping("/search/writer")
+    public List<NoticeBoardDTO.Response> searchPostsWriter(@RequestParam String keyword) {
+        return noticeBoardService.searchPostsByWriterKeyword(keyword);
+    }
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 11:05 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
