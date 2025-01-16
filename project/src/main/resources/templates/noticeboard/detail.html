@@ -1,170 +1,214 @@
 <!DOCTYPE html>
-<!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 14:41 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
-<!--@@ -2,58 +2,212 @@ (뭔지 모르는데 페이지 상단에 나오길래 주석처리)-->
-<!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 14:41 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notice Detail</title>
+    <link rel="stylesheet" href="/css/style.css">
     <style>
-        /* 기본 스타일 */
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
+            font-family: Arial, sans-serif; /* 기본 글꼴 설정 */
+            margin: 0; /* 문서의 기본 외곽 여백 제거 */
+            padding: 0; /* 문서의 기본 내부 여백 제거 */
+            background-color: #f5f5f5; /* 배경 색상 설정 */
         }
 
-        .container {
-            max-width: 900px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        .post-container {
+            max-width: 1200px; /* 컨테이너 최대 너비 설정 */
+            margin: 20px auto; /* 상하 여백 20px, 가운데 정렬 */
+            padding: 20px; /* 내부 여백 설정 */
+            background-color: #fff; /* 배경색 흰색 */
+            border: 1px solid #ddd; /* 연한 회색 테두리 */
+            border-radius: 5px; /* 둥근 모서리 */
         }
 
         /* 게시글 스타일 */
         .post-title {
-            font-size: 24px;
-            font-weight: bold;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            font-size: 24px; /* 제목 글자 크기 */
+            font-weight: bold; /* 글씨 굵게 */
+            border-bottom: 1px solid #ddd; /* 제목 하단 구분선 */
+            padding-bottom: 10px; /* 하단 여백 */
+            margin-bottom: 15px; /* 제목과 다음 콘텐츠 사이의 간격 */
         }
 
         .post-meta {
-            font-size: 12px;
-            color: #777;
-            margin-bottom: 15px;
+            font-size: 12px; /* 메타 정보 글자 크기 */
+            color: #777; /* 텍스트 색상을 회색으로 설정 */
+            margin-bottom: 15px; /* 메타 정보와 다음 콘텐츠 사이 간격 */
         }
 
         .post-content {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #333;
+            font-size: 16px; /* 게시글 내용 글자 크기 */
+            line-height: 1.6; /* 줄 간격 설정 */
+            color: #333; /* 어두운 회색 글자 색상 */
         }
 
         .post-actions {
-            margin-top: 20px;
+            margin-top: 20px; /* 상단 여백 */
         }
 
         .post-actions a, .post-actions button {
-            margin-right: 10px;
-            font-size: 14px;
-            color: #007bff;
-            text-decoration: none;
-            background: none;
-            border: none;
-            cursor: pointer;
+            all: unset; /* 모든 기본 스타일 초기화 */
+            margin-right: 10px; /* 오른쪽 여백 */
+            font-size: 14px; /* 글자 크기 */
+            color: #007bff; /* 버튼 및 링크 텍스트 색상 */
+            text-decoration: none; /* 밑줄 제거 */
+            background: none; /* 배경 제거 */
+            border: none; /* 테두리 제거 */
+            cursor: pointer; /* 클릭 가능한 커서 표시 */
         }
 
         .post-actions button:hover, .post-actions a:hover {
-            text-decoration: underline;
+            text-decoration: underline; /* 마우스 오버 시 밑줄 추가 */
         }
 
         /* 댓글 섹션 */
         .comments-section {
-            margin-top: 30px;
+            margin-top: 30px; /* 상단 여백 */
         }
 
         .comments-section h2 {
-            font-size: 18px;
-            margin-bottom: 10px;
+            font-size: 18px; /* 댓글 섹션 제목 글자 크기 */
+            margin-bottom: 10px; /* 하단 간격 */
+        }
+        /*댓글 테이블 내에 폼과 곂쳐서 > 자식사용자 사용*/
+        .comments-section > form {
+            display: flex; /* Flexbox를 사용하여 정렬 */
+            flex-direction: column; /* 자식 요소를 세로 방향으로 배치 */
+            align-items: flex-end; /* 자식 요소를 오른쪽 정렬 */
+            gap: 0px; /* 요소 사이 간격 없음 */
+        }
+        /* 외부 css와 충돌때문에 id사용 */
+        #commentsectionbtn {
+            font-size: 14px; /* 버튼 글자 크기 */
+            color: white; /* 버튼 텍스트 색상 */
+            background-color: #007bff; /* 버튼 배경색 */
+            padding: 8px 16px; /* 버튼 내부 여백 (상하 8px, 좌우 16px) */
+            border: none; /* 테두리 제거 */
+            border-radius: 4px; /* 둥근 모서리 */
+            cursor: pointer; /* 마우스 커서 모양 */
+        }
+
+        #commentsectionbtn:hover {
+            background-color: #0056b3; /* 호버 시 버튼 배경색 변경 */
+            text-decoration: underline; /* 호버 시 밑줄 추가 */
         }
 
         textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            resize: none;
-            font-size: 14px;
+            width: 97.5%; /* 텍스트 입력창 너비 */
+            padding: 10px; /* 내부 여백 */
+            margin-bottom: 10px; /* 하단 여백 */
+            border: 1px solid #ddd; /* 입력창 테두리 */
+            border-radius: 5px; /* 둥근 모서리 */
+            resize: none; /* 입력창 크기 조절 불가 */
+            font-size: 14px; /* 글자 크기 */
         }
 
         /* 댓글 리스트 테이블 */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+        .comment-table {
+            width: 100%; /* 테이블 너비를 부모 요소에 맞춤 */
+            border-collapse: collapse; /* 테두리 중복 제거 */
+            margin-top: 10px; /* 상단 여백 */
         }
 
-        table th, table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-            font-size: 14px;
+        .comment-table th,
+        .comment-table td {
+            border: 1px solid #ddd; /* 셀 테두리 */
+            padding: 8px; /* 셀 내부 여백 */
+            text-align: left; /* 텍스트 정렬 (왼쪽) */
+            font-size: 14px; /* 글자 크기 */
+            word-break: break-word; /* 긴 단어 줄바꿈 */
+            overflow-wrap: break-word; /* 줄바꿈 가능하도록 설정 */
+            text-overflow: ellipsis; /* 넘치는 텍스트 생략 표시 (...) */
+            white-space: normal; /* 줄바꿈 활성화 */
+            max-width: 400px; /* 셀 최대 너비 제한 */
         }
 
-        table th {
-            background-color: #f9f9f9;
-            font-weight: bold;
+        .comment-table th {
+            background-color: #f9f9f9; /* 헤더 배경색 */
+            font-weight: bold; /* 헤더 글씨 굵게 */
         }
 
-        table tr:hover {
-            background-color: #f1f1f1;
+        .comment-table tr:hover {
+            background-color: #f1f1f1; /* 행 마우스 오버 시 배경색 */
         }
 
-        /* 댓글 액션 */
+        /* 댓글 액션 버튼 */
         .comment-actions button {
-            font-size: 12px;
-            color: #007bff;
-            text-decoration: none;
-            background: none;
-            border: none;
-            cursor: pointer;
+            all: unset; /* 기본 스타일 초기화 */
+            font-size: 10px; /* 글자 크기 */
+            padding: 4px 6px; /* 내부 여백 줄이기 */
+            color: #007bff; /* 버튼 텍스트 색상 */
+            text-decoration: none; /* 밑줄 제거 */
+            background: none; /* 배경 제거 */
+            border: none; /* 테두리 제거 */
+            cursor: pointer; /* 클릭 가능한 커서 표시 */
         }
 
         .comment-actions button:hover {
-            text-decoration: underline;
+            text-decoration: underline; /* 마우스 오버 시 밑줄 추가 */
+        }
+
+        /* 댓글 수정 버튼 전용 스타일 */
+        .comment-edit-buttons {
+            all: unset; /* 기본 스타일 초기화 */
+            font-size: 14px; /* 글자 크기 */
+            padding: 10px 15px; /* 버튼 내부 여백 */
+            color: white; /* 버튼 텍스트 색상 */
+            background-color: #007bff; /* 버튼 배경색 */
+            border: none; /* 테두리 제거 */
+            border-radius: 4px; /* 둥근 모서리 */
+            cursor: pointer; /* 마우스 커서 */
+            float: right; /* 오른쪽 정렬 */
+            margin-left: 10px; /* 버튼 간 좌측 간격 */
+        }
+
+        .comment-edit-buttons:hover {
+            background-color: #0056b3; /* 호버 시 배경색 변경 */
+            text-decoration: underline; /* 호버 시 밑줄 추가 */
         }
 
         .hidden {
-            display: none;
-        }
-        /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
+            display: none; /* 요소 숨기기 */
         }
 
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
+        /* 신고 모달 스타일 */
+        .report-modal {
+            display: none; /* 기본적으로 숨김 */
+            position: fixed; /* 화면 고정 위치 */
+            z-index: 1; /* 쌓임 순서 */
+            left: 0; /* 좌측 시작 위치 */
+            top: 0; /* 상단 시작 위치 */
+            width: 100%; /* 모달의 너비 */
+            height: 100%; /* 모달의 높이 */
+            background-color: rgba(0, 0, 0, 0.5); /* 반투명 검정 배경 */
+            justify-content: center; /* 내용 가운데 정렬 (Flexbox) */
+            align-items: center; /* 세로 가운데 정렬 */
         }
 
-        .modal .close {
-            position: absolute;
-            right: 20px;
-            top: 10px;
-            font-size: 20px;
-            cursor: pointer;
+        .report-modal-content {
+            background-color: white; /* 모달 내부 배경 */
+            padding: 20px; /* 내부 여백 */
+            border-radius: 8px; /* 둥근 모서리 */
+            width: 90%; /* 모달 너비 */
+            max-width: 400px; /* 모달 최대 너비 */
+            text-align: center; /* 텍스트 가운데 정렬 */
         }
-    /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
+        .report-modal .close {
+            position: absolute; /* 화면 기준 위치 */
+            right: 20px; /* 오른쪽 위치 */
+            top: 10px; /* 상단 위치 */
+            font-size: 20px; /* 글자 크기 */
+            cursor: pointer; /* 클릭 가능한 커서 */
+        }
     </style>
 </head>
 <body>
-<!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
-<!-- HTML에서 postId를 숨겨서 전달 -->
 <div id="postContainer" th:data-post-id="${post.postId}"></div>
-<!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
 
-<div class="container">
+<div th:replace="navbar.html"></div>
+<div class="post-container">
     <!-- 게시글 정보 -->
     <div class="post-title" th:text="${post.title}">Post Title</div>
     <div class="post-meta">
@@ -181,15 +225,12 @@
         <form th:action="@{/noticeboard/{id}/delete(id=${post.postId})}" method="post" style="display:inline;">
             <button type="submit">Delete</button>
         </form>
-        <!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
         <button type="button" id="reportButton">Report</button> <!-- 신고 버튼 -->
-        <!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
         <a href="/noticeboard">Back to List</a>
     </div>
-    <!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
     <!-- 게시글 신고 모달 -->
-    <div id="reportModal" class="modal hidden">
-        <div class="modal-content">
+    <div id="reportModal" class="report-modal hidden">
+        <div class="report-modal-content">
             <span class="close" id="closeReportModal">&times;</span>
             <h2>Report Post</h2>
             <form id="reportForm" th:action="@{/noticeboard/{id}/report(id=${post.postId})}" method="post">
@@ -207,8 +248,8 @@
         </div>
     </div>
     <!-- 댓글 신고 모달 -->
-    <div id="commentReportModal" class="modal hidden">
-        <div class="modal-content">
+    <div id="commentReportModal" class="report-modal hidden">
+        <div class="report-modal-content">
             <span class="close" id="closeCommentReportModal">&times;</span>
             <h2>Report Comment</h2>
             <form id="commentReportForm" method="post">
@@ -233,11 +274,16 @@
         <!-- 댓글 작성 -->
         <form th:action="@{/noticeboard/{id}/comments(id=${post.postId})}" method="post">
             <textarea name="comment" placeholder="Write a comment..." required></textarea>
-            <button type="submit">Add Comment</button>
+            <button id="commentsectionbtn" type="submit">Add Comment</button>
         </form>
 
         <!-- 댓글 리스트 -->
-        <table>
+        <table class="comment-table">
+            <colgroup>
+                <col style="width: auto;"> <!-- 첫 번째 열 (comment) -->
+                <col style="width: 150px;"> <!-- 두 번째 열 (commenter) -->
+                <col style="width: 150px;"> <!-- 세 번째 열 (actions) -->
+            </colgroup>
             <thead>
             <tr>
                 <th>Comment</th>
@@ -253,12 +299,12 @@
                           th:action="@{/noticeboard/{postId}/comments/{commentId}/edit(postId=${post.postId}, commentId=${comment.commentId})}"
                           method="post">
                         <textarea name="comment" th:text="${comment.comment}" required></textarea>
-                        <button type="submit">Save</button>
-                        <button type="button" class="cancel-edit-btn">Cancel</button>
+                        <button type="submit" class="comment-edit-buttons" >Save</button>
+                        <button type="button" class="comment-edit-buttons cancel-edit-btn">Cancel</button>
                     </form>
                 </td>
                 <td th:text="${comment.commenterName}"></td>
-                <td>
+                <td class="comment-actions">
                     <button type="button" class="edit-comment-btn">Edit</button>
                     <form th:action="@{/noticeboard/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" method="post" style="display:inline;">
                         <button type="submit">Delete</button>
