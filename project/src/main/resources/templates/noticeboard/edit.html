@@ -1,19 +1,81 @@
 <!DOCTYPE html>
+<!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 14:41 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
+<!--@@ -2,19 +2,77 @@ (뭔지 모르는데 페이지 상단에 나오길래 주석처리)-->
+<!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 14:41 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit Notice</title>
 </head>
+<link rel="stylesheet" href="/css/style.css"> <!-- CSS 파일 링크 -->
+<style>
+  /* 폼 전체 스타일 */
+form {
+max-width: 400px; /* 폼의 최대 너비 */
+margin: 0 auto; /* 화면 중앙 정렬 */
+padding: 20px; /* 내부 여백 */
+border: 1px solid #ddd; /* 테두리 */
+border-radius: 10px; /* 둥근 모서리 */
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+background-color: #fff; /* 배경색 */
+}
+
+/* 레이블 스타일 */
+label {
+display: block; /* 블록 요소로 변환 */
+margin-bottom: 5px; /* 필드와의 간격 */
+font-weight: bold; /* 강조 */
+font-size: 14px; /* 글꼴 크기 */
+color: #333; /* 텍스트 색상 */
+}
+
+/* 입력 필드와 텍스트 영역 스타일 */
+input[type="text"], textarea {
+width: 90%; /* 입력 필드 너비를 폼에 맞춤 */
+padding: 10px; /* 내부 여백 */
+margin-bottom: 15px; /* 필드 간 간격 */
+border: 1px solid #ddd; /* 테두리 */
+border-radius: 5px; /* 둥근 모서리 */
+font-size: 14px; /* 글꼴 크기 */
+}
+
+/* 텍스트 영역 크기 조정 */
+textarea {
+resize: none; /* 사용자가 크기 조정 불가 */
+height: 100px; /* 기본 높이 */
+}
+
+/* 버튼 스타일 */
+.btn {
+width: 95%; /* 버튼 너비를 폼에 맞춤 */
+padding: 10px; /* 내부 여백 */
+font-size: 16px; /* 글꼴 크기 */
+color: white; /* 텍스트 색상 */
+background-color: #007bff; /* 배경색 */
+border: none; /* 테두리 제거 */
+border-radius: 5px; /* 둥근 모서리 */
+cursor: pointer; /* 마우스 포인터 변경 */
+}
+
+/* 버튼 호버 효과 */
+.btn:hover {
+background-color: #0056b3; /* 호버 시 배경색 변경 */
+}
+
+</style>
 <body>
-  <h1>Edit Notice</h1>
-    <form th:action="@{/noticeboard/{id}(id=${post.postId})}" method="post">
-      <label for="title">Title:</label>
-      <input type="text" id="title" name="title" th:value="${post.title}" required>
-      <br>
-      <label for="content">Content:</label>
-      <textarea id="content" name="content" th:text="${post.content}" required></textarea>
-      <br>
-      <button type="submit">Update</button>
-    </form>
+<div th:replace="navbar.html"></div> <!-- 네비게이션 바 포함 -->
+<h1>Edit Notice</h1>
+<form th:action="@{/noticeboard/{id}(id=${post.postId})}" method="post">
+  <label for="title">Title:</label>
+  <input type="text" id="title" name="title" th:value="${post.title}" required>
+  <br>
+  <label for="content">Content:</label>
+  <textarea id="content" name="content" th:text="${post.content}" required></textarea>
+  <br>
+  <button class="btn" type="submit">Update</button>
+  <a href="/noticeboard">Back to List</a>
+</form>
 </body>
 </html>

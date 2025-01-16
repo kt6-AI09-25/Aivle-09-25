@@ -1,5 +1,7 @@
 package com.example.project.domain.letter;
 
+import com.example.project.domain.report.ReportDto;
+import com.example.project.domain.report.ReportService;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +18,12 @@ public class LetterController {
 
     private final LetterService letterService;
     private final UserRepository userRepository;
+
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-10 14:37 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    private final ReportService reportService;
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-10 14:37 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
 
     // 수신한 편지 목록
     @GetMapping("/received")
@@ -34,6 +42,18 @@ public class LetterController {
         model.addAttribute("letters", letters);
         return "letters/sent";
     }
+
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-10 14:37 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // 편지 신고
+    @PostMapping("/{id}/report")
+    public String reportLetter(@PathVariable Long id, @ModelAttribute ReportDto.Request request) {
+
+        request.setReport_type(3);
+        request.setReported_id(id);
+        reportService.createReport(request);
+        return "redirect:/letters/received";
+    }
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-10 14:37 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     // 편지 작성 폼
     @GetMapping("/new")
