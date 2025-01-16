@@ -1,5 +1,7 @@
 <nav>
-  <a href="/" class="logo">로고</a>
+  <a href="/" class="logo">
+    <img src="/images/logo.png" alt="로고" style="width: 40px; height: auto;">
+  </a>
   <ul>
     <li><a href="/test" class="protected">발표하기</a></li>
     <li><a href="/myresult" class="protected">분석 결과</a></li>
@@ -23,6 +25,9 @@
 
       <input type="text" name="username" placeholder="아이디" required autocomplete="on"> <!-- autocomplete 추가 -->
       <input type="password" name="password" placeholder="비밀번호" required autocomplete="on"> <!-- autocomplete 추가 -->
+      <div>
+        <input type="checkbox" id="rememberId"> <label for="rememberId">아이디 저장</label>
+      </div>
 
       <button type="button" id="socialLogin">소셜로그인</button>
       <button type="submit">로그인</button>
