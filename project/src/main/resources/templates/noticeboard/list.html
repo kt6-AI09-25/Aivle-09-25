@@ -20,6 +20,14 @@
        text-align: center;
      }
 
+     .search-filter {
+        padding: 10px; /* 안쪽 여백 */
+        font-size: 16px; /* 글자 크기 */
+        border: 1px solid #ddd; /* 테두리 */
+        border-radius: 5px; /* 둥근 모서리 */
+        margin-right: 5px; /* 검색창과의 간격 */
+      }
+
     .search-bar input[type="text"] {
        width: 70%;
        padding: 10px;
@@ -112,12 +120,15 @@
 <div th:replace="navbar.html"></div> <!-- 네비게이션 바 포함 -->
 <h1>Notice Board</h1>
 <div class="notice-board">
-  <!-- 검색바 -->
+
+<!--검색바-->
   <div class="search-bar">
-    <form action="/noticeboard/search" method="get">
-      <input type="text" name="query" placeholder="Search by title or writer" required>
-      <button type="submit">Search</button>
-    </form>
+    <select id="filter-select" class="search-filter">
+      <option value="/noticeboard/search/title">제목 및 내용</option>
+      <option value="/noticeboard/search/writer">작성자</option>
+    </select>
+    <input type="text" id="search-query" placeholder="검색어를 입력하세요." required />
+    <button id="search-button">Search</button>
   </div>
 
 
@@ -137,6 +148,7 @@
       </td>
       <td class="writer-cell nowrap-cell" th:text="${post.writerName}"></td>
       <td class="view-count-cell nowrap-cell" th:text="${post.viewCount}"></td>
+      <!--      수정삭제버튼-->
       <!--      <td class="actions nowrap-cell">-->
       <!--        <a th:href="@{/noticeboard/{id}/edit(id=${post.postId})}" class="btn">Edit</a>-->
       <!--        <form th:action="@{/noticeboard/{id}/delete(id=${post.postId})}" method="post">-->
@@ -148,7 +160,60 @@
   </table>
 
   <a href="/noticeboard/new" class="btn">Create New Post</a>
+
 </div>
+<script>
+  // 검색 버튼에 클릭 이벤트를 추가
+ document.getElementById('search-button').addEventListener('click', function () {
+   // 검색 필터와 검색어를 가져옴
+   const filterUrl = document.getElementById('filter-select').value; // 선택된 필터 URL
+   const query = document.getElementById('search-query').value.trim(); // 입력된 검색어 (공백 제거)
+
+   // 검색어가 비어 있으면 경고 메시지 표시 후 종료
+   if (!query) {
+     alert("검색어를 입력하세요."); // 사용자에게 경고
+     return; // 검색 중단
+   }
+
+   // 서버에 검색 요청을 보냄
+   fetch(`${filterUrl}?keyword=${encodeURIComponent(query)}`)
+     .then(response => {
+       // 서버 응답 상태 확인
+       if (!response.ok) {
+         throw new Error('서버 요청 중 오류가 발생했습니다.'); // 오류 발생 시 예외 던짐
+       }
+       return response.json(); // 응답 데이터를 JSON으로 변환
+     })
+     .then(data => {
+       // 테이블의 tbody 선택
+       const tableBody = document.querySelector('table tbody');
+       tableBody.innerHTML = ''; // 기존 데이터 삭제
+
+       // 검색 결과가 없을 경우
+       if (data.length === 0) {
+         const row = document.createElement('tr'); // 새로운 <tr> 생성
+         row.innerHTML = `<td colspan="3" style="text-align:center;">검색 결과가 없습니다.</td>`; // 메시지 삽입
+         tableBody.appendChild(row); // 테이블에 추가
+       } else {
+         // 검색 결과가 있을 경우, 각각의 결과를 테이블에 추가
+         data.forEach(post => {
+           const row = document.createElement('tr'); // 새로운 <tr> 생성
+           row.innerHTML = `
+             <td><a href="/noticeboard/${post.postId}">${post.title}</a></td> <!-- 게시글 제목 -->
+             <td>${post.writerName}</td> <!-- 작성자 -->
+             <td>${post.viewCount}</td> <!-- 조회수 -->
+           `;
+           tableBody.appendChild(row); // 테이블에 추가
+         });
+       }
+     })
+     .catch(error => {
+       // 요청 중 오류 발생 시
+       console.error('Error:', error); // 콘솔에 오류 출력
+       alert('검색 요청 중 오류가 발생했습니다.'); // 사용자에게 경고 메시지 표시
+     });
+ });
+</script>
 </body>
 </html>
 `
