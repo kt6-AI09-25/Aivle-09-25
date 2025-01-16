@@ -142,12 +142,20 @@ public class NoticeBoardController {
 
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 11:05 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     @GetMapping("/search/title")
-    public List<NoticeBoardDTO.Response> searchPostsTitleOrContent(@RequestParam String keyword) {
+    @ResponseBody
+    public List<NoticeBoardDTO.Response> searchPostsTitleOrContent(@RequestParam(required = false) String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            throw new IllegalArgumentException("검색어를 입력해주세요.");
+        }
         return noticeBoardService.searchPostsByTitleOrContentKeyword(keyword);
     }
 
     @GetMapping("/search/writer")
-    public List<NoticeBoardDTO.Response> searchPostsWriter(@RequestParam String keyword) {
+    @ResponseBody
+    public List<NoticeBoardDTO.Response> searchPostsWriter(@RequestParam(required = false) String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            throw new IllegalArgumentException("검색어를 입력해주세요.");
+        }
         return noticeBoardService.searchPostsByWriterKeyword(keyword);
     }
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 11:05 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
