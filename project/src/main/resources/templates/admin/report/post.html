@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post Report Detail</title>
+    <style>
+        table {
+            border-collapse: separate; /* 테두리를 잘 보이게 설정 */
+            border-spacing: 0; /* 불필요한 간격 제거 */
+        }
+
+        .highlight {
+            background-color: rgba(255, 0, 0, 0.5); /* 옅은 빨간색 배경 */
+            border: 2px solid rgba(255, 0, 0, 0.8); /* 진한 빨간색 테두리 */
+            border-radius: 4px; /* 둥근 모서리 (선택 사항) */
+            display: table-row; /* 테두리가 적용되도록 설정 */
+        }
+    </style>
+</head>
+<body>
+<!-- 게시글 정보 -->
+<h1 th:text="${post.title}"></h1>
+<p><strong>Writer:</strong> <span th:text="${post.writerName}"></span></p>
+<p><strong>Views:</strong> <span th:text="${post.viewCount}"></span></p>
+<p><strong>Content:</strong></p>
+<p class="highlight" th:text="${post.content}"></p>
+
+<!-- 게시글 수정 및 삭제 -->
+<a th:href="@{/noticeboard/{id}/edit(id=${post.postId})}">Edit</a>
+<form th:action="@{/noticeboard/{id}/delete(id=${post.postId})}" method="post" style="display:inline;">
+    <button type="submit">Delete</button>
+</form>
+<a href="/noticeboard">Back to List</a>
+
+<hr>
+
+<!-- 댓글 작성 -->
+<h2>Add Comment</h2>
+<form th:action="@{/noticeboard/{id}/comments(id=${post.postId})}" method="post">
+    <textarea name="comment" placeholder="Write a comment..." required></textarea>
+    <button type="submit">Add Comment</button>
+</form>
+
+<hr>
+
+<!-- 댓글 리스트 -->
+<h2>Comments</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Comment</th>
+        <th>Commenter</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="comment : ${comments}"
+        th:classappend="${comment.commentId == selectedCommentId} ? 'highlight'">
+        <td th:text="${comment.comment}"></td>
+        <td th:text="${comment.commenterName}"></td>
+        <td>
+            <!-- 댓글 수정 -->
+            <a th:href="@{/noticeboard/{postId}/comments/{commentId}/edit(postId=${post.postId}, commentId=${comment.commentId})}">Edit</a>
+            <!-- 댓글 삭제 -->
+            <form th:action="@{/noticeboard/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" method="post" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 모든 Edit 버튼에 이벤트 리스너 추가
+        document.querySelectorAll('.edit-comment-btn').forEach((editButton) => {
+            editButton.addEventListener('click', () => {
+                const row = editButton.closest('tr');
+                const commentText = row.querySelector('.comment-text');
+                const editForm = row.querySelector('.edit-comment-form');
+
+                // 기존 댓글 숨기고 수정 폼 보여줌
+                commentText.style.display = 'none';
+                editForm.classList.remove('hidden');
+                editForm.style.display = 'block';
+
+                // Cancel 버튼 동작 추가
+                const cancelBtn = editForm.querySelector('.cancel-edit-btn');
+                cancelBtn.addEventListener('click', () => {
+                    // 수정 폼 숨기고 기존 댓글 표시
+                    editForm.style.display = 'none';
+                    editForm.classList.add('hidden');
+                    commentText.style.display = 'inline';
+                });
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
