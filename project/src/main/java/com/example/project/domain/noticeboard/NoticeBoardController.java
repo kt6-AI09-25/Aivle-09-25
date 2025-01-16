@@ -142,13 +142,8 @@ public class NoticeBoardController {
 
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 11:05 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     @GetMapping("/search/title")
-    public List<NoticeBoardDTO.Response> searchPostsTitle(@RequestParam String keyword) {
-        return noticeBoardService.searchPostsByTitleKeyword(keyword);
-    }
-
-    @GetMapping("/search/content")
-    public List<NoticeBoardDTO.Response> searchPostsContent(@RequestParam String keyword) {
-        return noticeBoardService.searchPostsByContentKeyword(keyword);
+    public List<NoticeBoardDTO.Response> searchPostsTitleOrContent(@RequestParam String keyword) {
+        return noticeBoardService.searchPostsByTitleOrContentKeyword(keyword);
     }
 
     @GetMapping("/search/writer")
