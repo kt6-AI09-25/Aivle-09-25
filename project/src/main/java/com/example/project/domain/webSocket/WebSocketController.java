@@ -57,10 +57,4 @@ public class WebSocketController {
             log.info("Active users after disconnect: {}", userStatus);
         }
     }
-
-    @GetMapping("/active-test")
-    public String wsPage() {
-        return "/admin/ws"; // templates/admin/ws.html로 매핑
-    }
 }
-
