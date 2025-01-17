@@ -249,7 +249,6 @@
               formData.append('file', blob, 'presentation.webm');
 
               try {
-
                   const response = await fetch('/files/upload', { // -수정 이유찬-
 
                       method: 'POST',
@@ -361,7 +360,6 @@
       document.getElementById('loadingModal').style.display = 'block'; // 로딩 화면 표시
 
       setTimeout(function() {
-
           window.location.href = "/files/upload/results" // 분석 결과 페이지로 이동 // -수정 이유찬-
 
       }, 1000); // 1초 후 페이지 이동
