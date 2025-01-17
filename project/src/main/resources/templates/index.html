@@ -279,17 +279,19 @@
         event.preventDefault();
 
         const data = new FormData(document.getElementById("loginForm"));
+        const username = data.get("username"); // FormData에서 username 값 가져오기
 
         fetch('/login', { method: 'POST', body: data })
             .then((response) => {
                 if (response.ok) {
                     alert("로그인 성공!");
-                    window.location.href = "/"; // 로그인 후 페이지 리프레시
                     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 14:48 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    // SharedWorker에 연결 요청
-                    worker.port.postMessage({ type: "connect", username: data.username });
+                    // SharedWorker에 메시지 전송
+                    worker.port.postMessage({ type: "connect", username: username });
+                    console.log("Message sent to SharedWorker:", { type: "connect", username: username });
                     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 14:48 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+                    window.location.href = "/"; // 로그인 후 페이지 리프레시
                 } else {
                     alert("로그인 실패. 아이디 또는 비밀번호를 확인하세요.");
                 }
@@ -314,29 +316,6 @@
             document.getElementById("signupModal").style.display = "none";
         }
     };
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 14:46 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-    // 페이지 종료 시 WebSocket 연결 해제
-    window.addEventListener('beforeunload', () => {
-        worker.port.postMessage({ type: "disconnect" });
-        worker.port.close();
-    });
-
-    const worker = new SharedWorker("shared-worker.js");
-
-    worker.port.onmessage = function (event) {
-        const data = event.data;
-
-        if (data.type === "connected") {
-            console.log("WebSocket connected via SharedWorker.");
-        } else if (data.type === "activeUsers") {
-            console.log("Active users received from SharedWorker:", data.data);
-            // 활성 사용자 목록 업데이트
-            updateActiveUsers(data.data);
-        }
-    };
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 14:46 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
 </script>
 </body>
 </html>

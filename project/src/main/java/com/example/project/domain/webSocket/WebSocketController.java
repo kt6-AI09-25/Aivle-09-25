@@ -57,4 +57,5 @@ public class WebSocketController {
             log.info("Active users after disconnect: {}", userStatus);
         }
     }
+
 }
