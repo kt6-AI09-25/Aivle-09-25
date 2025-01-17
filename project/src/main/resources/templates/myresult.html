@@ -12,22 +12,22 @@
             padding: 0;
             background-color: #f4f4f9;
             color: #333;
+            overflow-x: hidden;
         }
         body {
             display: flex;
             flex-direction: column;
         }
         .container {
-            width: 1600px;
-            height: 100%;
-            max-width: 100%;
+            width: 100%;
+            max-width: 1300px;
             margin: 20px auto;
             padding: 20px;
             background: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             display: grid;
-            grid-template-columns: 1.5fr 2fr;
+            grid-template-columns: 1fr 1.2fr;
             gap: 20px;
         }
         .video-section {
@@ -43,8 +43,8 @@
         }
         video {
             width: 100%;
-            max-width: 700px;
-            height: 400px;
+            max-width: 100%;
+            height: auto;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -52,6 +52,23 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
+        }
+        .chart {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 1;
+        }
+        #combinedSection {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        #feedbackSection {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 90%;
         }
         .section {
             background: #fff;
@@ -65,12 +82,6 @@
             align-items: center;
             overflow: hidden;
         }
-        .chart {
-            height: 400px; /* 높이를 1/5 줄임 */
-        }
-        #feedbackSection {
-            height: 400px; /* 높이를 1/5 줄임 */
-        }
         .chart canvas {
             max-width: 100%;
             max-height: 100%;
@@ -82,8 +93,7 @@
             text-align: center;
         }
         .record-section {
-            grid-column: 2 / 3;
-            grid-row: 2 / 3;
+            grid-column: 1 / 3;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -181,7 +191,6 @@
         data: {
             labels: labels,
             datasets: [{
-                label: '평균 점수',
                 data: averageScores,
                 backgroundColor: 'rgba(0, 123, 255, 0.2)',
                 borderColor: '#007bff',
@@ -191,7 +200,7 @@
         options: {
             plugins: {
                 legend: {
-                    display: true,
+                    display: false,
                 }
             }
         }
@@ -221,7 +230,6 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: `${selectedResult.date} 점수`,
                     data: selectedResult.scores,
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
                     borderColor: 'rgba(255, 99, 132, 1)',
@@ -231,7 +239,7 @@
             options: {
                 plugins: {
                     legend: {
-                        display: true,
+                        display: false,
                     }
                 }
             }
