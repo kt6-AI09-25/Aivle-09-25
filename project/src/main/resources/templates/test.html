@@ -6,57 +6,110 @@
   <title>테스트 페이지</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
+
     #myVideo {
+
         display: block;
+
         margin: 20px auto;
+
         border: 2px solid black;
+
         position: relative;
+
     }
+
     .controls {
+
         text-align: center;
+
         margin-top: 10px;
+
     }
+
     #timer {
+
         font-size: 24px;
+
         color: red;
+
         text-align: center;
+
         margin-top: 10px;
+
     }
+
     /* 로딩 화면 스타일 */
+
     #loadingModal {
+
         display: none; /* 기본적으로 숨김 */
+
         position: fixed;
+
         z-index: 2; /* 모달보다 위에 표시 */
+
         left: 0;
+
         top: 0;
+
         width: 100%;
+
         height: 100%;
+
         background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+
         color: white;
+
         text-align: center;
+
         padding-top: 20%;
+
         font-size: 24px;
+
     }
+
     #audioMeter {
+
         display: flex;
+
         justify-content: center;
+
         align-items: center;
+
         width: 90%;
+
         height: 50px;
+
         margin: 20px auto;
+
         position: relative;
+
     }
+
     .bar {
+
         width: 3px;
+
         margin: 0 1px;
+
         height: 20px;
+
         background-color: #ff3b3b;
+
         display: inline-block;
+
         transition: height 0.1s;
+
     }
   </style>
 </head>
 <body>
+<!-- 로딩 화면 -->
+<div id="loadingModal">        <!-- 수정 이유찬 -->
+
+  로딩 중입니다...
+</div>
 <!-- 비디오 화면 -->
 <video id="myVideo" width="900" height="500" autoplay playsinline></video>
 
@@ -74,150 +127,254 @@
 </div>
 
 <script>
+
   let stream;
+
   let mediaRecorder;
+
   let recordedChunks = [];
+
   let timerInterval;
+
   let seconds = 0;
+
   let audioContext;
+
   let analyser;
+
   let microphone;
+
   const bars = [];
 
   // 타이머 업데이트
+
   function updateTimer() {
+
       seconds++;
+
       const minutes = Math.floor(seconds / 60);
+
       const remainingSeconds = seconds % 60;
+
       document.getElementById('timer').textContent =
+
           `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+
   }
 
   // 오디오 레벨 바 생성
+
   function createAudioBars() {
+
       const audioMeter = document.getElementById('audioMeter');
+
       for (let i = 0; i < 40; i++) {
+
           const bar = document.createElement('div');
+
           bar.classList.add('bar');
+
           bars.push(bar);
+
           audioMeter.appendChild(bar);
+
       }
+
   }
 
   // 오디오 레벨 모니터링
+
   function monitorAudioLevel() {
+
       const dataArray = new Uint8Array(analyser.fftSize);
 
       function updateAudioLevel() {
+
           analyser.getByteFrequencyData(dataArray);
+
           for (let i = 0; i < bars.length; i++) {
+
               const barHeight = dataArray[i] / 256 * 50; // 값에 따라 바 크기 조정
+
               bars[i].style.height = `${barHeight}px`;
+
           }
+
           requestAnimationFrame(updateAudioLevel);
+
       }
 
       updateAudioLevel();
+
   }
 
   // 발표 시작
+
   async function startPresentation() {
+
       try {
+
           stream = await navigator.mediaDevices.getUserMedia({
+
               video: { width: 900, height: 500 },
+
               audio: true
+
           });
+
           const video = document.getElementById('myVideo');
+
           video.srcObject = stream;
 
           mediaRecorder = new MediaRecorder(stream);
+
           recordedChunks = [];
 
           mediaRecorder.ondataavailable = function(event) {
+
               if (event.data.size > 0) {
+
                   recordedChunks.push(event.data);
+
               }
+
           };
 
           mediaRecorder.onstop = async function() {
+
               const blob = new Blob(recordedChunks, { type: 'video/webm' });
+
               const formData = new FormData();
+
               formData.append('file', blob, 'presentation.webm');
 
               try {
-                  const response = await fetch('/upload', {
+
+                  const response = await fetch('/files/upload', { // -수정 이유찬-
+
                       method: 'POST',
+
                       body: formData
+
                   });
 
                   if (response.ok) {
+
                       console.log("녹화본이 서버로 성공적으로 업로드되었습니다.");
+
                   } else {
+
                       console.error("서버 응답 오류:", response.statusText);
+
                       alert("녹화본 업로드에 실패했습니다.");
+
                   }
+
               } catch (error) {
+
                   console.error("업로드 중 오류:", error);
+
                   alert("녹화본 업로드 중 문제가 발생했습니다.");
+
               }
+
           };
 
           mediaRecorder.start();
+
           seconds = 0;
+
           document.getElementById('timer').textContent = "00:00";
+
           timerInterval = setInterval(updateTimer, 1000);
 
           // 오디오 분석 초기화
+
           audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
           analyser = audioContext.createAnalyser();
+
           microphone = audioContext.createMediaStreamSource(stream);
+
           microphone.connect(analyser);
 
           createAudioBars();
+
           monitorAudioLevel();
 
           console.log("발표 녹화가 시작되었습니다.");
+
           document.getElementById('startBtn').disabled = true;
+
           document.getElementById('stopBtn').disabled = false;
+
       } catch (error) {
+
           console.error("발표 시작 중 오류:", error);
+
           alert("발표를 시작할 수 없습니다: " + error.message);
+
       }
+
   }
 
   // 발표 중지
+
   function stopPresentation() {
+
       if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+
           mediaRecorder.stop();
+
           console.log("발표 녹화가 중지되었습니다.");
+
       }
 
       if (stream) {
+
           const tracks = stream.getTracks();
+
           tracks.forEach(track => track.stop());
+
           stream = null;
+
       }
 
       if (audioContext) {
+
           audioContext.close();
+
       }
 
       clearInterval(timerInterval);
+
       document.getElementById('startBtn').disabled = false;
+
       document.getElementById('stopBtn').disabled = true;
+
   }
 
   // 분석 결과 보기 버튼 클릭 시 로딩 화면 표시 후 페이지 이동
+
   document.getElementById('viewResultsBtn').addEventListener('click', function() {
+
       document.getElementById('loadingModal').style.display = 'block'; // 로딩 화면 표시
+
       setTimeout(function() {
-          window.location.href = '/result'; // 분석 결과 페이지로 이동
+
+          window.location.href = "/files/upload/results" // 분석 결과 페이지로 이동 // -수정 이유찬-
+
       }, 1000); // 1초 후 페이지 이동
+
   });
 
   // 이벤트 핸들러 연결
+
   document.getElementById('startBtn').addEventListener('click', startPresentation);
+
   document.getElementById('stopBtn').addEventListener('click', stopPresentation);
 </script>
 </body>
 </html>
+
+ 
