@@ -57,6 +57,10 @@
   </style>
 </head>
 <body>
+<!-- 로딩 화면 -->
+<div id="loadingModal">        <!-- 수정 이유찬 -->
+  로딩 중입니다...
+</div>
 <!-- 비디오 화면 -->
 <video id="myVideo" width="900" height="500" autoplay playsinline></video>
 
@@ -145,7 +149,7 @@
               formData.append('file', blob, 'presentation.webm');
 
               try {
-                  const response = await fetch('/upload', {
+                  const response = await fetch('/files/upload', { // -수정 이유찬-
                       method: 'POST',
                       body: formData
                   });
@@ -211,7 +215,7 @@
   document.getElementById('viewResultsBtn').addEventListener('click', function() {
       document.getElementById('loadingModal').style.display = 'block'; // 로딩 화면 표시
       setTimeout(function() {
-          window.location.href = '/result'; // 분석 결과 페이지로 이동
+          window.location.href = "/files/upload/results" // 분석 결과 페이지로 이동 // -수정 이유찬-
       }, 1000); // 1초 후 페이지 이동
   });
 
