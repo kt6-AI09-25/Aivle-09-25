@@ -223,7 +223,7 @@
         const feedbackSection = document.getElementById('selectedFeedback');
         feedbackSection.textContent = selectedResult.feedback;
 
-        // 선택된 발표의 방사형 차트를 다시 그립니다.
+        // 선택된 발표의 방사형 차트를 다시 그립니다...
         const radarCtx = document.getElementById('averageRadarChart').getContext('2d');
         new Chart(radarCtx, {
             type: 'radar',
