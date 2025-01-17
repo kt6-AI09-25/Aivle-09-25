@@ -183,4 +183,45 @@
           alert("로그아웃 중 오류가 발생했습니다.");
       });
   };
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-17 15:26 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      const worker = new SharedWorker("/shared-worker.js?nocache=" + Date.now());
+    let currentUsername = null; // 사용자 이름 저장
+
+    worker.port.start(); // SharedWorker 시작
+
+    // SharedWorker 메시지 수신
+    worker.port.onmessage = function (event) {
+        console.log("Message received from SharedWorker:", event.data);
+        const data = event.data;
+
+        if (data.type === "activeUsers") {
+            console.log("Active users received:", data.data);
+            // 여기서 활성 사용자 목록을 업데이트하거나 필요한 작업 수행
+        } else if (data.type === "connected") {
+            console.log("WebSocket connected via SharedWorker.");
+        } else if (data.type === "requestUsername" && currentUsername) {
+            // SharedWorker로 사용자 이름 다시 전달
+            worker.port.postMessage({ type: "connect", username: currentUsername });
+        }
+    };
+
+    // 페이지 로드 시 사용자 상태 동기화
+    fetch('/auth/status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.isLoggedIn) {
+                currentUsername = data.username; // 사용자 이름 저장
+                worker.port.postMessage({ type: "connect", username: currentUsername });
+            }
+        });
+
+    // 페이지 종료 시 navigate 이벤트 전송
+    window.addEventListener('beforeunload', () => {
+        worker.port.postMessage({ type: "navigate", username: currentUsername });
+    });
+
+    console.log("SharedWorker initialized in navbar.");
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-17 15:26 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
 </script>
