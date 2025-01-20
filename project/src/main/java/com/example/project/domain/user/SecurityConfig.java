@@ -58,8 +58,8 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID") // 쿠키 삭제
                 )
                 .sessionManagement(session -> session
-                        .maximumSessions(1) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지)
-                        .maxSessionsPreventsLogin(true) // 새로운 로그인 시도를 막음
+                        .maximumSessions(3) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지)
+                        .maxSessionsPreventsLogin(false) // 새로운 로그인 시도를 막음
                         .sessionRegistry(sessionRegistry()) // SessionRegistry 설정
                 );
         return http.build();
