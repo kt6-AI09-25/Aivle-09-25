@@ -152,9 +152,8 @@
       loginModal.style.display = "none";
   }
 
-  // 로그아웃 버튼 클릭 처리
-  document.getElementById("logoutBtn").onclick = function() {
-      // 서버 로그아웃 요청
+  // 로그아웃 함수 정의
+  function handleLogout() {
       fetch('/logout', {
           method: 'POST',
           headers: {
@@ -163,7 +162,6 @@
       })
       .then(response => {
           if (response.ok) {
-              // 클라이언트 상태 초기화
               isLoggedIn = false;
               sessionStorage.removeItem("isLoggedIn"); // 세션 스토리지에서 로그인 상태 삭제
               sessionStorage.removeItem("nickname");  // 세션 스토리지에서 닉네임 삭제
@@ -184,5 +182,8 @@
           console.error("Logout Error:", error);
           alert("로그아웃 중 오류가 발생했습니다.");
       });
-  };
+  }
+
+  // 로그아웃 버튼 클릭 처리
+  document.getElementById("logoutBtn").onclick = handleLogout;
 </script>
