@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Received Letters</title>
+  <!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
+  <style>
+    /* 모달 스타일 */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .modal .close {
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .actions {
+      margin-top: 10px;
+    }
+
+    .actions button {
+      margin-right: 5px;
+      cursor: pointer;
+    }
+  </style>
+  <!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
+</head>
+<body>
+<h1>Received Letters</h1>
+<ul>
+  <li th:each="letter : ${letters}">
+    <p><strong>From:</strong> <span th:text="${letter.senderName}"></span></p>
+    <p><strong>Content:</strong> <span th:text="${letter.letterContent}"></span></p>
+    <p><strong>Received At:</strong> <span th:text="${letter.dateSend}"></span></p>
+    <!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
+    <div class="actions">
+      <button type="button" class="report-letter-btn" th:data-letter-id="${letter.letterId}">Report</button>
+    </div>
+    <!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
+    <hr>
+  </li>
+</ul>
+<a href="/letters/sent">View Sent Letters</a> | <a href="/letters/new">Compose Letter</a>
+<!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-11 16:23 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
+<!-- 신고 모달 -->
+<div id="letterReportModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeLetterReportModal">&times;</span>
+    <h2>Report Letter</h2>
+    <form id="letterReportForm" method="post">
+      <label for="letterReportReason">Select a reason:</label>
+      <select name="report_details" id="letterReportReason" required>
+        <option value="" disabled selected>Select reason</option>
+        <option th:each="reason : ${T(com.example.project.domain.report.ReportDetails).values()}"
+                th:value="${reason}" th:text="${reason}"></option>
+      </select>
+      <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="submit" style="background-color: #007bff; color: white;">Submit Report</button>
+        <button type="button" id="cancelLetterReportButton" style="background-color: #f5f5f5; color: #333;">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const letterReportModal = document.getElementById('letterReportModal');
+    const closeLetterReportModal = document.getElementById('closeLetterReportModal');
+    const cancelLetterReportButton = document.getElementById('cancelLetterReportButton');
+    const letterReportForm = document.getElementById('letterReportForm');
+
+    // 신고 버튼 클릭 시 모달 열기
+    document.querySelectorAll('.report-letter-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const letterId = button.getAttribute('data-letter-id');
+        letterReportForm.setAttribute('action', `/letters/${letterId}/report`);
+        letterReportModal.style.display = 'flex';
+      });
+    });
+
+    // 모달 닫기 (x 버튼 및 취소 버튼)
+    closeLetterReportModal.addEventListener('click', () => {
+      letterReportModal.style.display = 'none';
+    });
+
+    cancelLetterReportButton.addEventListener('click', () => {
+      letterReportModal.style.display = 'none';
+    });
+
+    // 모달 외부 클릭 시 닫기
+    window.addEventListener('click', (event) => {
+      if (event.target === letterReportModal) {
+        letterReportModal.style.display = 'none';
+      }
+    });
+  });
+</script>
+
+<!--!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-11 16:23 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
+</body>
+</html>

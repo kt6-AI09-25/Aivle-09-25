@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create New Report</title>
+</head>
+<body>
+<h1>Create New Report</h1>
+<form th:action="@{/admin/report}" method="post" th:object="${report}">
+  <!-- Reported ID 입력 -->
+  <label for="reported_id">Reported ID:</label>
+  <input type="number" id="reported_id" name="reported_id" th:field="*{reported_id}" required>
+  <br>
+
+  <!-- Reported Type 입력 -->
+  <label for="report_type">Report Type:</label>
+  <input type="number" id="report_type" name="report_type" th:field="*{report_type}" required>
+  <br>
+
+  <!-- Report Details 선택 -->
+  <label for="report_details">Report Details:</label>
+  <select id="report_details" name="report_details" th:field="*{report_details}" required>
+    <option value="" disabled selected>Choose...</option>
+    <option th:each="detail : ${T(com.example.project.domain.report.ReportDetails).values()}"
+            th:value="${detail}"
+            th:text="${detail}"></option>
+  </select>
+  <br>
+
+  <button type="submit">Create</button>
+</form>
+</body>
+</html>

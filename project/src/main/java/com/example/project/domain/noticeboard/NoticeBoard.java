@@ -1,5 +1,6 @@
 package com.example.project.domain.noticeboard;
 
+import com.example.project.domain.comment.Comment;
 import com.example.project.domain.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -37,6 +39,10 @@ public class NoticeBoard {
 
     @Column(nullable = false)
     private Boolean isEdited = false;
+
+    // 게시글 삭제 시, 댓글이 있어도 삭제(외래 키 제약 조건)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments;
 
     @PrePersist
     public void prePersist() {

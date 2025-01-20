@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sent Letters</title>
+</head>
+<body>
+<h1>Sent Letters</h1>
+<ul>
+  <li th:each="letter : ${letters}">
+    <p><strong>To:</strong> <span th:text="${letter.receiverUsername}"></span></p>
+    <p><strong>Content:</strong> <span th:text="${letter.letterContent}"></span></p>
+    <p><strong>Sent At:</strong> <span th:text="${letter.dateSend}"></span></p>
+    <hr>
+  </li>
+</ul>
+<a href="/letters/received">View Received Letters</a> | <a href="/letters/new">Compose Letter</a>
+</body>
+</html>

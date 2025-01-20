@@ -2,33 +2,218 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notice Board</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .notice-board {
+      border: 0px solid #333; /* 테두리 설정 (현재는 테두리 없음) */
+      padding: 20px; /* 내부 여백 설정 */
+      border-radius: 10px; /* 테두리 모서리를 둥글게 처리 */
+      width: 90%; /* 화면 전체 너비의 90% 사용 */
+      max-width: none; /* 최대 너비 제한 해제 */
+      margin: 0 auto; /* 중앙 정렬 */
+      background-color: #f9f9f9; /* 배경색 설정 (밝은 회색) */
+     }
+     .search-bar {
+       margin-bottom: 20px;
+       text-align: center;
+     }
+
+     .search-filter {
+        padding: 10px; /* 안쪽 여백 */
+        font-size: 16px; /* 글자 크기 */
+        border: 1px solid #ddd; /* 테두리 */
+        border-radius: 5px; /* 둥근 모서리 */
+        margin-right: 5px; /* 검색창과의 간격 */
+      }
+
+    .search-bar input[type="text"] {
+       width: 70%;
+       padding: 10px;
+       font-size: 16px;
+       border: 1px solid #ddd;
+       border-radius: 5px;
+     }
+
+     .search-bar button {
+       padding: 10px 15px;
+       font-size: 16px;
+       color: #fff;
+       background-color: #007bff;
+       border: none;
+       border-radius: 5px;
+       cursor: pointer;
+     }
+
+     .search-bar button:hover {
+       background-color: #0056b3;
+     }
+
+    table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 14px; /* 글씨 크기 슬림하게 */
+    }
+
+    table th, table td {
+    border-bottom: 1px solid #ddd; /* 하단 선만 유지 */
+    padding: 6px 8px; /* 패딩 조절 */
+    text-align: left;
+    }
+
+    table th {
+    background-color: #f7f7f7; /* 헤더의 은은한 배경색 */
+    color: #333; /* 헤더 글자색 */
+    font-weight: bold;
+    text-align: center;
+    }
+
+    table tr:hover {
+    background-color: #f5f5f5; /* 호버 시 은은한 강조 */
+    cursor: pointer; /* 클릭 가능해 보이는 느낌 */
+    }
+
+    .actions a {
+      margin-right: 10px;
+    }
+
+    form {
+      display: inline;
+    }
+
+    .title-cell {
+     width: 40%;
+    }
+
+    .writer-cell, .view-count-cell {
+      width: 5%;
+      text-align: center;
+    }
+
+    .nowrap-cell {
+      white-space: nowrap; /* 줄바꿈 방지 */
+      overflow: hidden; /* 넘치는 텍스트 숨김 */
+      text-overflow: ellipsis; /* 넘치는 텍스트는 "..."로 표시 */
+      max-width: 80px; /* 너비 제한 */
+    }
+
+     .btn {
+     display: inline-block; /* 버튼을 인라인 요소로 표시하되, 블록 요소처럼 크기를 지정 가능 */
+     padding: 15px 10px; /* 버튼 안쪽 여백(위아래 10px, 좌우 20px) */
+     background-color: #007BFF; /* 버튼의 배경색 (파란색) */
+     color: white; /* 텍스트 색상 (흰색) */
+     text-align: center; /* 텍스트를 버튼 내부에서 중앙 정렬 */
+     text-decoration: none; /* 링크일 경우 기본 밑줄 제거 */
+     border-radius: 8px; /* 버튼의 모서리를 둥글게 (5px 반경) */
+     font-size: 16px; /* 버튼 내부 텍스트의 글꼴 크기 (16px) */
+     margin: 20px 0;
+     float:right ;
+    }
+    .btn:hover {
+     background-color: #0056b3; /* 버튼 hover 효과 */
+    }
+  </style>
 </head>
 <body>
+<div th:replace="navbar.html"></div> <!-- 네비게이션 바 포함 -->
 <h1>Notice Board</h1>
-<a href="/noticeboard/new">Create New Post</a>
-<table>
-  <thead>
-  <tr>
-    <th>Title</th>
-    <th>Writer</th>
-    <th>View Count</th>
-    <th>Actions</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="post : ${posts}">
-    <td><a th:href="@{/noticeboard/{id}(id=${post.postId})}" th:text="${post.title}"></a></td>
-    <td th:text="${post.writerName}"></td>
-    <td th:text="${post.viewCount}"></td>
-    <td>
-      <a th:href="@{/noticeboard/{id}/edit(id=${post.postId})}">Edit</a> |
-      <form th:action="@{/noticeboard/{id}/delete(id=${post.postId})}" method="post" style="display:inline;">
-        <button type="submit">Delete</button>
-      </form>
-    </td>
-  </tr>
-  </tbody>
-</table>
+<div class="notice-board">
+
+<!--검색바-->
+  <div class="search-bar">
+    <select id="filter-select" class="search-filter">
+      <option value="/noticeboard/search/title">제목 및 내용</option>
+      <option value="/noticeboard/search/writer">작성자</option>
+    </select>
+    <input type="text" id="search-query" placeholder="검색어를 입력하세요." required />
+    <button id="search-button">Search</button>
+  </div>
+
+
+  <table>
+    <thead>
+    <tr>
+      <th class="title-cell">제목</th>
+      <th class="writer-cell nowrap-cell">작성자</th>
+      <th class="view-count-cell nowrap-cell">조회수</th>
+      <!--      <th>Actions</th>-->
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="post : ${posts}">
+      <td class="title-cell">
+        <a th:href="@{/noticeboard/{id}(id=${post.postId})}" th:text="${post.title}"></a>
+      </td>
+      <td class="writer-cell nowrap-cell" th:text="${post.writerName}"></td>
+      <td class="view-count-cell nowrap-cell" th:text="${post.viewCount}"></td>
+      <!--      수정삭제버튼-->
+      <!--      <td class="actions nowrap-cell">-->
+      <!--        <a th:href="@{/noticeboard/{id}/edit(id=${post.postId})}" class="btn">Edit</a>-->
+      <!--        <form th:action="@{/noticeboard/{id}/delete(id=${post.postId})}" method="post">-->
+      <!--          <button type="submit" class="btn">Delete</button>-->
+      <!--        </form>-->
+      <!--      </td>-->
+    </tr>
+    </tbody>
+  </table>
+
+  <a href="/noticeboard/new" class="btn">Create New Post</a>
+
+</div>
+<script>
+  // 검색 버튼에 클릭 이벤트를 추가
+ document.getElementById('search-button').addEventListener('click', function () {
+   // 검색 필터와 검색어를 가져옴
+   const filterUrl = document.getElementById('filter-select').value; // 선택된 필터 URL
+   const query = document.getElementById('search-query').value.trim(); // 입력된 검색어 (공백 제거)
+
+   // 검색어가 비어 있으면 경고 메시지 표시 후 종료
+   if (!query) {
+     alert("검색어를 입력하세요."); // 사용자에게 경고
+     return; // 검색 중단
+   }
+
+   // 서버에 검색 요청을 보냄
+   fetch(`${filterUrl}?keyword=${encodeURIComponent(query)}`)
+     .then(response => {
+       // 서버 응답 상태 확인
+       if (!response.ok) {
+         throw new Error('서버 요청 중 오류가 발생했습니다.'); // 오류 발생 시 예외 던짐
+       }
+       return response.json(); // 응답 데이터를 JSON으로 변환
+     })
+     .then(data => {
+       // 테이블의 tbody 선택
+       const tableBody = document.querySelector('table tbody');
+       tableBody.innerHTML = ''; // 기존 데이터 삭제
+
+       // 검색 결과가 없을 경우
+       if (data.length === 0) {
+         const row = document.createElement('tr'); // 새로운 <tr> 생성
+         row.innerHTML = `<td colspan="3" style="text-align:center;">검색 결과가 없습니다.</td>`; // 메시지 삽입
+         tableBody.appendChild(row); // 테이블에 추가
+       } else {
+         // 검색 결과가 있을 경우, 각각의 결과를 테이블에 추가
+         data.forEach(post => {
+           const row = document.createElement('tr'); // 새로운 <tr> 생성
+           row.innerHTML = `
+             <td><a href="/noticeboard/${post.postId}">${post.title}</a></td> <!-- 게시글 제목 -->
+             <td>${post.writerName}</td> <!-- 작성자 -->
+             <td>${post.viewCount}</td> <!-- 조회수 -->
+           `;
+           tableBody.appendChild(row); // 테이블에 추가
+         });
+       }
+     })
+     .catch(error => {
+       // 요청 중 오류 발생 시
+       console.error('Error:', error); // 콘솔에 오류 출력
+       alert('검색 요청 중 오류가 발생했습니다.'); // 사용자에게 경고 메시지 표시
+     });
+ });
+</script>
 </body>
 </html>
+`
