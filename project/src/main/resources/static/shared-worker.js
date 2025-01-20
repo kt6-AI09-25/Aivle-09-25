@@ -7,6 +7,7 @@ console.log("SockJS and StompJS loaded in SharedWorker");
 
 
 let stompClient = null;
+let connectedUsername = null; // 현재 연결된 사용자 추적
 const connectedPorts = []; // SharedWorker와 연결된 모든 포트
 
 console.log("SharedWorker script loaded");
@@ -14,6 +15,12 @@ console.log("SharedWorker script loaded");
 onconnect = function (event) {
 
     const port = event.ports[0];
+
+    if (connectedPorts.includes(port)) {
+        console.log("Port is already connected.");
+        return;
+    }
+
     console.log("SharedWorker connected to a client");
     connectedPorts.push(port);
 
@@ -22,6 +29,10 @@ onconnect = function (event) {
         const data = e.data;
 
         if (data.type === "connect") {
+            if (data.username === connectedUsername) {
+                console.log("Duplicate connect request ignored for user:", data.username);
+                return; // 중복 요청 무시
+            }
             initializeWebSocket(data.username, port);
             console.log("WebSocket initialization request for username:", data.username);
         } else if (data.type === 'navigate') {
@@ -42,16 +53,22 @@ onconnect = function (event) {
 
 function initializeWebSocket(username, port) {
     console.log("Initializing WebSocket connection for user:", username);
-    if (stompClient && stompClient.connected) {
-        console.log("WebSocket already connected.");
+    if (stompClient && stompClient.connected && connectedUsername === username) {
+        console.log("WebSocket already connected for user:", username);
         return;
+    }
+
+    // 이전 연결 정리
+    if (stompClient && stompClient.connected) {
+        disconnectWebSocket();
     }
 
     const socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
+    connectedUsername = username;
 
     stompClient.connect({}, () => {
-        console.log("WebSocket connected.");
+        console.log("WebSocket connected for user:", username);
 
         // 서버에 사용자 이름 전송
         stompClient.send('/app/status', {}, username);
