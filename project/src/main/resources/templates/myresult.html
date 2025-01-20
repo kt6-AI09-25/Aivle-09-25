@@ -27,13 +27,13 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             display: grid;
-            grid-template-columns: 1.5fr 1.5fr;
-            grid-template-rows: 2fr 1fr;
+            grid-template-columns: 2fr 1.5fr 1.5fr;
+            grid-template-rows: auto auto;
             gap: 20px;
         }
         .video-section {
             grid-column: 1 / 2;
-            grid-row: 1 / 2;
+            grid-row: 1 / 3;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -49,53 +49,35 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .chart-feedback-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .chart {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 1 / 1;
-        }
-        #combinedSection {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
-        #feedbackSection {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 90%;
-        }
-        .section {
+        .chart-section {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 15px;
-            font-size: 0.9rem;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            width: 100%;
+            height: 200px; /* 높이를 줄임 */
         }
-        .chart canvas {
-            max-width: 100%;
-            max-height: 100%;
-        }
-        .feedback {
-            font-size: 0.8rem;
-            color: #555;
-            margin-top: 15px;
-            text-align: center;
+        .feedback-section {
+            grid-column: 3 / 4;
+            grid-row: 1 / 2;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 200px; /* 높이를 방사형 차트와 동일하게 설정 */
         }
         .record-section {
-            grid-column: 2 / 3;
-            grid-row: 1 / 3;
+            grid-column: 2 / 4;
+            grid-row: 2 / 3;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -139,16 +121,14 @@
         </video>
     </div>
 
-    <!-- 방사형 차트와 발표 피드백 -->
-    <div class="chart-feedback-section">
-        <div class="section chart" id="combinedSection">
-            <h2 style="font-size: 1rem;">사용자의 발표 평균 점수</h2>
-            <canvas id="averageRadarChart"></canvas>
-        </div>
-        <div class="section" id="feedbackSection">
-            <h2 style="font-size: 1rem;">발표 피드백</h2>
-            <p class="feedback" id="selectedFeedback">발표를 선택하면 피드백이 여기에 표시됩니다.</p>
-        </div>
+    <!-- 방사형 차트 -->
+    <div class="chart-section">
+        <canvas id="averageRadarChart"></canvas>
+    </div>
+
+    <!-- 발표 피드백 -->
+    <div class="feedback-section">
+        <p id="selectedFeedback">발표를 선택하면 피드백이 여기에 표시됩니다.</p>
     </div>
 
     <!-- 발표 기록 -->
@@ -173,8 +153,8 @@
 <script>
     // 샘플 데이터
     const sampleResults = [
-        { date: '2025-01-01', scores: [80, 85, 75, 90, 88], feedback: '발표가 명확하지만 속도를 조절하세요.' },
-        { date: '2025-01-08', scores: [82, 88, 80, 85, 84], feedback: '논리 구조가 더 필요합니다.' },
+        { date: '2025-01-01', scores: [50, 50, 50, 50, 50], feedback: '발표가 명확하지만 속도를 조절하세요.' },
+        { date: '2025-01-08', scores: [100, 100, 100, 100, 100], feedback: '논리 구조가 더 필요합니다.' },
         { date: '2025-01-15', scores: [85, 87, 82, 88, 90], feedback: '청중과의 상호작용이 훌륭합니다.' },
     ];
 
@@ -187,26 +167,47 @@
     });
 
     // 방사형 차트 렌더링
+    let radarChart;
     const radarCtx = document.getElementById('averageRadarChart').getContext('2d');
-    new Chart(radarCtx, {
-        type: 'radar',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: averageScores,
-                backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                borderColor: '#007bff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: false,
+    function renderChart(data) {
+        if (radarChart) {
+            radarChart.destroy();
+        }
+        radarChart = new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20, // 20단위로 표시
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+                        enabled: true,
+                    }
                 }
             }
-        }
-    });
+        });
+    }
+
+    // 초기 평균 점수 렌더링
+    renderChart(averageScores);
 
     // 발표 기록 테이블 렌더링
     const resultsTableBody = document.getElementById('resultsTableBody');
@@ -226,26 +227,7 @@
         feedbackSection.textContent = selectedResult.feedback;
 
         // 선택된 발표의 방사형 차트를 다시 그립니다.
-        const radarCtx = document.getElementById('averageRadarChart').getContext('2d');
-        new Chart(radarCtx, {
-            type: 'radar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: selectedResult.scores,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                }
-            }
-        });
+        renderChart(selectedResult.scores);
     }
 </script>
 </body>

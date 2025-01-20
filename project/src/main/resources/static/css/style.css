@@ -8,7 +8,7 @@ nav {
     padding: 0 20px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center; /* 네비게이션 바 중앙 정렬 */
     border-bottom: 1px solid #ccc;
     min-height: 60px;
     position: relative;
@@ -29,6 +29,7 @@ nav ul {
     padding: 0;
     display: flex;
     align-items: center;
+    justify-content: center; /* 버튼 중앙 정렬 */
 }
 
 nav ul li {
@@ -87,7 +88,7 @@ h1 {
 
 .container {
     max-width: 800px; /* 최대 너비 설정 */
-    margin: 40; /* 중앙 정렬 */
+    margin: 40px auto; /* 중앙 정렬 */
     padding: 20px; /* 내부 여백 */
     text-align: center; /* 텍스트 중앙 정렬 */
 }
@@ -134,21 +135,21 @@ nav ul li a:hover {
 
 /* feature1 크기 조정 */
 .feature1 {
-    padding 20px;
+    padding: 20px;
     width: 350px; /* 화면 비율에 맞게 너비 조정 */
     height: 300px; /* 박스 높이 줄이기 */
 }
 
 /* feature2 크기 조정 */
 .feature2 {
-    padding 20px;
+    padding: 20px;
     width: 1090px; /* 화면 비율에 맞게 너비 조정 */
     height: 300px; /* 박스 높이 줄이기 */
 }
 
 /* feature3 크기 조정 */
 .feature3 {
-    padding 20px;
+    padding: 20px;
     width: 300px; /* 화면 비율에 맞게 너비 조정 */
     height: 300px; /* 박스 높이 줄이기 */
 }
