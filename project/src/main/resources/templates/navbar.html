@@ -205,6 +205,9 @@
         } else if (data.type === "requestUsername" && currentUsername) {
             // SharedWorker로 사용자 이름 다시 전달
             worker.port.postMessage({ type: "connect", username: currentUsername });
+        } else if (data.type === "forceLogout") {
+            console.log("Forced logout received in client. Redirecting...");
+            handleLogout();
         }
     };
 
