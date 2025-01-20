@@ -65,6 +65,14 @@ function initializeWebSocket(username, port) {
             connectedPorts.forEach((p) => p.postMessage({ type: "activeUsers", data: activeUsers }));
         });
 
+        // 강제 로그아웃 메시지 구독
+        stompClient.subscribe('/user/queue/logout', () => {
+            console.log("Forced logout message received.");
+            port.postMessage({ type: "forceLogout" });
+        }, (error) => {
+            console.error("Subscription to /user/queue/logout failed:", error);
+        });
+
         // 연결 완료 이벤트 전송
         port.postMessage({ type: "connected" });
     }, (error) => {
