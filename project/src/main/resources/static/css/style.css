@@ -1,6 +1,83 @@
 body {
     font-family: Arial, sans-serif;
-    margin: -20;
+    margin: 0;
+}
+
+nav {
+    background-color: white;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ccc;
+    min-height: 60px;
+    position: relative;
+}
+
+.logo {
+    display: inline-block;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+    margin-right: 20px;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    font-size: 16px; /* 글자 크기 추가 */
+}
+
+nav ul li a:hover {
+    background-color: #eaeaea; /* 더 연한 호버 배경색 */
+}
+
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 버튼 간격 조정 */
+}
+
+.auth-buttons a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    padding: 8px 15px;
+    border: 1px solid #007bff;
+    border-radius: 25px; /* 버튼 모서리를 둥글게 변경 */
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 14px; /* 글자 크기 추가 */
+}
+
+.auth-buttons a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.auth-buttons a:last-child {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px; /* 로그인 버튼 패딩 조정 */
+}
+
+.auth-buttons a:last-child:hover {
+    background-color: #0056b3;
 }
 
 h1 {
@@ -13,24 +90,6 @@ h1 {
     margin: 40; /* 중앙 정렬 */
     padding: 20px; /* 내부 여백 */
     text-align: center; /* 텍스트 중앙 정렬 */
-}
-
-nav {
-    background-color: white; /* 배경 색상 흰색 */
-    padding: 0px;
-    display: flex;
-    align-items: center; /* 세로 정렬 */
-    border-radius: 0px; /* 둥근 모서리 */
-    min-height: 60px; /* 최소 높이 설정 */
-}
-
-/* 로고 왼쪽 정렬 */
-.logo {
-    font-size: 20px;
-    font-weight: bold;
-    color: #333; /* 로고 글자색 */
-    text-decoration: none; /* 밑줄 없애기 */
-    margin-right: auto; /* 오른쪽 공간 확보 */
 }
 
 /* 중앙 정렬을 위한 버튼 스타일 */
@@ -64,20 +123,6 @@ nav ul li a:hover {
     color: black; /* 호버 시 글자색 변경 */
 }
 
-/* 버튼 스타일 */
-button {
-    width: 150px; /* 버튼 너비를 고정 값으로 설정 */
-    padding: 10px;
-    margin: 10px 0; /* 상하 여백 */
-    border: none; /* 테두리 없음 */
-    background-color: #007bff; /* 버튼 배경색 */
-    color: white; /* 기본 글자색 */
-    border-radius: 4px; /* 모서리 둥글게 */
-    cursor: pointer; /* 커서 포인터 */
-    transition: color 0.3s; /* 글자색 전환 효과 */
-}
-
-/* 사용법 및 설명 박스 스타일 */
 .feature1, .feature2, .feature3 {
     display: inline-block; /* 인라인 블록으로 설정 */
     background-color: #f0f0f0;
@@ -108,7 +153,6 @@ button {
     height: 300px; /* 박스 높이 줄이기 */
 }
 
-/* 모달 스타일 */
 .modal {
     display: none; /* 기본적으로 숨김 */
     position: fixed;
@@ -160,33 +204,10 @@ input[type="text"], input[type="password"] {
     border-radius: 4px; /* 모서리 둥글게 */
 }
 
-/* 푸터 스타일 */
 .footer {
     margin-top: 20px;
     padding: 20px; /* 푸터 두께 증가 */
     background-color: white;
     text-align: center;
     font-size: 18px; /* 글자 크기 조정 */
-}
-
-/* 로그인 및 회원가입 버튼 스타일 */
-.auth-buttons {
-    margin-left: auto; /* 오른쪽으로 밀어내기 */
-    display: flex; /* 플렉스 박스 사용 */
-    align-items: center; /* 세로 정렬 */
-}
-
-.auth-buttons a {
-    display: inline-block; /* 인라인 블록으로 설정 */
-    padding: 10px 20px; /* 패딩 */
-    margin-left: 10px; /* 간격 */
-    background-color: #007bff; /* 버튼 배경색 */
-    color: white; /* 기본 글자색 */
-    border-radius: 25px; /* 동그란 모서리 */
-    text-decoration: none; /* 밑줄 없애기 */
-    transition: background-color 0.3s; /* 배경색 전환 효과 */
-}
-
-.auth-buttons a:hover {
-    background-color: #0056b3; /* 호버 시 배경색 변경 */
 }
