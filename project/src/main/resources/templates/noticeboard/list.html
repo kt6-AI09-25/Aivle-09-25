@@ -58,21 +58,21 @@
     }
 
     table th, table td {
-    border-bottom: 1px solid #ddd; /* 하단 선만 유지 */
-    padding: 6px 8px; /* 패딩 조절 */
-    text-align: left;
+      border-bottom: 1px solid #ddd; /* 하단 선만 유지 */
+      padding: 6px 8px; /* 패딩 조절 */
+
     }
 
     table th {
-    background-color: #f7f7f7; /* 헤더의 은은한 배경색 */
-    color: #333; /* 헤더 글자색 */
-    font-weight: bold;
-    text-align: center;
+      background-color: #f7f7f7; /* 헤더의 은은한 배경색 */
+      color: #333; /* 헤더 글자색 */
+      font-weight: bold;
+      text-align: left;
     }
 
     table tr:hover {
-    background-color: #f5f5f5; /* 호버 시 은은한 강조 */
-    cursor: pointer; /* 클릭 가능해 보이는 느낌 */
+      background-color: #f5f5f5; /* 호버 시 은은한 강조 */
+      cursor: pointer; /* 클릭 가능해 보이는 느낌 */
     }
 
     .actions a {
@@ -84,7 +84,7 @@
     }
 
     .title-cell {
-     width: 40%;
+      width: 40%;
     }
 
     .writer-cell, .view-count-cell {
@@ -100,19 +100,19 @@
     }
 
      .btn {
-     display: inline-block; /* 버튼을 인라인 요소로 표시하되, 블록 요소처럼 크기를 지정 가능 */
-     padding: 15px 10px; /* 버튼 안쪽 여백(위아래 10px, 좌우 20px) */
-     background-color: #007BFF; /* 버튼의 배경색 (파란색) */
-     color: white; /* 텍스트 색상 (흰색) */
-     text-align: center; /* 텍스트를 버튼 내부에서 중앙 정렬 */
-     text-decoration: none; /* 링크일 경우 기본 밑줄 제거 */
-     border-radius: 8px; /* 버튼의 모서리를 둥글게 (5px 반경) */
-     font-size: 16px; /* 버튼 내부 텍스트의 글꼴 크기 (16px) */
-     margin: 20px 0;
-     float:right ;
+       display: inline-block; /* 버튼을 인라인 요소로 표시하되, 블록 요소처럼 크기를 지정 가능 */
+       padding: 15px 10px; /* 버튼 안쪽 여백(위아래 10px, 좌우 20px) */
+       background-color: #007BFF; /* 버튼의 배경색 (파란색) */
+       color: white; /* 텍스트 색상 (흰색) */
+       text-align: center; /* 텍스트를 버튼 내부에서 중앙 정렬 */
+       text-decoration: none; /* 링크일 경우 기본 밑줄 제거 */
+       border-radius: 8px; /* 버튼의 모서리를 둥글게 (5px 반경) */
+       font-size: 16px; /* 버튼 내부 텍스트의 글꼴 크기 (16px) */
+       margin: 20px 0;
+       float:right ;
     }
     .btn:hover {
-     background-color: #0056b3; /* 버튼 hover 효과 */
+      background-color: #0056b3; /* 버튼 hover 효과 */
     }
   </style>
 </head>
@@ -186,6 +186,8 @@
      })
      .then(data => {
        // 테이블의 tbody 선택
+
+       data.sort((a, b) => new Date(b.dateWrite) - new Date(a.dateWrite));
        const tableBody = document.querySelector('table tbody');
        tableBody.innerHTML = ''; // 기존 데이터 삭제
 
@@ -200,8 +202,8 @@
            const row = document.createElement('tr'); // 새로운 <tr> 생성
            row.innerHTML = `
              <td><a href="/noticeboard/${post.postId}">${post.title}</a></td> <!-- 게시글 제목 -->
-             <td>${post.writerName}</td> <!-- 작성자 -->
-             <td>${post.viewCount}</td> <!-- 조회수 -->
+             <td class="writer-cell nowrap-cell">${post.writerName}</td>
+             <td class="view-count-cell nowrap-cell">${post.viewCount}</td>
            `;
            tableBody.appendChild(row); // 테이블에 추가
          });
