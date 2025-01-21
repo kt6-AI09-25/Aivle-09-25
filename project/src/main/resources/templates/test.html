@@ -146,6 +146,8 @@
 
   const bars = [];
 
+  let uploadedFilePath = ""; // 수정 이유찬: 업로드된 파일 경로 저장
+
   // 타이머 업데이트
 
   function updateTimer() {
@@ -240,44 +242,6 @@
 
           };
 
-          mediaRecorder.onstop = async function() {
-
-              const blob = new Blob(recordedChunks, { type: 'video/webm' });
-
-              const formData = new FormData();
-
-              formData.append('file', blob, 'presentation.webm');
-
-              try {
-                  const response = await fetch('/files/upload', { // -수정 이유찬-
-
-                      method: 'POST',
-
-                      body: formData
-
-                  });
-
-                  if (response.ok) {
-
-                      console.log("녹화본이 서버로 성공적으로 업로드되었습니다.");
-
-                  } else {
-
-                      console.error("서버 응답 오류:", response.statusText);
-
-                      alert("녹화본 업로드에 실패했습니다.");
-
-                  }
-
-              } catch (error) {
-
-                  console.error("업로드 중 오류:", error);
-
-                  alert("녹화본 업로드 중 문제가 발생했습니다.");
-
-              }
-
-          };
 
           mediaRecorder.start();
 
@@ -353,24 +317,51 @@
 
   }
 
-  // 분석 결과 보기 버튼 클릭 시 로딩 화면 표시 후 페이지 이동
+  // 녹화본 업로드 및 결과 페이지 이동 // 수정 이유찬: 함수 추가
+  async function uploadAndGoToResults() {
+      if (recordedChunks.length === 0) {
+          alert("녹화된 파일이 없습니다.");
+          return;
+      }
 
-  document.getElementById('viewResultsBtn').addEventListener('click', function() {
-
+      document.getElementById('viewResultsBtn').disabled = true;
       document.getElementById('loadingModal').style.display = 'block'; // 로딩 화면 표시
 
-      setTimeout(function() {
-          window.location.href = "/files/upload/results" // 분석 결과 페이지로 이동 // -수정 이유찬-
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const formData = new FormData();
+      formData.append('file', blob, 'presentation.webm');
 
-      }, 1000); // 1초 후 페이지 이동
+      try {
+          const response = await fetch('/files/upload/results', {
+              method: 'POST',
+              body: formData
+          });
 
-  });
+          if (response.ok) {
+              const result = await response.json();
+              uploadedFilePath = result.filePath; // 수정 이유찬: 업로드된 경로 저장
+              console.log("녹화본 업로드 성공:", uploadedFilePath);
+              window.location.href = `/files/upload/results?filePath=${encodeURIComponent(uploadedFilePath)}`;
+          } else {
+              console.error("서버 응답 오류:", response.statusText);
+              alert("녹화본 업로드에 실패했습니다.");
+          }
+      } catch (error) {
+          console.error("업로드 중 오류:", error);
+          alert("녹화본 업로드 중 문제가 발생했습니다.");
+      } finally {
+          document.getElementById('loadingModal').style.display = 'none'; // 로딩 화면 숨김
+          document.getElementById('viewResultsBtn').disabled = false;
+      }
+  }
+
+
 
   // 이벤트 핸들러 연결
 
   document.getElementById('startBtn').addEventListener('click', startPresentation);
-
   document.getElementById('stopBtn').addEventListener('click', stopPresentation);
+  document.getElementById('viewResultsBtn').addEventListener('click', uploadAndGoToResults); // 수정 이유찬: 업로드 및 이동 처리
 </script>
 </body>
 </html>
