@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Letter Report Detail</title>
+  <style>
+    table {
+        border-collapse: separate; /* 테두리를 잘 보이게 설정 */
+        border-spacing: 0; /* 불필요한 간격 제거 */
+    }
+
+    .highlight {
+        background-color: rgba(255, 0, 0, 0.5); /* 옅은 빨간색 배경 */
+        border: 2px solid rgba(255, 0, 0, 0.8); /* 진한 빨간색 테두리 */
+        border-radius: 4px; /* 둥근 모서리 (선택 사항) */
+        display: table-row; /* 테두리가 적용되도록 설정 */
+    }
+  </style>
+</head>
+<body>
+<h1>Letter Detail</h1>
+<p><strong>From:</strong> <span th:text="${letter.senderName}"></span></p>
+<p><strong>To:</strong> <span th:text="${letter.receiverUsername}"></span></p>
+<p><strong>Content:</strong></p>
+<p class="highlight" th:text="${letter.letterContent}"></p>
+<p><strong>Sent At:</strong> <span th:text="${letter.dateSend}"></span></p>
+<p><strong>Status:</strong> <span th:text="${letter.state ? '읽음' : '안읽음'}"></span></p>
+<a href="/letters/received">Back to List</a>
+</body>
+</html>

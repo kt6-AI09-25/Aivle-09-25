@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Report List</title>
+  <style>
+    .state-0 {
+      background-color: #ffcccc; /* 옅은 붉은색 */
+    }
+    .state-1 {
+      background-color: #ccffcc; /* 옅은 연두색 */
+    }
+  </style>
+</head>
+<body>
+<h1>Report List</h1>
+<table>
+  <thead>
+  <tr>
+    <th>신고물</th>
+    <th>신고자</th>
+    <th>신고사유</th>
+    <th>처리상태</th>
+    <th>처리 일자</th> <!-- 처리 일자 추가 -->
+    <th>Action</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="report : ${reports}"
+      th:classappend="${report.processing_state == 0} ? 'state-0' : 'state-1'">
+    <td><a th:href="@{/admin/report/{report_type}/{reported_id}(report_type=${report.report_type}, reported_id=${report.reported_id})}"
+           th:text="'신고물 상세보기: ' + (${report.report_type == 1 ? '게시글 ' : (report.report_type == 2 ? '댓글 ' : (report.report_type == 3 ? '쪽지 ' : '기타'))}) + ${report.reported_id}"></a></td>
+    <td th:text="${report.reporter_name}"></td>
+    <td th:text="${report.report_details}"></td>
+    <td th:text="${report.processing_state == 0 ? '처리 안됨' : '처리 완료'}"></td>
+    <td th:text="${report.date_processing != null ? #temporals.format(report.date_processing, 'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
+    <td>
+      <form th:action="@{/admin/report/{id}/update(id=${report.report_id})}" method="post">
+        <select name="reportProcessType">
+          <option th:each="type : ${T(com.example.project.domain.report.ReportProcessTypes).values()}"
+                  th:value="${type}" th:text="${type}"
+                  th:selected="${type} == ${report.report_process_type}"></option>
+        </select>
+        <button type="submit">확인</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>
