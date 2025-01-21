@@ -178,38 +178,8 @@
 <div th:replace="footer.html"></div>
 
 <!-- Font Awesome for Social Media Icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
-
-<!-- 로그인 모달 -->
-<div id="loginModal" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closeLogin">&times;</span>
-        <h2>로그인</h2>
-        <form>
-            <input type="text" name="username" placeholder="아이디" required>
-            <input type="password" name="password" placeholder="비밀번호" required>
-            <button type="button" >소셜로그인</button>
-            <button type="submit">로그인</button>
-            <button type="button">회원가입</button>
-        </form>
-    </div>
-</div>
-
-<!-- 회원가입 모달 -->
-<div id="signupModal" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closeSignup">&times;</span>
-        <h2>회원가입</h2>
-        <form>
-            <input type="text" name="nickname" placeholder="닉네임" required>
-            <input type="text" name="username" placeholder="아이디" required>
-            <input type="password" name="password" placeholder="비밀번호" required>
-            <button type="submit">가입완료</button>
-        </form>
-    </div>
-</div>
-
+<!-- 폰트자리 -->
 <script>
     var isLoggedIn = false; // 로그인 상태 플래그
 
@@ -282,6 +252,7 @@
         const username = data.get("username"); // FormData에서 username 값 가져오기
 
         fetch('/login', { method: 'POST', body: data })
+
             .then((response) => {
                 if (response.ok) {
                     alert("로그인 성공!");
@@ -290,6 +261,7 @@
                     worker.port.postMessage({ type: "connect", username: username });
                     console.log("Message sent to SharedWorker:", { type: "connect", username: username });
                     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 14:48 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 
                     window.location.href = "/"; // 로그인 후 페이지 리프레시
                 } else {
