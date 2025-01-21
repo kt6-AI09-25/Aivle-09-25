@@ -3,8 +3,8 @@ package com.example.project.domain.file;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -25,22 +25,13 @@ public class FileService {
     private final UserRepository userRepository;
     private final FileRepository fileRepository;
 
-    private static final String STORAGE_DIRECTORY = "C:\\Users\\User\\Downloads\\"; // 파일 저장 경로
+    // 파일 저장 경로를 @Value로 주입받기(서버 배포시에 경로 수정 예정)
+    @Value("${file.storage.directory}")
+    private String storageDirectory;
 
     private final WebClient webClient = WebClient.builder()
             .baseUrl("http://127.0.0.1:8000")
             .build();
-
-    // 파일 폴더 생성
-    static {
-        File directory = new File(STORAGE_DIRECTORY);
-        if (!directory.exists()) {
-            boolean isCreated = directory.mkdirs();
-            if (!isCreated) {
-                throw new RuntimeException("파일 저장 경로를 생성할 수 없습니다: " + STORAGE_DIRECTORY);
-            }
-        }
-    }
 
     public FileDTO.Response uploadFile(MultipartFile file) {
         // 로그인된 사용자 정보 가져오기
@@ -88,7 +79,7 @@ public class FileService {
 
         // 파일 저장 경로 생성
         String uniqueFilename = UUID.randomUUID() + "_" + originalFilename;
-        String storedFilePath = STORAGE_DIRECTORY + uniqueFilename;
+        String storedFilePath = storageDirectory + uniqueFilename;
 
         try {
             file.transferTo(new File(storedFilePath));
