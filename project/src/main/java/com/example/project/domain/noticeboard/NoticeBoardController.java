@@ -26,7 +26,8 @@ public class NoticeBoardController {
     // 게시글 목록
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("posts", noticeBoardService.getAllPosts());
+        List<NoticeBoardDTO.Response> posts = noticeBoardService.getAllPosts();
+        model.addAttribute("posts", posts);
         return "noticeboard/list";
     }
 

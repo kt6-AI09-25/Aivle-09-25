@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Sort;
+
 @Service
 @RequiredArgsConstructor
 public class NoticeBoardService {
@@ -21,7 +23,8 @@ public class NoticeBoardService {
     private final UserRepository userRepository;
 
     public List<NoticeBoardDTO.Response> getAllPosts() {
-        return noticeBoardRepository.findAll()
+        Sort sort = Sort.by(Sort.Direction.DESC, "dateWrite");
+        return noticeBoardRepository.findAll(sort)
                 .stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());

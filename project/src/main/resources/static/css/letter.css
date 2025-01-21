@@ -1,0 +1,190 @@
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+<!--      justify-content: center;-->
+<!--      align-items: center;-->
+      height: 100vh;
+    }
+
+    .main-container {
+      width: 90%;
+      max-width: 1200px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      position: relative;
+      align-items: center;
+      margin: 20px auto;
+    }
+
+    .header {
+      background-color: #1a73e8;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      height: calc(100% - 50px);
+    }
+
+    .inner-container {
+      display: flex;
+      flex-grow: 1;
+      height: 600px;
+    }
+
+    .mail-list {
+    width: 30%;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    }
+
+    .mail-list ul {
+        padding: 0;
+        margin: 0;
+        overflow-y: auto;
+        list-style: none; /* 리스트 기본 스타일 제거 */
+    }
+
+    .mail-list li {
+        margin: 0; /* 항목 간 간격 제거 */
+        padding: 0; /* 내부 간격 제거 */
+    }
+
+    .mail-item {
+        margin: 0; /* 항목 간 간격 제거 */
+        padding: 0; /* 내부 간격 제거 */
+        border-bottom: 1px solid #ddd; /* 구분선 유지 */
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .mail-item:hover {
+        background-color: #eef3fc; /* 호버 시 배경색 */
+    }
+
+
+    .mail-item p {
+        margin: 2px; /* 기본 여백 제거 */
+        padding: 0; /* 기본 여백 제거 */
+        white-space: nowrap; /* 텍스트를 한 줄로 유지 */
+        overflow: hidden; /* 넘치는 텍스트를 숨김 */
+        text-overflow: ellipsis; /* 생략(...) 처리 */
+    }
+
+    .mail-item button {
+        all: unset; /* 기본 스타일 초기화 */
+        font-size: 14px; /* 글자 크기 */
+        padding: 4px 6px; /* 내부 여백 */
+        color: #007bff; /* 버튼 텍스트 색상 */
+        text-decoration: none; /* 밑줄 제거 */
+        background: none; /* 배경 제거 */
+        border: none; /* 테두리 제거 */
+        cursor: pointer; /* 클릭 가능 커서 */
+    }
+
+    .mail-item button:hover {
+          text-decoration: underline; /* 마우스 오버 시 밑줄 추가 */
+    }
+
+
+
+    .footer-buttons {
+      display: flex;
+     margin-top: auto; /* 메일 리스트의 나머지 공간 아래로 밀기 */
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #1a73e8;
+      height: 50px;
+    }
+
+    .footer-buttons button {
+      flex: 1;
+      margin: 0;
+      border: none;
+      background-color: white;
+      color: #1a73e8;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+       border-radius: 0;
+    }
+
+    .footer-buttons button:hover {
+      background-color: #155cb0;
+      color: white;
+    }
+
+    .footer-buttons button.active {
+      background-color: #155cb0;
+      color: white;
+    }
+
+<!--    .mail-item {-->
+<!--    margin: 0; /* 외부 여백 제거 */-->
+<!--    padding: 0; /* 내부 여백 제거 */-->
+<!--    border-bottom: 1px solid #ddd; /* 구분선 유지 */-->
+<!--    display: flex;-->
+<!--    flex-direction: column;-->
+<!--    cursor: pointer;-->
+<!--    transition: background-color 0.2s;-->
+<!--}-->
+
+<!--    .mail-item:hover {-->
+<!--      background-color: #eef3fc;-->
+<!--    }-->
+
+<!--    .mail-item .sender {-->
+<!--      font-weight: bold;-->
+<!--    }-->
+
+<!--    .mail-item .preview {-->
+<!--      color: #555;-->
+<!--      font-size: 14px;-->
+<!--      margin-top: 5px;-->
+<!--    }-->
+
+<!--    .mail-item .time {-->
+<!--      color: #888;-->
+<!--      font-size: 12px;-->
+<!--      margin-top: 5px;-->
+<!--    }-->
+
+    .mail-details {
+      flex-grow: 1;
+      padding: 20px;
+      background-color: #f9f9f9;
+      overflow-y: auto;
+    }
+
+    .mail-details-header {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .mail-details-content {
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
