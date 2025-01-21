@@ -178,38 +178,7 @@
 <div th:replace="footer.html"></div>
 
 <!-- Font Awesome for Social Media Icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
-
-<!-- 로그인 모달 -->
-<div id="loginModal" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closeLogin">&times;</span>
-        <h2>로그인</h2>
-        <form id="loginForm">
-            <input type="text" id="username" name="username" placeholder="아이디" required>
-            <input type="password" id="password" name="password" placeholder="비밀번호" required>
-            <button type="button" id="socialLogin">소셜로그인</button>
-            <button type="submit">로그인</button>
-            <button type="button" id="goToSignup">회원가입</button>
-        </form>
-    </div>
-</div>
-
-<!-- 회원가입 모달 -->
-<div id="signupModal" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closeSignup">&times;</span>
-        <h2>회원가입</h2>
-        <form id="signupForm">
-            <input type="text" id="nickname" name="nickname" placeholder="닉네임" required>
-            <input type="text" id="username" name="username" placeholder="아이디" required>
-            <input type="password" id="password" name="password" placeholder="비밀번호" required>
-            <button type="submit">가입완료</button>
-        </form>
-    </div>
-</div>
-
+<!-- 폰트자리 -->
 <script>
 
     var isLoggedIn = false;
@@ -227,17 +196,16 @@
             if (isLoggedIn) {
 
                 document.getElementById("nickname").innerText = data.username;
-
                 document.getElementById("nickname").style.display = "inline";
-
                 document.getElementById("logoutBtn").style.display = "inline";
-
                 document.querySelector(".signup-button").style.display = "none";
-
                 document.querySelector(".login-button").style.display = "none";
 
+                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 14:48 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // SharedWorker에 연결 요청
+                worker.port.postMessage({ type: "connect", username: data.username });
+                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 14:48 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             }
-
         });
 
     // "시작하기" 버튼 클릭 시 페이지 이동 처리
@@ -245,15 +213,10 @@
     document.getElementById("startButton").onclick = function() {
 
         if (isLoggedIn) {
-
             window.location.href = "/test"; // 로그인 상태일 때 test.html로 이동
-
         } else {
-
             alert("로그인 후 이용해 주세요."); // 로그인 필요 알림
-
             document.getElementById("loginModal").style.display = "block"; // 로그인 모달 열기
-
         }
 
     }
@@ -263,33 +226,23 @@
     document.getElementById("goToSignup").onclick = function() {
 
         document.getElementById("loginModal").style.display = "none"; // 로그인 모달 닫기
-
         document.getElementById("signupModal").style.display = "block"; // 회원가입 모달 열기
 
     }
 
     // 회원가입 처리
-
     document.getElementById("signupForm").onsubmit = function (event) {
-
         event.preventDefault();
 
         const data = {
-
             username: document.querySelector('#signupForm [name="username"]').value,
-
             password: document.querySelector('#signupForm [name="password"]').value,
-
             nickname: document.querySelector('#signupForm [name="nickname"]').value,
-
         };
 
         fetch('/register', {
-
             method: 'POST',
-
             headers: { 'Content-Type': 'application/json' },
-
             body: JSON.stringify(data),
 
         })
@@ -297,30 +250,21 @@
         .then((response) => {
 
             if (response.ok) {
-
                 alert("회원가입 성공!");
-
                 document.getElementById("signupModal").style.display = "none";
-
                 document.getElementById("loginModal").style.display = "block";
-
             } else {
-
                 alert("회원가입 실패. 아이디가 이미 존재합니다.");
-
             }
-
         });
-
     };
 
     // 로그인 처리
-
     document.getElementById("loginForm").onsubmit = function (event) {
-
         event.preventDefault();
 
         const data = new FormData(document.getElementById("loginForm"));
+        const username = data.get("username"); // FormData에서 username 값 가져오기
 
         fetch('/login', { method: 'POST', body: data })
 
@@ -330,49 +274,31 @@
 
                 alert("로그인 성공!");
 
-                window.location.href = "/";
-
-            } else {
-
-                alert("로그인 실패. 아이디 또는 비밀번호를 확인하세요.");
-
-            }
-
-        });
-
+                    window.location.href = "/"; // 로그인 후 페이지 리프레시
+                } else {
+                    alert("로그인 실패. 아이디 또는 비밀번호를 확인하세요.");
+                }
+            });
     };
 
     // 모달 닫기
-
-    document.getElementById("closeLogin").onclick = function() {
-
+    document.getElementById("closeLogin").onclick = function () {
         document.getElementById("loginModal").style.display = "none";
+    };
 
-    }
-
-    document.getElementById("closeSignup").onclick = function() {
-
+    document.getElementById("closeSignup").onclick = function () {
         document.getElementById("signupModal").style.display = "none";
-
-    }
+    };
 
     // 모달 외부 클릭 시 닫기
-
-    window.onclick = function(event) {
-
+    window.onclick = function (event) {
         if (event.target === document.getElementById("loginModal")) {
-
             document.getElementById("loginModal").style.display = "none";
-
         }
-
         if (event.target === document.getElementById("signupModal")) {
-
             document.getElementById("signupModal").style.display = "none";
-
         }
-
-    }
+    };
 </script>
 </body>
 </html>
