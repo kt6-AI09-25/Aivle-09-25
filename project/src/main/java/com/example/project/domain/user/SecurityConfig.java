@@ -1,5 +1,6 @@
 package com.example.project.domain.user;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -40,7 +41,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/", "/login", "/ws/**").permitAll()
+                        .requestMatchers("/register", "/", "/login", "/ws/**", "/auth/status").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/shared-worker.js").permitAll()// 정적 리소스 허용
                         .anyRequest().authenticated()
@@ -56,6 +57,13 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true) // 세션 무효화
                         .deleteCookies("JSESSIONID") // 쿠키 삭제
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                        })
                 )
                 .sessionManagement(session -> session
                         .maximumSessions(3) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지)
