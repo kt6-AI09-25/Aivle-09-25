@@ -37,42 +37,68 @@
         .analysis-result {
             font-size: 1.75em;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
             text-align: left;
+            user-select: none; /* 드래그 방지 */
         }
 
         .analysis-line {
             width: 100%;
             height: 0.9px;
-            background-color: #666; /* 중간 회색 */
+            background-color: #666;
             margin: 5px 0;
+            user-select: none; /* 드래그 방지 */
         }
 
         .presentation-video {
-            font-size: 1em; /* 더 작은 글자 크기 */
+            font-size: 1em;
             font-weight: normal;
-            color: #888; /* 살짝 더 진한 회색 */
+            color: #888;
             text-align: left;
             margin-top: 5px;
+            user-select: none; /* 드래그 방지 */
         }
 
         .thumbnail-container {
-            width: 1027px; /* 회색 선 기준으로 맞춤 */
+            width: 1027px;
             margin: 10px auto 0 auto;
             display: flex;
-            justify-content: flex-start; /* 항상 왼쪽 정렬 */
+            justify-content: flex-start;
+            user-select: none; /* 드래그 방지 */
         }
 
         .thumbnail-container img {
-            flex-shrink: 0; /* 크기 고정 */
+            flex-shrink: 0;
             width: 327px;
             height: 327px;
             cursor: pointer;
             border: 1px solid #ccc;
         }
 
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .mui-button {
+            padding: 10px 20px;
+            background-color: transparent;
+            color: inherit;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .mui-button:hover {
+            background-color: #f0f0f0;
+        }
+
         .modal {
-            display: none; /* 기본적으로 숨김 */
+            display: none;
             position: fixed;
             z-index: 1000;
             left: 0;
@@ -80,7 +106,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: rgba(0, 0, 0, 0.8); /* 어두운 반투명 배경 복원 */
+            background-color: rgba(0, 0, 0, 0.8);
         }
 
         .modal-content {
@@ -88,61 +114,151 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90%; /* 기본 크기 */
-            max-width: 1100px; /* 최대 너비 제한 */
+            width: 90%;
+            max-width: 1100px;
             height: 92%;
-            overflow-y: auto; /* 내부 스크롤 활성화 */
-            scrollbar-width: none; /* 스크롤바 숨기기 (Firefox) */
-            -ms-overflow-style: none; /* 스크롤바 숨기기 (IE/Edge) */
-            background-color: #fff; /* 흰색 내부 배경 */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 더 나은 디자인 */
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
 
-        .modal-content::-webkit-scrollbar {
-            display: none; /* 스크롤바 숨기기 (Webkit 기반 브라우저) */
+        .module-titleArea {
+            background-color: #fff;
+            color: #333;
+            height: 72px;
+            line-height: 72px;
+            padding: 0 15px; /* 좌우 공백 제거 */
+            border-bottom: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            display: flex;
+            align-items: center; /* 텍스트 수직 중앙 정렬 */
+            user-select: none; /* 드래그 방지 */
         }
 
-        .modal-content video {
-            max-width: 100%;
-            max-height: 100%;
+        .menu-bar {
+            background-color: #f8f8f8;
+            height: 44px;
+            line-height: 44px;
+            display: flex;
+            gap: 10px;
+            padding: 0 10px;
+            user-select: none; /* 드래그 방지 */
         }
 
-        .close {
+        .menu-bar.hidden {
+            display: none;
+        }
+
+        .menu-bar a {
+            text-decoration: none;
+            color: #bbb;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            user-select: none; /* 드래그 방지 */
+        }
+
+        .menu-bar a:hover {
+            color: #000;
+        }
+
+        .menu-bar a.active {
+            color: #000;
+        }
+
+        .modal-body {
+            display: none; /* 기본적으로 숨김 */
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .modal-body.split {
+            display: flex;
+        }
+
+        .modal-left {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            border-right: 1px solid #ccc;
+            scrollbar-width: none; /* 스크롤바 숨김 */
+            -ms-overflow-style: none;
+            user-select: none; /* 드래그 방지 */
+        }
+
+        .modal-left::-webkit-scrollbar {
+            display: none;
+        }
+
+        .modal-right {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scrollbar-width: none; /* 스크롤바 숨김 */
+            -ms-overflow-style: none;
+            user-select: none; /* 드래그 방지 */
+        }
+
+        .modal-right::-webkit-scrollbar {
+            display: none;
+        }
+
+        .modal-left video {
+            display: block;
+            width: 100%;
+            max-width: 480px;
+            user-select: none; /* 드래그 방지 */
+        }
+
+        .modal-right .frame-card {
+            background: #fff;
+            padding: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            user-select: none; /* 드래그 방지 */
+        }
+
+        .modal-close {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #fff;
-            font-size: 28px;
+            top: 15px;
+            right: 20px;
+            color: #666;
+            font-size: 30px;
             font-weight: bold;
             cursor: pointer;
-            text-decoration: none;
-            visibility: visible; /* 항상 표시되도록 설정 */
+            background-color: transparent;
+            border: none;
+            user-select: none; /* 드래그 방지 */
         }
 
-        .modal-navbar {
-            width: 100%;
-            background-color: white; /* 흰색 배경 */
-            color: black; /* 글자색 검정 */
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        .modal-close:hover {
+            color: #000;
         }
 
-        .modal-navbar a {
-            color: black; /* 글자색 검정 */
-            text-decoration: none;
-            margin: 0 10px;
-            font-size: 1em;
+        .summary-content {
+            display: block;
+            padding: 20px;
+            user-select: none; /* 드래그 방지 */
         }
 
-        .modal-navbar a:hover {
-            text-decoration: underline;
+        .detail-content {
+            display: none;
+            user-select: none; /* 드래그 방지 */
         }
 
+        .motion-content, .voice-content, .gaze-content {
+            display: none;
+            user-select: none; /* 드래그 방지 */
+        }
+
+        .motion-content.active, .voice-content.active, .gaze-content.active {
+            display: block;
+            user-select: none; /* 드래그 방지 */
+        }
+
+        .chart-container {
+            margin-top: 20px;
+            height: 300px;
+        }
     </style>
 </head>
 <body>
@@ -151,66 +267,181 @@
     <div class="centered-content analysis-section">
         <h1 class="analysis-result">분석결과</h1>
         <div class="analysis-line"></div>
-        <p class="presentation-video">나의 발표영상</p>
+        <div class="button-container">
+            <button class="mui-button" id="presentationVideoButton">발표영상</button>
+            <button class="mui-button" id="interviewVideoButton">면접영상</button>
+        </div>
     </div>
     <div class="thumbnail-container">
         <img src="/path/to/example.jpg" alt="Video Thumbnail" id="videoThumbnail">
     </div>
-    <div class="spacer"></div> <!-- 빈 공간 -->
+    <div class="spacer"></div>
     <div id="videoModal" class="modal">
         <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <div class="modal-navbar">
-                <a href="#">종합결과</a>
-                <a href="#">표정변화</a>
-                <a href="#">머리움직임</a>
-                <a href="#">음성크기</a>
+            <button class="modal-close">&times;</button>
+            <div class="module-titleArea">
+                <h1>분석 결과</h1>
             </div>
-            <video controls>
-                <source th:src="@{/path/to/video.mp4}" type="video/mp4">
-                브라우저가 동영상을 지원하지 않습니다.
-            </video>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
-            <h1>분결</h1>
+            <div class="menu-bar" id="menuBar1">
+                <a href="#" id="summaryResult" class="active">종합결과</a>
+                <a href="#" id="detailAnalysis">세부분석</a>
+            </div>
+            <div id="summaryContent" class="summary-content">
+                <p>이곳은 종합결과를 보여주는 영역입니다.</p>
+            </div>
+            <div id="detailContent" class="detail-content">
+                <div class="menu-bar hidden" id="menuBar2">
+                    <a href="#" id="motion" class="active">머리움직임</a>
+                    <a href="#" id="voice">음성크기</a>
+                    <a href="#" id="gaze">시선처리</a>
+                </div>
+                <div class="modal-body split">
+                    <div class="modal-left">
+                        <video controls id="analysisVideo">
+                            <source src="/path/to/video.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="modal-right">
+                        <div class="frame-card">
+                            <div id="motionContent" class="motion-content active">
+                                <p>머리움직임 평가 내용이 여기에 표시됩니다.</p>
+                            </div>
+                            <div id="voiceContent" class="voice-content">
+                                <p>음성크기 평가 내용이 여기에 표시됩니다.</p>
+                            </div>
+                            <div id="gazeContent" class="gaze-content">
+                                <p>시선처리 평가 내용이 여기에 표시됩니다.</p>
+                                <div class="chart-container">
+                                    <canvas id="gazeChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 <div th:replace="footer.html"></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const thumbnail = document.getElementById('videoThumbnail');
     const modal = document.getElementById('videoModal');
-    const closeModal = document.getElementById('closeModal');
+    const videoThumbnail = document.getElementById('videoThumbnail');
+    const presentationVideoButton = document.getElementById('presentationVideoButton');
+    const interviewVideoButton = document.getElementById('interviewVideoButton');
+    const summaryContent = document.getElementById('summaryContent');
+    const detailContent = document.getElementById('detailContent');
+    const menuBar2 = document.getElementById('menuBar2');
+    const detailAnalysis = document.getElementById('detailAnalysis');
+    const summaryResult = document.getElementById('summaryResult');
+    const closeModal = document.querySelector('.modal-close');
+    const motionButton = document.getElementById('motion');
+    const voiceButton = document.getElementById('voice');
+    const gazeButton = document.getElementById('gaze');
+    const motionContent = document.getElementById('motionContent');
+    const voiceContent = document.getElementById('voiceContent');
+    const gazeContent = document.getElementById('gazeContent');
+    const gazeChart = document.getElementById('gazeChart');
 
-    thumbnail.onclick = function() {
+    videoThumbnail.onclick = function() {
         modal.style.display = "block";
+        resetToSummary();
     };
+
+    detailAnalysis.onclick = function(event) {
+        event.preventDefault();
+        summaryContent.style.display = "none";
+        detailContent.style.display = "block";
+        menuBar2.classList.remove('hidden');
+        summaryResult.classList.remove('active');
+        detailAnalysis.classList.add('active');
+    };
+
+    summaryResult.onclick = function(event) {
+        event.preventDefault();
+        resetToSummary();
+    };
+
+    function resetToSummary() {
+        summaryContent.style.display = "block";
+        detailContent.style.display = "none";
+        menuBar2.classList.add('hidden');
+        detailAnalysis.classList.remove('active');
+        summaryResult.classList.add('active');
+    }
+
+    motionButton.onclick = function(event) {
+        event.preventDefault();
+        activateTab(motionButton, motionContent);
+    };
+
+    voiceButton.onclick = function(event) {
+        event.preventDefault();
+        activateTab(voiceButton, voiceContent);
+    };
+
+    gazeButton.onclick = function(event) {
+        event.preventDefault();
+        activateTab(gazeButton, gazeContent);
+        renderGazeChart();
+    };
+
+    function activateTab(button, content) {
+        motionButton.classList.remove('active');
+        voiceButton.classList.remove('active');
+        gazeButton.classList.remove('active');
+
+        motionContent.classList.remove('active');
+        voiceContent.classList.remove('active');
+        gazeContent.classList.remove('active');
+
+        button.classList.add('active');
+        content.classList.add('active');
+    }
+
+    function renderGazeChart() {
+        new Chart(gazeChart, {
+            type: 'line',
+            data: {
+                labels: ['1초', '2초', '3초', '4초', '5초'],
+                datasets: [{
+                    label: '시선처리 데이터',
+                    data: [2, 1, 3, 4, 2],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '시간'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '값'
+                        }
+                    }
+                }
+            }
+        });
+    }
 
     closeModal.onclick = function() {
         modal.style.display = "none";
+        resetToSummary();
     };
 
     window.onclick = function(event) {
         if (event.target === modal) {
             modal.style.display = "none";
+            resetToSummary();
         }
     };
 </script>
