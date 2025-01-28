@@ -1,0 +1,246 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    flex: 1; /* Footer를 아래로 밀기 위한 공간 차지 */
+}
+
+.spacer {
+    height: 500px; /* 빈 공간 채우기 */
+}
+
+.centered-content {
+    text-align: center;
+    margin: 0 auto;
+}
+
+.analysis-section {
+    width: 1027px; /* 고정된 길이 */
+    margin: 0 auto;
+}
+
+.analysis-result {
+    font-size: 1.75em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-align: left;
+    user-select: none; /* 드래그 방지 */
+}
+
+.analysis-line {
+    width: 100%;
+    height: 0.9px;
+    background-color: #666;
+    margin: 5px 0;
+    user-select: none; /* 드래그 방지 */
+}
+
+/* 버튼 컨테이너 */
+.button-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/*
+  (1) 글자 굵기를 400(일반)로 설정
+  (2) 기본 텍스트 색은 회색(#bbb)
+  (3) 호버 시 검정(#000)
+*/
+.mui-button {
+    padding: 10px 20px;
+    background-color: transparent;
+    color: #bbb;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 550; /* 글자 굵기 조정 */
+    text-align: center;
+}
+.mui-button:hover {
+    color: #000; /* 호버 시 검정색 */
+    background-color: transparent;
+}
+
+/*
+  활성화된 버튼(사용자가 누른 상태)
+  → 호버 없이도 검정색 유지
+*/
+.mui-button.active-button {
+    color: #000;
+}
+
+.thumbnail-container {
+    width: 1027px;
+    margin: 10px auto 0 auto;
+    display: flex;
+    justify-content: flex-start;
+    user-select: none; /* 드래그 방지 */
+}
+.thumbnail-container img {
+    flex-shrink: 0;
+    width: 327px;
+    height: 327px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    display: none; /* 기본은 숨김 → JS에서 제어 */
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 1100px;
+    height: 92%;
+    display: flex;
+    flex-direction: column;
+}
+
+.module-titleArea {
+    background-color: #fff;
+    color: #333;
+    height: 72px;
+    line-height: 72px;
+    padding: 0 15px; /* 좌우 공백 제거 */
+    border-bottom: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    display: flex;
+    align-items: center; /* 텍스트 수직 중앙 정렬 */
+    user-select: none; /* 드래그 방지 */
+}
+
+.menu-bar {
+    background-color: #f8f8f8;
+    height: 44px;
+    line-height: 44px;
+    display: flex;
+    gap: 10px;
+    padding: 0 10px;
+    user-select: none; /* 드래그 방지 */
+}
+.menu-bar a {
+    text-decoration: none;
+    color: #bbb;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    user-select: none; /* 드래그 방지 */
+}
+.menu-bar a:hover {
+    color: #000;
+}
+.menu-bar a.active {
+    color: #000;
+}
+.menu-bar.hidden {
+    display: none;
+}
+
+.modal-body {
+    display: none; /* 기본적으로 숨김 */
+    flex: 1;
+    overflow: hidden;
+}
+.modal-body.split {
+    display: flex;
+}
+
+.modal-left {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+    scrollbar-width: none; /* 스크롤바 숨김 */
+    -ms-overflow-style: none;
+    user-select: none; /* 드래그 방지 */
+}
+.modal-left::-webkit-scrollbar {
+    display: none;
+}
+
+.modal-right {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    scrollbar-width: none; /* 스크롤바 숨김 */
+    -ms-overflow-style: none;
+    user-select: none; /* 드래그 방지 */
+}
+.modal-right::-webkit-scrollbar {
+    display: none;
+}
+
+.modal-left video {
+    display: block;
+    width: 100%;
+    max-width: 480px;
+    user-select: none; /* 드래그 방지 */
+}
+
+.modal-right .frame-card {
+    background: #fff;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    user-select: none; /* 드래그 방지 */
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #666;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    user-select: none; /* 드래그 방지 */
+}
+.modal-close:hover {
+    color: #000;
+}
+
+.summary-content {
+    display: block;
+    padding: 20px;
+    user-select: none; /* 드래그 방지 */
+}
+.detail-content {
+    display: none;
+    user-select: none; /* 드래그 방지 */
+}
+
+.motion-content, .voice-content, .gaze-content {
+    display: none;
+    user-select: none; /* 드래그 방지 */
+}
+.motion-content.active, .voice-content.active, .gaze-content.active {
+    display: block;
+    user-select: none; /* 드래그 방지 */
+}
+
+.chart-container {
+    margin-top: 20px;
+    height: 300px;
+}
