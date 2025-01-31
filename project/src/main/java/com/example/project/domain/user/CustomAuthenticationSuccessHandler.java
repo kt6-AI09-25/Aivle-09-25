@@ -38,7 +38,3 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         response.getWriter().write("{\"message\":\"Login successful\"}");
     }
 }
-
-
-
-

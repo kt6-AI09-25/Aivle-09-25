@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Map;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -35,8 +36,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getPassword(),
                 user.getState(),
                 user.getBan_end_time(),
-                Collections.singletonList(new SimpleGrantedAuthority(user.getRole()))
+                Collections.singletonList(new SimpleGrantedAuthority(user.getRole())),
+                Map.of()
         );
     }
 }
-

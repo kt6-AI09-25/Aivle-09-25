@@ -26,7 +26,6 @@ public class TempController {
                 .collect(Collectors.toList());
     }
 
-
     @GetMapping("/active-sessions")
     public List<String> getActiveSessions() {
         return sessionRegistry.getAllPrincipals().stream()

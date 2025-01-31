@@ -58,7 +58,6 @@ public class WebSocketController {
         headerAccessor.getSessionAttributes().put("username", username);
     }
 
-
     // 활성 사용자 목록을 모든 구독자에게 전송
     @SendTo("/topic/status")
     public Map<String, Boolean> getActiveUsers() {
@@ -84,6 +83,4 @@ public class WebSocketController {
         String username = headerAccessor.getUser().getName();
         log.info("WebSocket connection established for user: {}", username);
     }
-
-
 }

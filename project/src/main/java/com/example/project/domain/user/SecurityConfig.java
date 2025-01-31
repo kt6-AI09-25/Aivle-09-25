@@ -1,11 +1,13 @@
 package com.example.project.domain.user;
 
+import com.example.project.domain.kakao.CustomOAuth2SuccessHandler;
+import com.example.project.domain.kakao.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,15 +20,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.Objects;
-
 @Configuration
 public class SecurityConfig {
 
     private final UserRepository userRepository;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
-    public SecurityConfig(UserRepository userRepository) {
+    public SecurityConfig(UserRepository userRepository, CustomOAuth2UserService customOAuth2UserService) {
         this.userRepository = userRepository;
+        this.customOAuth2UserService = customOAuth2UserService;
     }
 
     @Bean
@@ -34,16 +36,17 @@ public class SecurityConfig {
         return new SessionRegistryImpl();
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/login", "/register", "/", "/oauth2/**", "/favicon.ico", "/auth/status", "/logout") // OAuth2 로그인 경로에서 CSRF 제외
+                )
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/", "/login", "/ws/**", "/auth/status").permitAll()
+                        .requestMatchers("/register", "/", "/login", "/ws/**", "/auth/status", "/favicon.ico").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/shared-worker.js").permitAll()// 정적 리소스 허용
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/shared-worker.js", "/favicon.ico").permitAll()// 정적 리소스 허용
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -51,6 +54,13 @@ public class SecurityConfig {
                         .successHandler(new CustomAuthenticationSuccessHandler(userRepository))
                         .failureHandler(new CustomAuthenticationFailureHandler())
                         .permitAll()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(new CustomOAuth2SuccessHandler(userRepository))
+                        .failureHandler((request, response, exception) -> {
+                            response.sendRedirect("/");
+                        })
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -66,8 +76,11 @@ public class SecurityConfig {
                         })
                 )
                 .sessionManagement(session -> session
-                        .maximumSessions(3) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지)
-                        .maxSessionsPreventsLogin(false) // 새로운 로그인 시도를 막음
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 필요할 때만 세션 생성
+                )
+                .sessionManagement(session -> session
+                        .maximumSessions(3) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지는 웹 소켓에서 수행)
+                        .maxSessionsPreventsLogin(false) // 새로운 로그인 시도를 막지 않음
                         .sessionRegistry(sessionRegistry()) // SessionRegistry 설정
                 );
         return http.build();
@@ -80,7 +93,6 @@ public class SecurityConfig {
         configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
         configuration.addAllowedHeader("*"); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 쿠키 및 인증정보 허용
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // 모든 경로에 적용
         return source;
@@ -108,6 +120,4 @@ public class SecurityConfig {
             }
         };
     }
-
-
 }

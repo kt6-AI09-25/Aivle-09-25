@@ -7,8 +7,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-
-
 @Entity
 @NoArgsConstructor
 @Table(name="user")

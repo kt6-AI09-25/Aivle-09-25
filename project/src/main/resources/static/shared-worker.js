@@ -2,9 +2,7 @@ importScripts('https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js');
 
 importScripts('/js/stomp.min.js');
 
-
 console.log("SockJS and StompJS loaded in SharedWorker");
-
 
 let stompClient = null;
 let connectedUsername = null; // 현재 연결된 사용자 추적
