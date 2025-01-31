@@ -12,8 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.IOException;
+
 @Controller
-@RequestMapping("/files")
+@RequestMapping("/myresults")
 @RequiredArgsConstructor
 public class FileController {
 
@@ -27,43 +33,58 @@ public class FileController {
         return "test";
     }
 
-
     @PostMapping("/upload/results")
     @ResponseBody
     public FileDTO.Response uploadFile(@RequestPart MultipartFile file) {
         return fileService.uploadFile(file);
     }
 
-    @GetMapping("/upload/results")
-    public String resultPage(@RequestParam("filePath") String filePath, Model model) {
-        String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
+    @GetMapping("/upload/results/{fileId}")
+    public ResponseEntity<Resource> getVideo(@PathVariable Long fileId) {
+        // 파일 정보 조회
+        com.example.project.domain.file.File fileEntity = fileService.getFileById(fileId);
+        if (fileEntity == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-        // 동영상 URL 생성
-        String videoUrl = "/files/upload/results/" + fileName;
-        model.addAttribute("videoUrl", videoUrl);
-
-        return "result";
-    }
-
-    @GetMapping("/upload/results/{fileName}")
-    public ResponseEntity<Resource> getVideo(@PathVariable String fileName) {
-        String filePath = storageDirectory + "/" + fileName; // 파일 경로 생성
-        java.io.File videoFile = new java.io.File(filePath); // 파일 객체 생성
+        String filePath = fileEntity.getFilePath();
+        File videoFile = new File(filePath);
 
         // 파일이 존재하는지 확인
         if (!videoFile.exists()) {
-            return ResponseEntity.notFound().build(); // 파일이 없으면 404 반환
+            return ResponseEntity.notFound().build();
         }
 
-        Resource resource = new FileSystemResource(videoFile); // 파일 자원 생성
+        Resource resource = new FileSystemResource(videoFile);
+
+        // 동영상의 미디어 타입을 자동 감지
+        String contentType;
+        try {
+            Path path = Paths.get(filePath);
+            contentType = Files.probeContentType(path);
+        } catch (IOException e) {
+            contentType = "video/webm"; // 기본값 설정
+        }
+
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("video/webm")); // 미디어 타입 설정
-        headers.setContentDispositionFormData("inline", fileName); // 브라우저에서 재생 가능하게 설정
+        headers.setContentType(MediaType.parseMediaType(contentType != null ? contentType : "video/webm"));
+        headers.setContentDispositionFormData("inline", videoFile.getName());
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(resource); // 파일 반환
+                .body(resource);
     }
 
+    @GetMapping("/upload/results")
+    public String resultPage(@RequestParam("fileId") Long fileId, Model model) {
+        com.example.project.domain.file.File fileEntity = fileService.getFileById(fileId);
+        if (fileEntity == null) {
+            return "error"; // 파일이 없으면 에러 페이지로 이동
+        }
 
+        String videoUrl = "/myresults/upload/results/" + fileId;
+        model.addAttribute("videoUrl", videoUrl);
+
+        return "myresult";
+    }
 }
