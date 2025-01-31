@@ -3,12 +3,14 @@ package com.example.project.domain.user;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails, OAuth2User {
 
     private final String username;
     private final String password;
@@ -17,13 +19,16 @@ public class CustomUserDetails implements UserDetails {
     @Getter
     private final LocalDateTime banEndTime;
     private final Collection<? extends GrantedAuthority> authorities;
+    private final Map<String, Object> attributes; // ✅ OAuth2User 속성 저장
 
-    public CustomUserDetails(String username, String password, Integer state, LocalDateTime banEndTime, Collection<? extends GrantedAuthority> authorities) {
+    // ✅ 생성자에서 쉼표 오류 수정
+    public CustomUserDetails(String username, String password, Integer state, LocalDateTime banEndTime, Collection<? extends GrantedAuthority> authorities, Map<String, Object> attributes) {
         this.username = username;
         this.password = password;
         this.state = state;
         this.banEndTime = banEndTime;
         this.authorities = authorities;
+        this.attributes = attributes;
     }
 
     @Override
@@ -68,4 +73,15 @@ public class CustomUserDetails implements UserDetails {
     public int hashCode() {
         return Objects.hash(this.getUsername());
     }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes; // ✅ OAuth2User에서 필요한 속성 값 제공
+    }
+
+    @Override
+    public String getName() {
+        return username; // ✅ OAuth2User에서 이름을 반환하는 메서드
+    }
 }
+
