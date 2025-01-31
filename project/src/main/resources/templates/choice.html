@@ -4,108 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>발표 선택 페이지</title>
+
     <link rel="stylesheet" href="/css/style.css"> <!-- CSS 파일 링크 -->
+    <link rel="stylesheet" href="/css/choice.css">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            background-color: #f5f5f5;
-            text-align: center;
-        }
 
-        h1 {
-            margin: 20px 0;
-            color: #333;
-        }
 
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 20px;
-            margin: 40px auto;
-            max-width: 1200px;
-        }
-
-        .box {
-            width: 45%;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: left;
-        }
-
-        .box h2 {
-            color: #007BFF;
-            font-size: 20px;
-        }
-
-        .box ul {
-            margin: 10px 0;
-            padding: 0;
-            list-style: none;
-        }
-
-        .box ul li {
-            margin: 5px 0;
-        }
-
-        .box button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        .box button:hover {
-            background-color: #0056b3;
-        }
-
-        .box a {
-            text-decoration: none;
-        }
-    </style>
 </head>
 <body>
 <div th:replace="navbar.html"></div>
 
-<h1>어떤 발표를 할지 선택하세요!</h1>
+<div class="centered-content analysis-section">
+    <h1 class="analysis-result">분석 유형 선택</h1>
+    <div class="analysis-line"></div>
+</div>
 
 <div class="container">
-    <!-- 대화형 면접 연습 -->
-    <div class="box">
-        <h2>대화형 면접 연습</h2>
+    <!-- 면접 -->
+     <div class="box">
+        <h2>면접 연습</h2>
         <ul>
-            <li>AI 면접관과 함께 구조화된 면접 연습</li>
-            <li>맞춤형 질문 제시와 실제 면접과 같은 환경</li>
-            <li>면접 내용을 분석한 AI 리포트 제공</li>
-        </ul>
-        <a href="pr_test"><button>발표연습하기</button></a>
-    </div>
-
-    <!-- 일반형 면접 연습 -->
-    <div class="box">
-        <h2>일반형 면접 연습</h2>
-        <ul>
-            <li>자신만의 면접 질문에 대한 답변 연습</li>
+            <li>제시된 면접 질문에 대한 답변 연습</li>
             <li>다양한 유형의 면접 질문 및 AI 분석</li>
             <li>면접 결과 AI 리포트 제공</li>
         </ul>
         <a href="test"><button>면접연습하기</button></a>
     </div>
+    <!-- 발표 -->
+    <div class="box">
+        <h2>발표 연습</h2>
+        <ul>
+            <li>AI 면접관과 함께 구조화된 면접 연습</li>
+            <li>실전 발표처럼 몰입해, 나의 발표 역량을 시험해보세요.</li>
+            <li>발표 내용을 분석한 AI 리포트 제공</li>
+        </ul>
+        <a href="pr_test"><button>발표연습하기</button></a>
+    </div>
 </div>
+
 <div th:replace="footer.html"></div>
 
 </body>
