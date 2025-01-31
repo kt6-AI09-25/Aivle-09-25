@@ -5,6 +5,7 @@ importScripts('/js/stomp.min.js');
 console.log("SockJS and StompJS loaded in SharedWorker");
 
 let stompClient = null;
+let connectionId = null; // 고유 식별자 저장
 let connectedUsername = null; // 현재 연결된 사용자 추적
 const connectedPorts = []; // SharedWorker와 연결된 모든 포트
 
@@ -68,8 +69,14 @@ function initializeWebSocket(username, port) {
     stompClient.connect({}, () => {
         console.log("WebSocket connected for user:", username);
 
-        // 서버에 사용자 이름 전송
-        stompClient.send('/app/status', {}, username);
+        // 서버에서 고유 식별자 생성 요청
+        stompClient.send('/app/status', {}, JSON.stringify({ username }));
+
+        // 고유 식별자를 수신
+        stompClient.subscribe('/user/queue/connectionId', (message) => {
+            connectionId = message.body; // 서버에서 받은 connectionId 저장
+            console.log("Received connectionId from server:", connectionId);
+        });
 
         // 활성 사용자 목록 구독
         stompClient.subscribe('/topic/status', (message) => {
