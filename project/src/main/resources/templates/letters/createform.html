@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Compose Letter</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/letter.css">
+</head>
+<style>
+  /* 폼 전체 스타일 */
+ form {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 폼 중앙 정렬 */
+  width: 100%; /* 폼 전체 너비 */
+  margin: 0 auto; /* 폼을 페이지 중앙으로 */
+}
+
+/* Form Group (Label과 Input/Textarea 그룹) */
+.form-group {
+  display: flex;
+  align-items: center; /* 세로축 중앙 정렬 */
+  width: 90%; /* 그룹 너비 */
+  margin-bottom: 15px; /* 아래 간격 */
+}
+
+/* Label 스타일 */
+form label {
+  font-size: 16px;
+  font-weight: bold;
+  width: 20%; /* Label의 고정 너비 */
+  text-align: right; /* 텍스트 오른쪽 정렬 */
+  margin-right: 10px; /* 필드와 간격 */
+}
+
+/* Input과 Textarea 스타일 */
+input#receiverUsername,
+textarea#letterContent {
+  width: 100%; /* 나머지 공간 채우기 */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+ /* To와 Content 필드 공통 스타일 */
+ input#receiverUsername,
+ textarea#letterContent {
+   width: 90%; /* 너비를 90%로 설정 */
+   padding: 10px;
+   margin: 0; /* 내부 간격 초기화 */
+   border: 1px solid #ddd; /* 기본 테두리 */
+   border-radius: 4px; /* 둥근 테두리 */
+   font-size: 16px;
+   color: #333;
+   background-color: #f9f9f9;
+   transition: border-color 0.3s, box-shadow 0.3s;
+ }
+
+ /* 포커스 효과 */
+ input#receiverUsername:focus,
+ textarea#letterContent:focus {
+   outline: none;
+   border-color: #1a73e8;
+   box-shadow: 0 0 5px rgba(26, 115, 232, 0.5);
+   background-color: #ffffff;
+ }
+
+ /* Textarea 개별 스타일 */
+ textarea#letterContent {
+   min-height: 150px; /* 최소 높이 */
+   resize: vertical; /* 세로 크기만 조정 가능 */
+ }
+
+ /* Form 내부 정렬 */
+ form > * {
+   margin-bottom: 15px; /* 필드 간 간격 설정 */
+ }
+
+ /* Send 버튼 */
+ button[type="submit"] {
+   width: 90%; /* 버튼도 텍스트 필드와 같은 너비 */
+   padding: 12px;
+   background-color: #1a73e8;
+   color: white;
+   font-size: 18px;
+   font-weight: bold;
+   border: none;
+   border-radius: 4px;
+   cursor: pointer;
+   transition: background-color 0.3s, box-shadow 0.3s;
+   align-self: center; /* 버튼을 중앙 정렬 */
+ }
+
+ button[type="submit"]:hover {
+   background-color: #155cb0;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+ }
+
+ /* Cancel 링크 */
+ a[href="/letters/received"] {
+   display: inline-block;
+   text-decoration: none;
+   color: #1a73e8;
+   font-size: 16px;
+   transition: color 0.3s;
+   margin-top: -5px; /* 버튼 아래에 위치 */
+ }
+
+ a[href="/letters/received"]:hover {
+   color: #155cb0;
+   text-decoration: underline;
+ }
+
+</style>
+<body>
+<div th:replace="navbar.html"></div>
+<div class="main-container">
+  <div class="header">Recived letter</div>
+  <div class="content">
+    <form th:action="@{/letters}" method="post">
+      <div class="form-group">
+        <label for="receiverUsername">To:</label>
+        <input type="text" id="receiverUsername" name="receiverUsername" placeholder="Receiver Username" required>
+      </div>
+      <div class="form-group">
+        <label for="letterContent">Content:</label>
+        <textarea id="letterContent" name="letterContent" placeholder="Write your letter..." required></textarea>
+      </div>
+      <button type="submit">Send</button>
+      <a href="/letters/received">Cancel</a>
+    </form>
+    <a href="/letters/received">Cancel</a>
+  </div>
+</div>
+
+</body>
+</html>

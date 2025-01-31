@@ -178,23 +178,18 @@
 <div th:replace="footer.html"></div>
 
 <!-- Font Awesome for Social Media Icons -->
+
 <!-- 폰트자리 -->
 <script>
-
-    var isLoggedIn = false;
+    var isLoggedIn = false; // 로그인 상태 플래그
 
     // 백엔드에서 로그인 상태 동기화
-
     fetch('/auth/status')
-
         .then(response => response.json())
-
         .then(data => {
-
             isLoggedIn = data.isLoggedIn;
 
             if (isLoggedIn) {
-
                 document.getElementById("nickname").innerText = data.username;
                 document.getElementById("nickname").style.display = "inline";
                 document.getElementById("logoutBtn").style.display = "inline";
@@ -209,26 +204,20 @@
         });
 
     // "시작하기" 버튼 클릭 시 페이지 이동 처리
-
-    document.getElementById("startButton").onclick = function() {
-
+    document.getElementById("startButton").onclick = function () {
         if (isLoggedIn) {
             window.location.href = "/choice"; // 로그인 상태일 때 test.html로 이동
         } else {
             alert("로그인 후 이용해 주세요."); // 로그인 필요 알림
             document.getElementById("loginModal").style.display = "block"; // 로그인 모달 열기
         }
-
-    }
+    };
 
     // 로그인 모달에서 회원가입 버튼 클릭 시
-
-    document.getElementById("goToSignup").onclick = function() {
-
+    document.getElementById("goToSignup").onclick = function () {
         document.getElementById("loginModal").style.display = "none"; // 로그인 모달 닫기
         document.getElementById("signupModal").style.display = "block"; // 회원가입 모달 열기
-
-    }
+    };
 
     // 회원가입 처리
     document.getElementById("signupForm").onsubmit = function (event) {
@@ -244,11 +233,7 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
-
-        })
-
-        .then((response) => {
-
+        }).then((response) => {
             if (response.ok) {
                 alert("회원가입 성공!");
                 document.getElementById("signupModal").style.display = "none";
@@ -268,11 +253,15 @@
 
         fetch('/login', { method: 'POST', body: data })
 
-        .then((response) => {
+            .then((response) => {
+                if (response.ok) {
+                    alert("로그인 성공!");
+                    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 14:48 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    // SharedWorker에 메시지 전송
+                    worker.port.postMessage({ type: "connect", username: username });
+                    console.log("Message sent to SharedWorker:", { type: "connect", username: username });
+                    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 14:48 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-            if (response.ok) {
-
-                alert("로그인 성공!");
 
                     window.location.href = "/"; // 로그인 후 페이지 리프레시
                 } else {

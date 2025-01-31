@@ -22,13 +22,11 @@
     <span class="close" id="closeLogin">&times;</span>
     <h2>로그인 모달</h2>
     <form id="loginForm">
-
       <input type="text" name="username" placeholder="아이디" required autocomplete="on"> <!-- autocomplete 추가 -->
       <input type="password" name="password" placeholder="비밀번호" required autocomplete="on"> <!-- autocomplete 추가 -->
       <div>
         <input type="checkbox" id="rememberId"> <label for="rememberId">아이디 저장</label>
       </div>
-
       <button type="button" id="socialLogin">소셜로그인</button>
       <button type="submit">로그인</button>
       <button type="button" id="goToSignup">회원가입</button>
@@ -42,9 +40,9 @@
     <span class="close" id="closeSignup">&times;</span>
     <h2>회원가입 모달</h2>
     <form id="signupForm">
-      <input type="text" id="nickname" name="nickname" placeholder="닉네임" required autocomplete="off"> <!-- autocomplete 추가 -->
-      <input type="text" id="username" name="username" placeholder="아이디" required autocomplete="off"> <!-- autocomplete 추가 -->
-      <input type="password" id="password" name="password" placeholder="비밀번호" required autocomplete="off"> <!-- autocomplete 추가 -->
+      <input type="text" name="nickname" placeholder="닉네임" required autocomplete="off"> <!-- autocomplete 추가 -->
+      <input type="text" name="username" placeholder="아이디" required autocomplete="off"> <!-- autocomplete 추가 -->
+      <input type="password" name="password" placeholder="비밀번호" required autocomplete="off"> <!-- autocomplete 추가 -->
       <button type="submit">가입완료</button>
     </form>
   </div>
@@ -173,6 +171,8 @@
               document.querySelector(".login-button").style.display = "inline"; // 로그인 버튼 보이기
 
               alert("로그아웃되었습니다.");
+
+              alert("중복된 로그인이 감지되어 일괄 로그아웃 처리되었습니다.");
               window.location.href = "/"; // 로그아웃 후 홈으로 리디렉션
           } else {
               alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
@@ -184,6 +184,85 @@
       });
   }
 
+  // 강제 로그아웃 함수 정의
+  function forceLogout() {
+      fetch('/logout', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      })
+      .then(response => {
+          if (response.ok) {
+              isLoggedIn = false;
+              sessionStorage.removeItem("isLoggedIn"); // 세션 스토리지에서 로그인 상태 삭제
+              sessionStorage.removeItem("nickname");  // 세션 스토리지에서 닉네임 삭제
+
+              // UI 업데이트
+              document.getElementById("nickname").style.display = "none"; // 닉네임 숨기기
+              document.getElementById("logoutBtn").style.display = "none"; // 로그아웃 버튼 숨기기
+              document.querySelector(".signup-button").style.display = "inline"; // 회원가입 버튼 보이기
+              document.querySelector(".login-button").style.display = "inline"; // 로그인 버튼 보이기
+
+              alert("중복된 로그인이 감지되어 일괄 로그아웃 처리되었습니다.");
+
+              window.location.href = "/";
+
+          } else {
+              alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
+          }
+      })
+      .catch(error => {
+          console.error("Logout Error:", error);
+          alert("로그아웃 중 오류가 발생했습니다.");
+      });
+  }
+
+
   // 로그아웃 버튼 클릭 처리
   document.getElementById("logoutBtn").onclick = handleLogout;
+  
+  
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-17 15:26 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      const worker = new SharedWorker("/shared-worker.js?nocache=" + Date.now());
+    let currentUsername = null; // 사용자 이름 저장
+
+    worker.port.start(); // SharedWorker 시작
+
+    // SharedWorker 메시지 수신
+    worker.port.onmessage = function (event) {
+        console.log("Message received from SharedWorker:", event.data);
+        const data = event.data;
+
+        if (data.type === "activeUsers") {
+            console.log("Active users received:", data.data);
+            // 여기서 활성 사용자 목록을 업데이트하거나 필요한 작업 수행
+        } else if (data.type === "connected") {
+            console.log("WebSocket connected via SharedWorker.");
+        } else if (data.type === "requestUsername" && currentUsername) {
+            // SharedWorker로 사용자 이름 다시 전달
+            worker.port.postMessage({ type: "connect", username: currentUsername });
+        } else if (data.type === "forceLogout") {
+            console.log("Forced logout received in client. Redirecting...");
+            forceLogout();
+        }
+    };
+
+    // 페이지 로드 시 사용자 상태 동기화
+    fetch('/auth/status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.isLoggedIn) {
+                currentUsername = data.username; // 사용자 이름 저장
+                worker.port.postMessage({ type: "connect", username: currentUsername });
+            }
+        });
+
+    // 페이지 종료 시 navigate 이벤트 전송
+    window.addEventListener('beforeunload', () => {
+        worker.port.postMessage({ type: "navigate", username: currentUsername });
+    });
+
+    console.log("SharedWorker initialized in navbar.");
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-17 15:26 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 </script>

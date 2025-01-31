@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Received Letters</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/reportmodal.css">
+  <link rel="stylesheet" href="/css/letter.css">
+</head>
+<body>
+<div th:replace="navbar.html"></div>
+<div class="main-container">
+  <div class="header">Recived letter</div>
+  <div class="content">
+    <div class="inner-container">
+      <!-- Mail List -->
+      <div class="mail-list">
+        <ul>
+          <li th:each="letter : ${letters}" class="mail-item"
+              th:data-sender-name="${letter.senderName}"
+              th:data-content="${letter.letterContent}"
+              th:data-received-at="${letter.dateSend}">
+            <p><strong>From:</strong> <span th:text="${letter.senderName}"></span></p>
+            <p><strong>Content:</strong> <span th:text="${letter.letterContent}"></span></p>
+            <p><strong>Received At:</strong> <span th:text="${letter.dateSend}"></span></p>
+            <div class="actions">
+              <button type="button" class="report-letter-btn mail-report-button" th:data-letter-id="${letter.letterId}">Report</button>
+            </div>
+          </li>
+        </ul>
+        <div class="footer-buttons">
+          <button class="active" onclick="location.href='/letters/received'">Received</button>
+          <button onclick="location.href='/letters/sent'">Sent</button>
+        </div>
+      </div>
+
+      <!-- Mail Details -->
+      <div class="mail-details">
+        <div class="mail-details-header">Select a message to view details</div>
+        <div class="mail-details-content" id="mailDetailsContent">
+          <!-- Message details will appear here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<a href="/letters/new">Compose Letter</a>
+
+<div id="letterReportModal" class="report-modal">
+  <div class="report-modal-content">
+    <span class="close" id="closeLetterReportModal">&times;</span>
+    <h2>Report Letter</h2>
+    <form id="letterReportForm" method="post">
+      <label for="letterReportReason">Select a reason:</label>
+      <select name="report_details" id="letterReportReason" required>
+        <option value="" disabled selected>Select reason</option>
+        <option th:each="reason : ${T(com.example.project.domain.report.ReportDetails).values()}" th:value="${reason}" th:text="${reason}"></option>
+      </select>
+      <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="submit" style="background-color: #007bff; color: white;">Submit Report</button>
+        <button type="button" id="cancelLetterReportButton" style="background-color: #f5f5f5; color: #333;">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+
+  function handleClick(element) {
+  const sender = element.dataset.senderName;
+  const content = element.dataset.content;
+  const receivedAt = element.dataset.receivedAt;
+
+  const detailsHeader = document.querySelector('.mail-details-header');
+  const detailsContent = document.getElementById('mailDetailsContent');
+
+  detailsHeader.textContent = `From: ${sender} - ${receivedAt}`;
+  detailsContent.textContent = content;
+}
+document.querySelector('.mail-list').addEventListener('click', function(e) {
+  if (e.target.closest('.mail-item')) {
+    handleClick(e.target.closest('.mail-item'));
+  }
+});
+<!--  function showDetails(sender, content, time) {-->
+<!--     console.log("showDetails 함수가 호출되었습니다!");-->
+<!--     console.log("Sender:", sender);-->
+<!--     console.log("Content:", content);-->
+<!--     console.log("Time:", time);-->
+
+<!--     const detailsHeader = document.querySelector('.mail-details-header');-->
+<!--     const detailsContent = document.getElementById('mailDetailsContent');-->
+
+<!--     if (!sender || !content || !time) {-->
+<!--         detailsHeader.textContent = "Error: Unable to load details.";-->
+<!--         detailsContent.textContent = "No data available for this message.";-->
+<!--         return;-->
+<!--     }-->
+
+<!--     detailsHeader.textContent = `From: ${sender} - ${time}`;-->
+<!--     detailsContent.textContent = content;-->
+<!-- }-->
+
+   document.addEventListener('DOMContentLoaded', () => {
+     const letterReportModal = document.getElementById('letterReportModal');
+     const closeLetterReportModal = document.getElementById('closeLetterReportModal');
+     const cancelLetterReportButton = document.getElementById('cancelLetterReportButton');
+     const letterReportForm = document.getElementById('letterReportForm');
+
+     document.querySelectorAll('.report-letter-btn').forEach(button => {
+       button.addEventListener('click', () => {
+         const letterId = button.getAttribute('data-letter-id');
+         letterReportForm.setAttribute('action', `/letters/${letterId}/report`);
+         letterReportModal.style.display = 'flex';
+       });
+     });
+
+     closeLetterReportModal.addEventListener('click', () => {
+       letterReportModal.style.display = 'none';
+     });
+
+     cancelLetterReportButton.addEventListener('click', () => {
+       letterReportModal.style.display = 'none';
+     });
+
+     window.addEventListener('click', (event) => {
+       if (event.target === letterReportModal) {
+         letterReportModal.style.display = 'none';
+       }
+     });
+   });
+</script>
+</body>
+</html>

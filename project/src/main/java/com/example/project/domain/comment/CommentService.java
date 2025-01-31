@@ -4,7 +4,9 @@ import com.example.project.domain.noticeboard.NoticeBoard;
 import com.example.project.domain.noticeboard.NoticeBoardRepository;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
+import com.example.project.domain.user.UserUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,21 @@ public class CommentService {
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
     }
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 11:25 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    public Long getPostIdByCommentId(Long commentId) {
+        // commentId로 Comment 엔티티 조회
+        Comment comment = commentRepository.findByCommentId(commentId);
+
+        if (comment == null) {
+            throw new IllegalArgumentException("Comment with ID " + commentId + " not found");
+        }
+
+        // 관련된 postId 반환
+        NoticeBoard post = comment.getPost();
+        return post.getPostId();
+    }
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 11:25 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 
     @Transactional
     public CommentDTO.Response addComment(CommentDTO.Request request) {
@@ -35,6 +52,9 @@ public class CommentService {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         User commenter = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new RuntimeException("현재 사용자를 찾을 수 없습니다."));
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 11:25 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        checkBan();
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 11:25 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
         NoticeBoard post = noticeBoardRepository.findById(request.getPostId())
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
@@ -54,6 +74,9 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
         checkPermission(comment.getCommenter().getUsername());
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 15:29 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        checkBan();
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>22025-01-09 15:29 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
         comment.setComment(request.getComment());
         comment.setIsEdited(true);
@@ -66,16 +89,37 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
         checkPermission(comment.getCommenter().getUsername());
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 15:29 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        checkBan();
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 15:29 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 
         commentRepository.deleteById(commentId);
     }
 
     private void checkPermission(String commenterUsername) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!Objects.equals(currentUsername, commenterUsername)) {
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 11:25 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        String currentUserRole = UserUtils.getCurrentUserRole();
+        if ((!Objects.equals(currentUsername, commenterUsername))&&(!Objects.equals(currentUserRole, "[ADMIN]"))) {
             throw new RuntimeException("권한이 없습니다.");
         }
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 11:25 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     }
+
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 15:29 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    private void checkBan() {
+        Integer state = UserUtils.getCurrentUserState();
+        LocalDateTime banEndTime = UserUtils.getCurrentUserBanEndTime();
+        if (state == 0) {
+            if (banEndTime != null) {
+                throw new RuntimeException(String.format("%tY-%<tm-%<td %<tH:%<tM 까지 작성, 수정이 금지된 사용자 입니다.", banEndTime));
+            } else {
+                throw new RuntimeException("작성, 수정이 금지된 사용자 입니다.");
+            }
+        }
+    }
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 15:29 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     private CommentDTO.Response convertToResponseDTO(Comment comment) {
         return CommentDTO.Response.builder()
@@ -88,4 +132,16 @@ public class CommentService {
                 .isEdited(comment.getIsEdited())
                 .build();
     }
+
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-09 11:25 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    public User getWriterByCommentId(Long commentId) {
+        Comment comment = commentRepository.findByCommentId(commentId);
+
+        if (comment == null) {
+            throw new IllegalArgumentException("Comment with ID " + commentId + " not found");
+        }
+
+        return comment.getCommenter();
+    }
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 11:25 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

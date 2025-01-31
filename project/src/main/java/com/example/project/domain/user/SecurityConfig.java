@@ -1,5 +1,6 @@
 package com.example.project.domain.user;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -14,6 +15,10 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Objects;
 
 @Configuration
 public class SecurityConfig {
@@ -36,11 +41,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register").permitAll()
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll()// 정적 리소스 허용
+                        .requestMatchers("/register", "/", "/login", "/ws/**", "/auth/status").permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/shared-worker.js").permitAll()// 정적 리소스 허용
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -55,8 +58,16 @@ public class SecurityConfig {
                         .invalidateHttpSession(true) // 세션 무효화
                         .deleteCookies("JSESSIONID") // 쿠키 삭제
                 )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                        })
+                )
                 .sessionManagement(session -> session
-                        .maximumSessions(1) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지)
+                        .maximumSessions(3) // 한 사용자당 허용되는 세션 수 (중복 로그인 방지)
+                        .maxSessionsPreventsLogin(false) // 새로운 로그인 시도를 막음
                         .sessionRegistry(sessionRegistry()) // SessionRegistry 설정
                 );
         return http.build();
@@ -84,4 +95,19 @@ public class SecurityConfig {
     public HttpSessionEventPublisher httpSessionEventPublisher() {
         return new HttpSessionEventPublisher();
     }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/shared-worker.js")
+                        .allowedOrigins("http://localhost:8080") // 허용할 클라이언트 도메인
+                        .allowedMethods("GET", "OPTIONS")
+                        .allowCredentials(true);
+            }
+        };
+    }
+
+
 }

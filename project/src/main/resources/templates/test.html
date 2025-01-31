@@ -138,6 +138,7 @@
   let microphone;
   const bars = [];
 
+
   // === 새 전역 상태 ===
   let isRecording = false;  // true면 녹화 중
   let isPaused = false;     // true면 일시중지 중
@@ -175,6 +176,73 @@
       alert("카메라/마이크를 사용할 수 없습니다: " + error.message);
     }
   });
+
+  let uploadedFilePath = ""; // 수정 이유찬: 업로드된 파일 경로 저장
+
+  // 타이머 업데이트
+
+  function updateTimer() {
+
+      seconds++;
+
+      const minutes = Math.floor(seconds / 60);
+
+      const remainingSeconds = seconds % 60;
+
+      document.getElementById('timer').textContent =
+
+          `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+
+  }
+
+  // 오디오 레벨 바 생성
+
+  function createAudioBars() {
+
+      const audioMeter = document.getElementById('audioMeter');
+
+      for (let i = 0; i < 40; i++) {
+
+          const bar = document.createElement('div');
+
+          bar.classList.add('bar');
+
+          bars.push(bar);
+
+          audioMeter.appendChild(bar);
+
+      }
+
+  }
+
+  // 오디오 레벨 모니터링
+
+  function monitorAudioLevel() {
+
+      const dataArray = new Uint8Array(analyser.fftSize);
+
+      function updateAudioLevel() {
+
+          analyser.getByteFrequencyData(dataArray);
+
+          for (let i = 0; i < bars.length; i++) {
+
+              const barHeight = dataArray[i] / 256 * 50; // 값에 따라 바 크기 조정
+
+              bars[i].style.height = `${barHeight}px`;
+
+          }
+
+          requestAnimationFrame(updateAudioLevel);
+
+      }
+
+      updateAudioLevel();
+
+  }
+
+  // 발표 시작
+
 
   // 2) 발표 시작 or 다시시작
   async function startPresentation() {
@@ -218,6 +286,7 @@
             }
           };
 
+
           // stop → 업로드
           mediaRecorder.onstop = async function() {
             const blob = new Blob(recordedChunks, { type: 'video/webm' });
@@ -240,6 +309,7 @@
               alert("녹화본 업로드 중 문제가 발생했습니다.");
             }
           };
+
 
           // 녹화 시작
           mediaRecorder.start();
@@ -352,6 +422,47 @@
       `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
+  // 녹화본 업로드 및 결과 페이지 이동 // 수정 이유찬: 함수 추가
+  async function uploadAndGoToResults() {
+      if (recordedChunks.length === 0) {
+          alert("녹화된 파일이 없습니다.");
+          return;
+      }
+
+      document.getElementById('viewResultsBtn').disabled = true;
+      document.getElementById('loadingModal').style.display = 'block'; // 로딩 화면 표시
+
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const formData = new FormData();
+      formData.append('file', blob, 'presentation.webm');
+
+      try {
+          const response = await fetch('/files/upload/results', {
+              method: 'POST',
+              body: formData
+          });
+
+          if (response.ok) {
+              const result = await response.json();
+              uploadedFilePath = result.filePath; // 수정 이유찬: 업로드된 경로 저장
+              console.log("녹화본 업로드 성공:", uploadedFilePath);
+              window.location.href = `/files/upload/results?filePath=${encodeURIComponent(uploadedFilePath)}`;
+          } else {
+              console.error("서버 응답 오류:", response.statusText);
+              alert("녹화본 업로드에 실패했습니다.");
+          }
+      } catch (error) {
+          console.error("업로드 중 오류:", error);
+          alert("녹화본 업로드 중 문제가 발생했습니다.");
+      } finally {
+          document.getElementById('loadingModal').style.display = 'none'; // 로딩 화면 숨김
+          document.getElementById('viewResultsBtn').disabled = false;
+      }
+  }
+
+
+
+
   // ====== 오디오 게이지 ======
   function createAudioBars() {
     const audioMeter = document.getElementById('audioMeter');
@@ -362,6 +473,7 @@
       audioMeter.appendChild(bar);
     }
   }
+
 
   function monitorAudioLevel() {
     const dataArray = new Uint8Array(analyser.fftSize);
@@ -376,6 +488,11 @@
     }
     updateAudioLevel();
   }
+
+  document.getElementById('startBtn').addEventListener('click', startPresentation);
+  document.getElementById('stopBtn').addEventListener('click', stopPresentation);
+  document.getElementById('viewResultsBtn').addEventListener('click', uploadAndGoToResults); // 수정 이유찬: 업로드 및 이동 처리
+
 </script>
 </body>
 </html>

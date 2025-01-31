@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sent Letters</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/letter.css">
+</head>
+<body>
+<div th:replace="navbar.html"></div>
+<div class="main-container">
+  <div class="header">Sent Letters</div>
+  <div class="content">
+    <div class="inner-container">
+      <div class="mail-list">
+        <ul>
+          <li th:each="letter : ${letters}" class="mail-item"
+              th:data-sender-name="${letter.receiverUsername}"
+              th:data-content="${letter.letterContent}"
+              th:data-received-at="${letter.dateSend}">
+            <p><strong>To:</strong> <span th:text="${letter.receiverUsername}"></span></p>
+            <p><strong>Content:</strong> <span th:text="${letter.letterContent}"></span></p>
+            <p><strong>Sent At:</strong> <span th:text="${letter.dateSend}"></span></p>
+          </li>
+        </ul>
+        <div class="footer-buttons">
+          <button onclick="location.href='/letters/received'">Received</button>
+          <button class="active" onclick="location.href='/letters/sent'">Sent</button>
+        </div>
+      </div>
+
+      <div class="mail-details">
+        <div class="mail-details-header">Select a message to view details</div>
+        <div class="mail-details-content" id="mailDetailsContent">
+          <!-- Message details will appear here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="compose-link">
+  <a href="/letters/new">Compose Letter</a>
+</div>
+<script>
+
+  function handleClick(element) {
+  const sender = element.dataset.senderName;
+  const content = element.dataset.content;
+  const receivedAt = element.dataset.receivedAt;
+
+  const detailsHeader = document.querySelector('.mail-details-header');
+  const detailsContent = document.getElementById('mailDetailsContent');
+
+  detailsHeader.textContent = `From: ${sender} - ${receivedAt}`;
+  detailsContent.textContent = content;
+}
+document.querySelector('.mail-list').addEventListener('click', function(e) {
+  if (e.target.closest('.mail-item')) {
+    handleClick(e.target.closest('.mail-item'));
+  }
+});
+</script>
+</body>
+</html>
