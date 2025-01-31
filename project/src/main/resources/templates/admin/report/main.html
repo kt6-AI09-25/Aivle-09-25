@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <title>관리자 페이지 - 메인</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        /* 대시보드용 간단한 카드 스타일 */
+        .dashboard-cards {
+          display: flex;
+          flex-wrap: wrap;        /* 화면이 좁아지면 다음 줄로 넘어가게 */
+          gap: 20px;             /* 카드 사이 간격 */
+          margin-bottom: 30px;
+        }
+        .card {
+          flex: 1;               /* 화면 크기에 따라 카드가 자동으로 늘어나도록 */
+          min-width: 200px;      /* 너무 작아지지 않도록 최소 너비 설정 */
+          background-color: #fff;
+          border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          padding: 20px;
+        }
+        .card h3 {
+          margin-bottom: 10px;
+          font-size: 1.2rem;
+          color: #333;
+        }
+        .card p {
+          font-size: 1.4rem;
+          font-weight: bold;
+          color: #007bff;
+          margin: 0;
+        }
+
+        /* 최근 활동 섹션 예시 */
+        .recent-activities {
+          background-color: #fff;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .recent-activities h3 {
+          margin-bottom: 15px;
+          font-size: 1.2rem;
+          color: #333;
+        }
+        .activities-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+        .activities-list li {
+          padding: 10px 0;
+          border-bottom: 1px solid #eee;
+        }
+        .activities-list li:last-child {
+          border-bottom: none;
+        }
+        .activity-title {
+          font-weight: bold;
+          margin-right: 5px;
+        }
+        .activity-time {
+          color: #999;
+          font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+<div class="admin-container">
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <h2>Admin</h2>
+        <ul class="menu">
+            <li><a href="main.html" class="active">메인</a></li>
+            <li><a href="members.html">회원 관리</a></li>
+            <li><a href="/admin/report">게시판 신고 관리</a></li>
+            <li><a href="presentations.html">발표 내용 조회</a></li>
+            <li><a href="statistics.html">통계 페이지</a></li>
+        </ul>
+
+        <footer class="sidebar-footer">
+            <!-- 홈페이지 링크 -->
+            <a href="index.html">홈페이지로 돌아가기</a>
+        </footer>
+    </div>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <div class="content">
+        <h1 class="page-title">관리자 메인 페이지</h1>
+        <div class="title-line"></div>
+
+        <!-- 카드 형태의 주요 지표 -->
+        <div class="dashboard-cards">
+            <!-- 예시 카드 1: 전체 회원 수 -->
+            <div class="card">
+                <h3>전체 회원 수</h3>
+                <p>120명</p>
+            </div>
+            <!-- 예시 카드 2: 오늘 신규 가입 -->
+            <div class="card">
+                <h3>오늘 신규 가입</h3>
+                <p>5명</p>
+            </div>
+            <!-- 예시 카드 3: 미처리 신고 -->
+            <div class="card">
+                <h3>미처리 신고</h3>
+                <p>3건</p>
+            </div>
+            <!-- 예시 카드 4: 발표 등록 수 -->
+            <div class="card">
+                <h3>발표 등록 수</h3>
+                <p>45건</p>
+            </div>
+        </div>
+
+        <!-- 최근 활동 목록 -->
+        <div class="recent-activities">
+            <h3>최근 활동</h3>
+            <ul class="activities-list">
+                <!-- 예시로 회원가입/신고/발표등록 등을 표시 -->
+                <li>
+                    <span class="activity-title">user10님이 회원가입</span>
+                    <span class="activity-time">2025-01-26 12:30</span>
+                </li>
+                <li>
+                    <span class="activity-title">user07님이 발표를 등록</span>
+                    <span class="activity-time">2025-01-26 11:20</span>
+                </li>
+                <li>
+                    <span class="activity-title">user05님 게시글 신고 접수</span>
+                    <span class="activity-time">2025-01-26 10:10</span>
+                </li>
+                <li>
+                    <span class="activity-title">user02님 댓글 신고 접수</span>
+                    <span class="activity-time">2025-01-25 23:59</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 차트나 그래프를 넣고 싶다면 Chart.js 사용 가능 -->
+
+        <canvas id="myChart" width="400" height="200" style="background-color: #fff; margin-top: 20px;"></canvas>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            window.onload = () => {
+              const ctx = document.getElementById('myChart').getContext('2d');
+              new Chart(ctx, {
+                type: 'bar',
+                data: {
+                  labels: ['01-20','01-21','01-22','01-23','01-24','01-25','01-26'],
+                  datasets: [{
+                    label: '일일 가입자 수',
+                    data: [3,4,2,6,5,7,5],
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    }
+                  }
+                }
+              });
+            }
+        </script>
+
+    </div>
+</div>
+</body>
+</html>
