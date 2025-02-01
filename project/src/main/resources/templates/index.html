@@ -48,9 +48,10 @@
         .feature1 {
             background-color: #f1f8fe;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 35px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 400px;
+            height: 400px;
             flex-shrink: 0;
         }
 
@@ -131,16 +132,18 @@
 </head>
 <body>
 <div th:replace="navbar.html"></div>
-<div class="header" style="background-color: #d2dfff; text-align: center; padding: 50px 20px; display: flex; align-items: center; justify-content: space-around;">
-    <div style="max-width: 600px;">
-        <h1 style="font-size: 2rem; color: #007bff;">AI 발표분석 서비스입니다!!!</h1>
-        <h2 style="font-size: 1.25rem; color: #333; margin-top: 10px;">당신의 발표능력을 향상시켜보세요</h2>
+<div class="header" style="background-color: #d2dfff; text-align: center; padding: 50px 20px; display: flex; align-items: center; justify-content: center; gap: 50px;">
+    <div class="text" style="max-width: 800px; margin-right: 8px;">
+        <h1 style="font-size: 2.5rem; color: #007bff;">AI 발표분석 서비스입니다!!!</h1>
+        <h2 style="font-size: 1.75rem; color: #333; margin-top: 10px;">당신의 발표능력을 향상시켜보세요</h2>
         <button id="startButton" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; margin-top: 20px;">시작하기</button>
     </div>
-    <div class="image-container" style="margin: 0;">
-        <img src="images/present1.png" alt="발표 분석 이미지" style="max-width: 400px; width: 100%; height: auto;">
+    <div class="image-container">
+        <img src="images/present1.png" alt="발표 분석 이미지" style="max-width: 550px; width: 100%; height: auto;">
     </div>
 </div>
+
+
 
 </div>
 

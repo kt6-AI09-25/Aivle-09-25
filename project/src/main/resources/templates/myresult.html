@@ -1,93 +1,86 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>분석 결과 및 평가 기록</title>
     <!-- 기존 style.css -->
-    <link rel="stylesheet" href="/css/style.css"> <!-- CSS 파일 링크 -->
+    <link rel="stylesheet" href="/css/style.css">
     <!-- 새로 분리한 analysis.css -->
     <link rel="stylesheet" href="/css/myresult.css">
 </head>
 <body>
-<div class="content">
-    <div th:replace="navbar.html"></div>
+<!-- 네비게이션 (Thymeleaf include) -->
+<div th:replace="navbar.html"></div>
 
-    <div class="centered-content analysis-section">
-        <h1 class="analysis-result">분석결과</h1>
-        <div class="analysis-line"></div>
-
-        <!-- 발표영상, 면접영상 선택 버튼 -->
-        <div class="button-container">
-            <button class="mui-button" id="presentationVideoButton">발표영상</button>
-            <button class="mui-button" id="interviewVideoButton">면접영상</button>
+<!-- 분석 결과 영역 (프론트엔드 담당 코드) -->
+<main>
+    <section class="content">
+        <div class="centered-content analysis-section">
+            <h1 class="analysis-result">분석결과</h1>
+            <div class="analysis-line"></div>
+            <!-- 발표영상, 면접영상 선택 버튼 -->
+            <div class="button-container">
+                <button class="mui-button" id="presentationVideoButton">발표영상</button>
+                <button class="mui-button" id="interviewVideoButton">면접영상</button>
+            </div>
         </div>
-    </div>
 
-    <!-- 썸네일 컨테이너 -->
-    <div class="thumbnail-container">
-        <!-- 발표영상 썸네일 -->
-        <img
-                src="/path/to/presentationThumb.jpg"
-                alt="Presentation Video Thumbnail"
-                id="presentationThumbnail"
-        >
-        <!-- 면접영상 썸네일 -->
-        <img
-                src="/path/to/interviewThumb.jpg"
-                alt="Interview Video Thumbnail"
-                id="interviewThumbnail"
-        >
-    </div>
+        <!-- 썸네일 컨테이너 -->
+        <div class="thumbnail-container">
+            <!-- 발표영상 썸네일 -->
+            <img src="/path/to/presentationThumb.jpg" alt="Presentation Video Thumbnail" id="presentationThumbnail">
+            <!-- 면접영상 썸네일 -->
+            <img src="/path/to/interviewThumb.jpg" alt="Interview Video Thumbnail" id="interviewThumbnail">
+        </div>
 
-    <div class="spacer"></div>
+        <div class="spacer"></div>
 
-    <!-- 모달 -->
-    <div id="videoModal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close">&times;</button>
-            <div class="module-titleArea">
-                <h1>분석 결과</h1>
-            </div>
-            <div class="menu-bar" id="menuBar1">
-                <a href="#" id="summaryResult" class="active">종합결과</a>
-                <a href="#" id="detailAnalysis">세부분석</a>
-            </div>
-
-            <!-- 종합결과 -->
-            <div id="summaryContent" class="summary-content">
-                <p>이곳은 종합결과를 보여주는 영역입니다.</p>
-            </div>
-
-            <!-- 세부분석 -->
-            <div id="detailContent" class="detail-content">
-                <div class="menu-bar hidden" id="menuBar2">
-                    <a href="#" id="motion" class="active">머리움직임</a>
-                    <a href="#" id="voice">음성크기</a>
-                    <a href="#" id="gaze">시선처리</a>
+        <!-- 분석 결과 모달 -->
+        <div id="videoModal" class="modal" role="dialog" aria-modal="true">
+            <div class="modal-content" tabindex="-1">
+                <button class="modal-close" id="analysisModalClose" aria-label="Close analysis modal">&times;</button>
+                <div class="module-titleArea">
+                    <h1>분석 결과</h1>
                 </div>
-                <div class="modal-body split">
-                    <div class="modal-left">
-                        <!-- 모달 왼쪽에 표시될 영상 -->
-                        <video controls id="analysisVideo">
-                            <!-- src는 JavaScript에서 동적으로 변경할 예정 -->
-                            Your browser does not support the video tag.
-                        </video>
+                <div class="menu-bar" id="menuBar1">
+                    <a href="#" id="summaryResult" class="active">종합결과</a>
+                    <a href="#" id="detailAnalysis">세부분석</a>
+                </div>
+
+                <!-- 종합결과 -->
+                <div id="summaryContent" class="summary-content">
+                    <p>이곳은 종합결과를 보여주는 영역입니다.</p>
+                </div>
+
+                <!-- 세부분석 -->
+                <div id="detailContent" class="detail-content">
+                    <div class="menu-bar hidden" id="menuBar2">
+                        <a href="#" id="motion" class="active">머리움직임</a>
+                        <a href="#" id="voice">음성크기</a>
+                        <a href="#" id="gaze">시선처리</a>
                     </div>
-                    <div class="modal-right">
-                        <div class="frame-card">
-                            <div id="motionContent" class="motion-content active">
-                                <p>머리움직임 평가 내용이 여기에 표시됩니다.</p>
-                            </div>
-                            <div id="voiceContent" class="voice-content">
-                                <p>음성크기 평가 내용이 여기에 표시됩니다.</p>
-                            </div>
-                            <div id="gazeContent" class="gaze-content">
-                                <p>시선처리 평가 내용이 여기에 표시됩니다.</p>
-                                <div class="chart-container">
-                                    <canvas id="gazeChart"></canvas>
+                    <div class="modal-body split">
+                        <div class="modal-left">
+                            <!-- 모달 왼쪽에 표시될 영상 -->
+                            <video controls id="analysisVideo">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <div class="modal-right">
+                            <div class="frame-card">
+                                <div id="motionContent" class="motion-content active">
+                                    <p>머리움직임 평가 내용이 여기에 표시됩니다.</p>
+                                </div>
+                                <div id="voiceContent" class="voice-content">
+                                    <p>음성크기 평가 내용이 여기에 표시됩니다.</p>
+                                </div>
+                                <div id="gazeContent" class="gaze-content">
+                                    <p>시선처리 평가 내용이 여기에 표시됩니다.</p>
+                                    <div class="chart-container">
+                                        <canvas id="gazeChart"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -95,184 +88,294 @@
                 </div>
             </div>
         </div>
-    </div> <!-- /modal -->
+    </section>
+
+    <!-- 평가 기록 영역 (백엔드 담당 코드) -->
+    <section>
+        <h1>이전 평가 기록</h1>
+        <div th:each="score : ${previousScores}" class="video-container">
+            <div class="video-thumbnail" th:attr="data-scoreid=${score.scoreId}" onclick="openScoreModal(this)">
+                <video width="300" height="180" th:src="@{/myresults/upload/results/{fileId}(fileId=${score.fileName})}" controls></video>
+            </div>
+            <p><strong>날짜:</strong> <span th:text="${#temporals.format(score.date, 'yyyy-MM-dd HH:mm')}"></span></p>
+            <p><strong>작성자:</strong> <span th:text="${score.userId}"></span></p>
+        </div>
+
+        <h1>현재 평가 중</h1>
+        <div th:if="${evaluatingScore != null}" class="video-container">
+            <div class="video-thumbnail" th:if="${evaluatingScore.status == 'IN_PROGRESS'}">
+                <span class="loading">평가 진행 중...</span>
+            </div>
+            <div class="video-thumbnail" th:if="${evaluatingScore.status == 'COMPLETED' or evaluatingScore.fileId != null}" th:attr="data-scoreid=${evaluatingScore.scoreId}" onclick="openScoreModal(this)">
+                <video width="300" height="180" th:src="@{/myresults/upload/results/{fileId}(fileId=${evaluatingScore.fileId})}" controls></video>
+            </div>
+            <p><strong>날짜:</strong> <span th:text="${#temporals.format(evaluatingScore.date, 'yyyy-MM-dd HH:mm')}"></span></p>
+            <p><strong>작성자:</strong> <span th:text="${evaluatingScore.userId}"></span></p>
+        </div>
+    </section>
+</main>
+
+<!-- 평가 상세 모달 (Score Modal) -->
+<div id="commonModal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-content" tabindex="-1">
+        <button class="modal-close" id="scoreModalClose" aria-label="Close score modal">✖</button>
+        <video id="modalVideo" controls></video>
+        <div class="score-details">
+            <h3>총 점수: <span id="modalTotalScore"></span></h3>
+            <p>움직임 점수: <span id="modalMotionScore"></span></p>
+            <p>표정 점수: <span id="modalExpressionScore"></span></p>
+            <p>언어 점수: <span id="modalLanguageScore"></span></p>
+            <p>속도: <span id="modalTempo"></span></p>
+            <p>날짜: <span id="modalDate"></span></p>
+            <h4>머리 움직임 시간대</h4>
+            <ul id="motionTimesList"></ul>
+            <h4>표정 변화 시간대</h4>
+            <ul id="expressionTimesList"></ul>
+            <h4>언어 사용 시간대</h4>
+            <ul id="languageTimesList"></ul>
+        </div>
+    </div>
 </div>
 
+<!-- 푸터 (Thymeleaf include) -->
 <div th:replace="footer.html"></div>
 
+<!-- 외부 Chart.js 라이브러리 -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- 스크립트 (두 영역의 기능을 모두 포함) -->
 <script>
-    // ========= 기존 변수 =========
-    const modal = document.getElementById('videoModal');
+    /***** 분석 결과 영역 (프론트엔드) *****/
+    // 관련 요소들
+    const analysisModal = document.getElementById('videoModal');
     const summaryContent = document.getElementById('summaryContent');
     const detailContent = document.getElementById('detailContent');
     const menuBar2 = document.getElementById('menuBar2');
     const detailAnalysis = document.getElementById('detailAnalysis');
     const summaryResult = document.getElementById('summaryResult');
-    const closeModal = document.querySelector('.modal-close');
+    const analysisModalClose = document.getElementById('analysisModalClose');
     const motionButton = document.getElementById('motion');
     const voiceButton = document.getElementById('voice');
     const gazeButton = document.getElementById('gaze');
     const motionContent = document.getElementById('motionContent');
     const voiceContent = document.getElementById('voiceContent');
     const gazeContent = document.getElementById('gazeContent');
-    const gazeChart = document.getElementById('gazeChart');
+    const gazeChartElement = document.getElementById('gazeChart');
     const analysisVideo = document.getElementById('analysisVideo');
 
-    // ========= 새로 추가 / 수정된 변수 =========
+    // Chart.js 인스턴스 보관 변수
+    let gazeChartInstance = null;
+
+    // 발표/면접 버튼 및 썸네일 요소
     const presentationVideoButton = document.getElementById('presentationVideoButton');
     const interviewVideoButton = document.getElementById('interviewVideoButton');
     const presentationThumbnail = document.getElementById('presentationThumbnail');
     const interviewThumbnail = document.getElementById('interviewThumbnail');
 
-    // 실제 저장된 영상 경로
+    // 실제 저장된 영상 경로 (필요에 따라 수정)
     const presentationVideoSrc = "/path/to/presentationVideo.mp4";
     const interviewVideoSrc = "/path/to/interviewVideo.mp4";
 
-    // ========== 초기 설정 ==========
-    // 1) 발표영상 썸네일 보이기, 면접영상 숨김
+    // 초기 설정: 발표 썸네일 보이기, 버튼 활성화
     presentationThumbnail.style.display = "block";
     interviewThumbnail.style.display = "none";
-
-    // 2) '발표영상' 버튼이 이미 눌린(active) 상태로
     presentationVideoButton.classList.add("active-button");
     interviewVideoButton.classList.remove("active-button");
 
-    // ========== 버튼 클릭 로직 ==========
-    presentationVideoButton.onclick = function() {
-        // 발표영상 썸네일만 보이도록
-        presentationThumbnail.style.display = "block";
-        interviewThumbnail.style.display = "none";
+    // 이벤트 등록 (addEventListener 사용)
+    presentationVideoButton.addEventListener('click', () => {
+      presentationThumbnail.style.display = "block";
+      interviewThumbnail.style.display = "none";
+      presentationVideoButton.classList.add("active-button");
+      interviewVideoButton.classList.remove("active-button");
+    });
 
-        // 현재 버튼을 활성화 상태로, 다른 버튼은 비활성
-        presentationVideoButton.classList.add("active-button");
-        interviewVideoButton.classList.remove("active-button");
-    };
+    interviewVideoButton.addEventListener('click', () => {
+      presentationThumbnail.style.display = "none";
+      interviewThumbnail.style.display = "block";
+      interviewVideoButton.classList.add("active-button");
+      presentationVideoButton.classList.remove("active-button");
+    });
 
-    interviewVideoButton.onclick = function() {
-        // 면접영상 썸네일만 보이도록
-        presentationThumbnail.style.display = "none";
-        interviewThumbnail.style.display = "block";
+    // 썸네일 클릭 시 분석 모달 열기
+    presentationThumbnail.addEventListener('click', () => {
+      analysisVideo.src = presentationVideoSrc;
+      openAnalysisModal();
+    });
 
-        // 현재 버튼을 활성화 상태로, 다른 버튼은 비활성
-        interviewVideoButton.classList.add("active-button");
-        presentationVideoButton.classList.remove("active-button");
-    };
+    interviewThumbnail.addEventListener('click', () => {
+      analysisVideo.src = interviewVideoSrc;
+      openAnalysisModal();
+    });
 
-    // 썸네일 클릭 -> 모달 열기
-    presentationThumbnail.onclick = function() {
-        analysisVideo.src = presentationVideoSrc;
-        openModal();
-    };
-    interviewThumbnail.onclick = function() {
-        analysisVideo.src = interviewVideoSrc;
-        openModal();
-    };
-
-    function openModal() {
-        modal.style.display = "block";
-        resetToSummary();
+    function openAnalysisModal() {
+      analysisModal.style.display = "block";
+      resetToSummary();
+      // 모달이 열리면 포커스를 modal-content로 이동하여 접근성을 향상
+      analysisModal.querySelector('.modal-content').focus();
     }
 
-    // 종합결과 / 세부분석 탭 전환
-    detailAnalysis.onclick = function(event) {
-        event.preventDefault();
-        summaryContent.style.display = "none";
-        detailContent.style.display = "block";
-        menuBar2.classList.remove('hidden');
-        summaryResult.classList.remove('active');
-        detailAnalysis.classList.add('active');
-    };
+    // 탭 전환: 종합결과 / 세부분석
+    detailAnalysis.addEventListener('click', function(event) {
+      event.preventDefault();
+      summaryContent.style.display = "none";
+      detailContent.style.display = "block";
+      menuBar2.classList.remove('hidden');
+      summaryResult.classList.remove('active');
+      detailAnalysis.classList.add('active');
+    });
 
-    summaryResult.onclick = function(event) {
-        event.preventDefault();
-        resetToSummary();
-    };
+    summaryResult.addEventListener('click', function(event) {
+      event.preventDefault();
+      resetToSummary();
+    });
 
     function resetToSummary() {
-        summaryContent.style.display = "block";
-        detailContent.style.display = "none";
-        menuBar2.classList.add('hidden');
-        detailAnalysis.classList.remove('active');
-        summaryResult.classList.add('active');
+      summaryContent.style.display = "block";
+      detailContent.style.display = "none";
+      menuBar2.classList.add('hidden');
+      detailAnalysis.classList.remove('active');
+      summaryResult.classList.add('active');
     }
 
-    motionButton.onclick = function(event) {
-        event.preventDefault();
-        activateTab(motionButton, motionContent);
-    };
-    voiceButton.onclick = function(event) {
-        event.preventDefault();
-        activateTab(voiceButton, voiceContent);
-    };
-    gazeButton.onclick = function(event) {
-        event.preventDefault();
-        activateTab(gazeButton, gazeContent);
-        renderGazeChart();
-    };
+    // 세부분석 내 탭 전환
+    motionButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      activateTab(motionButton, motionContent);
+    });
+
+    voiceButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      activateTab(voiceButton, voiceContent);
+    });
+
+    gazeButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      activateTab(gazeButton, gazeContent);
+      renderGazeChart();
+    });
 
     function activateTab(button, content) {
-        motionButton.classList.remove('active');
-        voiceButton.classList.remove('active');
-        gazeButton.classList.remove('active');
+      motionButton.classList.remove('active');
+      voiceButton.classList.remove('active');
+      gazeButton.classList.remove('active');
 
-        motionContent.classList.remove('active');
-        voiceContent.classList.remove('active');
-        gazeContent.classList.remove('active');
+      motionContent.classList.remove('active');
+      voiceContent.classList.remove('active');
+      gazeContent.classList.remove('active');
 
-        button.classList.add('active');
-        content.classList.add('active');
+      button.classList.add('active');
+      content.classList.add('active');
     }
 
     function renderGazeChart() {
-        new Chart(gazeChart, {
-            type: 'line',
-            data: {
-                labels: ['1초', '2초', '3초', '4초', '5초'],
-                datasets: [{
-                    label: '시선처리 데이터',
-                    data: [2, 1, 3, 4, 2],
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 2,
-                    fill: false
-                }]
+      // 기존 차트가 있으면 파괴 후 다시 생성
+      if (gazeChartInstance) {
+        gazeChartInstance.destroy();
+      }
+      gazeChartInstance = new Chart(gazeChartElement, {
+        type: 'line',
+        data: {
+          labels: ['1초', '2초', '3초', '4초', '5초'],
+          datasets: [{
+            label: '시선처리 데이터',
+            data: [2, 1, 3, 4, 2],
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 2,
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: '시간'
+              }
             },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: '시간'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: '값'
-                        }
-                    }
-                }
+            y: {
+              title: {
+                display: true,
+                text: '값'
+              }
             }
+          }
+        }
+      });
+    }
+
+    // 분석 모달 닫기 (addEventListener 사용)
+    analysisModalClose.addEventListener('click', () => {
+      closeAnalysisModal();
+    });
+
+    // 모달 외부 클릭 시 닫기 (분석 모달)
+    analysisModal.addEventListener('click', (event) => {
+      if (event.target === analysisModal) {
+        closeAnalysisModal();
+      }
+    });
+
+    function closeAnalysisModal() {
+      analysisModal.style.display = "none";
+      resetToSummary();
+      analysisVideo.pause();
+      analysisVideo.src = "";
+    }
+
+    /***** 평가 기록 영역 (백엔드) *****/
+    function openScoreModal(element) {
+      const scoreId = element.getAttribute("data-scoreid");
+      fetch(`/scores/details?scoreId=${scoreId}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById("modalTotalScore").textContent = data.totalScore;
+          document.getElementById("modalMotionScore").textContent = data.motionScore;
+          document.getElementById("modalExpressionScore").textContent = data.expressionScore;
+          document.getElementById("modalLanguageScore").textContent = data.languageScore;
+          document.getElementById("modalTempo").textContent = data.tempo;
+          document.getElementById("modalDate").textContent = data.date;
+          document.getElementById("modalVideo").src = `/myresults/upload/results/${data.fileName}`;
+
+          displayTimes("motionTimesList", data.motionTimes);
+          displayTimes("expressionTimesList", data.expressionTimes);
+          displayTimes("languageTimesList", data.languageTimes);
+
+          document.getElementById("commonModal").classList.add("active");
+        })
+        .catch(error => {
+          console.error("데이터 로드 실패:", error);
+          alert("평가 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.");
         });
     }
 
-    // 모달 닫기
-    closeModal.onclick = function() {
-        modal.style.display = "none";
-        resetToSummary();
-        analysisVideo.pause();
-        analysisVideo.src = "";
-    };
+    function displayTimes(elementId, timesArray) {
+      const listElement = document.getElementById(elementId);
+      listElement.innerHTML = "";
+      timesArray.forEach(time => {
+        const li = document.createElement("li");
+        li.textContent = `${time.actionName || time.expressionName || time.languageName}: ${time.actionTime || time.expressionTime || time.languageTime}초`;
+        listElement.appendChild(li);
+      });
+    }
 
-    window.onclick = function(event) {
-        if (event.target === modal) {
-            modal.style.display = "none";
-            resetToSummary();
-            analysisVideo.pause();
-            analysisVideo.src = "";
-        }
-    };
+    // 평가 상세 모달 닫기 (addEventListener 사용)
+    const scoreModalClose = document.getElementById('scoreModalClose');
+    scoreModalClose.addEventListener('click', closeScoreModal);
+
+    // 모달 외부 클릭 시 닫기 (평가 상세 모달)
+    const commonModal = document.getElementById('commonModal');
+    commonModal.addEventListener('click', (event) => {
+      if (event.target === commonModal) {
+        closeScoreModal();
+      }
+    });
+
+    function closeScoreModal() {
+      commonModal.classList.remove("active");
+      document.getElementById("modalVideo").src = "";
+    }
 </script>
 </body>
 </html>
