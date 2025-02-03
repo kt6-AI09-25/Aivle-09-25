@@ -2,8 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>분석 결과 및 평가 기록</title>
     <!-- 기존 style.css -->
     <link rel="stylesheet" href="/css/style.css">
@@ -29,10 +28,10 @@
 
         <!-- 썸네일 컨테이너 -->
         <div class="thumbnail-container">
-            <!-- 발표영상 썸네일 -->
-            <img src="/path/to/presentationThumb.jpg" alt="Presentation Video Thumbnail" id="presentationThumbnail">
-            <!-- 면접영상 썸네일 -->
-            <img src="/path/to/interviewThumb.jpg" alt="Interview Video Thumbnail" id="interviewThumbnail">
+            <!-- 녹화된 발표영상 썸네일 -->
+            <img src="/video/recorded_presentation.jpg" alt="Recorded Presentation Thumbnail" id="presentationThumbnail">
+            <!-- 녹화된 면접영상 썸네일 -->
+            <img src="/video/recorded_interview.jpg" alt="Recorded Interview Thumbnail" id="interviewThumbnail">
         </div>
 
         <div class="spacer"></div>
@@ -95,7 +94,10 @@
         <h1>이전 평가 기록</h1>
         <div th:each="score : ${previousScores}" class="video-container">
             <div class="video-thumbnail" th:attr="data-scoreid=${score.scoreId}" onclick="openScoreModal(this)">
-                <video width="300" height="180" th:src="@{/myresults/upload/results/{fileId}(fileId=${score.fileName})}" controls></video>
+                <video width="300" height="180"
+                       th:src="@{/myresults/upload/results/{fileId}(fileId=${score.fileName})}"
+                       poster="/video/recorded_thumbnail.jpg" controls>
+                </video>
             </div>
             <p><strong>날짜:</strong> <span th:text="${#temporals.format(score.date, 'yyyy-MM-dd HH:mm')}"></span></p>
             <p><strong>작성자:</strong> <span th:text="${score.userId}"></span></p>
@@ -107,7 +109,10 @@
                 <span class="loading">평가 진행 중...</span>
             </div>
             <div class="video-thumbnail" th:if="${evaluatingScore.status == 'COMPLETED' or evaluatingScore.fileId != null}" th:attr="data-scoreid=${evaluatingScore.scoreId}" onclick="openScoreModal(this)">
-                <video width="300" height="180" th:src="@{/myresults/upload/results/{fileId}(fileId=${evaluatingScore.fileId})}" controls></video>
+                <video width="300" height="180"
+                       th:src="@{/myresults/upload/results/{fileId}(fileId=${evaluatingScore.fileId})}"
+                       poster="/video/recorded_thumbnail.jpg" controls>
+                </video>
             </div>
             <p><strong>날짜:</strong> <span th:text="${#temporals.format(evaluatingScore.date, 'yyyy-MM-dd HH:mm')}"></span></p>
             <p><strong>작성자:</strong> <span th:text="${evaluatingScore.userId}"></span></p>
@@ -143,10 +148,9 @@
 <!-- 외부 Chart.js 라이브러리 -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- 스크립트 (두 영역의 기능을 모두 포함) -->
+<!-- 스크립트 (분석 결과 및 평가 기록 영역 기능 포함) -->
 <script>
     /***** 분석 결과 영역 (프론트엔드) *****/
-    // 관련 요소들
     const analysisModal = document.getElementById('videoModal');
     const summaryContent = document.getElementById('summaryContent');
     const detailContent = document.getElementById('detailContent');
@@ -163,26 +167,21 @@
     const gazeChartElement = document.getElementById('gazeChart');
     const analysisVideo = document.getElementById('analysisVideo');
 
-    // Chart.js 인스턴스 보관 변수
     let gazeChartInstance = null;
 
-    // 발표/면접 버튼 및 썸네일 요소
     const presentationVideoButton = document.getElementById('presentationVideoButton');
     const interviewVideoButton = document.getElementById('interviewVideoButton');
     const presentationThumbnail = document.getElementById('presentationThumbnail');
     const interviewThumbnail = document.getElementById('interviewThumbnail');
 
-    // 실제 저장된 영상 경로 (필요에 따라 수정)
-    const presentationVideoSrc = "/path/to/presentationVideo.mp4";
-    const interviewVideoSrc = "/path/to/interviewVideo.mp4";
+    const presentationVideoSrc = "/video/recorded_presentation.mp4";
+    const interviewVideoSrc = "/video/recorded_interview.mp4";
 
-    // 초기 설정: 발표 썸네일 보이기, 버튼 활성화
     presentationThumbnail.style.display = "block";
     interviewThumbnail.style.display = "none";
     presentationVideoButton.classList.add("active-button");
     interviewVideoButton.classList.remove("active-button");
 
-    // 이벤트 등록 (addEventListener 사용)
     presentationVideoButton.addEventListener('click', () => {
       presentationThumbnail.style.display = "block";
       interviewThumbnail.style.display = "none";
@@ -197,7 +196,6 @@
       presentationVideoButton.classList.remove("active-button");
     });
 
-    // 썸네일 클릭 시 분석 모달 열기
     presentationThumbnail.addEventListener('click', () => {
       analysisVideo.src = presentationVideoSrc;
       openAnalysisModal();
@@ -211,11 +209,9 @@
     function openAnalysisModal() {
       analysisModal.style.display = "block";
       resetToSummary();
-      // 모달이 열리면 포커스를 modal-content로 이동하여 접근성을 향상
       analysisModal.querySelector('.modal-content').focus();
     }
 
-    // 탭 전환: 종합결과 / 세부분석
     detailAnalysis.addEventListener('click', function(event) {
       event.preventDefault();
       summaryContent.style.display = "none";
@@ -238,7 +234,6 @@
       summaryResult.classList.add('active');
     }
 
-    // 세부분석 내 탭 전환
     motionButton.addEventListener('click', function(event) {
       event.preventDefault();
       activateTab(motionButton, motionContent);
@@ -269,7 +264,6 @@
     }
 
     function renderGazeChart() {
-      // 기존 차트가 있으면 파괴 후 다시 생성
       if (gazeChartInstance) {
         gazeChartInstance.destroy();
       }
@@ -305,12 +299,10 @@
       });
     }
 
-    // 분석 모달 닫기 (addEventListener 사용)
     analysisModalClose.addEventListener('click', () => {
       closeAnalysisModal();
     });
 
-    // 모달 외부 클릭 시 닫기 (분석 모달)
     analysisModal.addEventListener('click', (event) => {
       if (event.target === analysisModal) {
         closeAnalysisModal();
@@ -360,11 +352,9 @@
       });
     }
 
-    // 평가 상세 모달 닫기 (addEventListener 사용)
     const scoreModalClose = document.getElementById('scoreModalClose');
     scoreModalClose.addEventListener('click', closeScoreModal);
 
-    // 모달 외부 클릭 시 닫기 (평가 상세 모달)
     const commonModal = document.getElementById('commonModal');
     commonModal.addEventListener('click', (event) => {
       if (event.target === commonModal) {
