@@ -4,6 +4,7 @@
     <meta charset="UTF-8"/>
     <title>관리자 페이지 - 메인</title>
     <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/style.css">
     <style>
         /* 대시보드용 간단한 카드 스타일 */
         .dashboard-cards {
@@ -67,6 +68,7 @@
     </style>
 </head>
 <body>
+<div th:replace="navbar.html"></div>
 <div class="admin-container">
     <!-- 사이드바 -->
     <div class="sidebar">
@@ -81,7 +83,7 @@
 
         <footer class="sidebar-footer">
             <!-- 홈페이지 링크 -->
-            <a href="index.html">홈페이지로 돌아가기</a>
+            <a href="/">홈페이지로 돌아가기</a>
         </footer>
     </div>
 
