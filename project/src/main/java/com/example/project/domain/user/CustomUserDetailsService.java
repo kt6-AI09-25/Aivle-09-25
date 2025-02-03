@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
@@ -39,5 +40,16 @@ public class CustomUserDetailsService implements UserDetailsService {
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole())),
                 Map.of()
         );
+    }
+
+    public long getTotalUsers() {
+        return userRepository.countAllUsers();
+    }
+
+    public long getTodayJoinedUsers() {
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // 오늘 00:00:00
+        LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59); // 오늘 23:59:59
+
+        return userRepository.countUsersByDateJoinBetween(startOfDay, endOfDay);
     }
 }

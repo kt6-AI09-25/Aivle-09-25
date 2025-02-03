@@ -36,5 +36,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.getWriter().write("{\"message\":\"Login successful\"}");
+
+        if ("ADMIN".equals(user.getRole())) {
+            response.sendRedirect("/admin"); // 관리자 대시보드로 이동
+        }
     }
 }
