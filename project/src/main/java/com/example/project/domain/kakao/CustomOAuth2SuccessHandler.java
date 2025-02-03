@@ -36,15 +36,13 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         String email = oAuth2User.getAttribute("email");
 
         if (email == null) {
-            response.sendRedirect("/"); // ✅ Whitelabel Error Page 방지
+            response.sendRedirect("/");
             return;
         }
 
-        // 기존 사용자 조회
         User user = userRepository.findByUsername(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + email));
 
-        // ✅ CustomUserDetails 생성
         CustomUserDetails userDetails = new CustomUserDetails(
                 user.getUsername(),
                 user.getPassword(),
@@ -54,21 +52,17 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                 oAuth2User.getAttributes()
         );
 
-        // ✅ 로그 추가: 인증 정보 확인
-        logger.info("SecurityContext에 저장할 사용자 정보: {}", userDetails.getUsername());
 
-        // ✅ 새로운 Authentication 객체 생성
         Authentication newAuth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-        // ✅ 세션 설정
         request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
         request.getSession().setMaxInactiveInterval(30 * 60); // 30분 유지
 
         if ("ADMIN".equals(user.getRole())) {
-            response.sendRedirect("/admin");  // 어드민이면 관리자 페이지 이동
+            response.sendRedirect("/admin");
         } else {
-            response.sendRedirect("/");  // 일반 사용자는 대시보드 이동
+            response.sendRedirect("/");
         }
     }
 
