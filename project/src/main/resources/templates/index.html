@@ -257,9 +257,9 @@
         const username = data.get("username"); // FormData에서 username 값 가져오기
 
         fetch('/login', { method: 'POST', body: data })
-
-            .then((response) => {
-                if (response.ok) {
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Login successful") {
                     alert("로그인 성공!");
                     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 14:48 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     // SharedWorker에 메시지 전송
@@ -267,8 +267,11 @@
                     console.log("Message sent to SharedWorker:", { type: "connect", username: username });
                     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 14:48 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-
-                    window.location.href = "/"; // 로그인 후 페이지 리프레시
+                    if (data.role === "ADMIN") {
+                        window.location.href = "/admin";
+                    } else {
+                        window.location.href = "/";
+                    }
                 } else {
                     alert("로그인 실패. 아이디 또는 비밀번호를 확인하세요.");
                 }
