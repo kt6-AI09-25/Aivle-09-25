@@ -26,7 +26,7 @@ public class AuthController {
 
     @Transactional
     @PostMapping("/register")
-    @CrossOrigin(origins = "http://localhost:8080")
+    @CrossOrigin(origins = "http://aivle-ai9-25-bigproject-buasgtbpbgh8aagh.koreacentral-01.azurewebsites.net")
     public ResponseEntity<?> registerUser(@RequestBody Map<String, String> request) {
         String username = request.get("username");
         String password = request.get("password");

@@ -1,0 +1,97 @@
+/* admin.css */
+
+/* 기본 리셋 및 전체 설정 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: sans-serif;
+  }
+  /* 관리자 페이지 전체 레이아웃: 사이드바 + 메인영역 */
+  .admin-container {
+    display: flex;
+    min-height: 100vh;
+  }
+  /* 사이드바 스타일 */
+  .sidebar {
+    position: fixed;      /* 스크롤해도 항상 같은 위치에 고정 */
+    top: 0;
+    left: 0;
+    width: 220px;         /* 사이드바 너비 고정 */
+    height: 100vh;        /* 뷰포트 전체 높이 */
+    background-color: #333;
+    color: #fff;
+    overflow-y: auto; /* 사이드바 내용이 많을 경우 별도 스크롤 */
+    display: flex;         /* Flex 사용 */
+    flex-direction: column;/* 수직 방향으로 나열 */
+  }
+  .sidebar h2 {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid #444;
+    margin: 0;
+  }
+  .menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    flex: 1;              /* 메뉴가 세로로 확장되어 나머지 공간 사용 */
+    overflow-y: auto;
+  }
+  .menu li {
+    border-bottom: 1px solid #444;
+  }
+  .menu li a {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 14px 20px;
+  }
+  .menu li a:hover {
+    background-color: #555;
+  }
+  /* 현재 페이지를 표시하기 위해 active 클래스 사용 (선택 사항) */
+  .menu li a.active {
+    background-color: #555;
+  }
+  /* 메인 컨텐츠 영역 스타일 */
+  .content {
+    flex-grow: 1; /* 나머지 공간 전부 차지 */
+    margin-left: 220px;
+    background-color: #f5f5f5;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  .page-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  .title-line {
+    width: 100%;
+    height: 0.9px;
+    background-color: #666; /* 중간 회색 */
+    margin-bottom: 20px;
+}
+.sidebar-footer {
+  /* flex 아이템 중 마지막에 배치돼 맨 아래로 내려감 */
+  padding: 10px;
+  text-align: center;
+  border-top: 1px solid #444; /* 위쪽 구분선 (선택 사항) */
+}
+.sidebar-footer:hover{
+  background-color: #555;
+  text-decoration: underline;
+}
+
+.sidebar-footer a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  padding: 4px 6px;
+}
+
+
+

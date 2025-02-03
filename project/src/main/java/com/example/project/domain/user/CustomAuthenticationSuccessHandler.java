@@ -35,10 +35,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         // JSON 응답 반환
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
-        response.getWriter().write("{\"message\":\"Login successful\"}");
+        response.getWriter().write("{\"message\":\"Login successful\", \"role\":\"" + user.getRole() + "\"}");
     }
 }
-
-
-
-

@@ -68,6 +68,7 @@
       color: #333; /* 헤더 글자색 */
       font-weight: bold;
       text-align: left;
+      border-bottom: 0.5px solid #333;
     }
 
     table tr:hover {
@@ -92,6 +93,12 @@
       text-align: center;
     }
 
+    .index-cell {
+    width: 5%; /* 인덱스 열 너비 */
+    text-align: center; /* 가운데 정렬 */
+    font-weight: bold; /* 굵게 표시 */
+  }
+
     .nowrap-cell {
       white-space: nowrap; /* 줄바꿈 방지 */
       overflow: hidden; /* 넘치는 텍스트 숨김 */
@@ -108,7 +115,7 @@
        text-decoration: none; /* 링크일 경우 기본 밑줄 제거 */
        border-radius: 8px; /* 버튼의 모서리를 둥글게 (5px 반경) */
        font-size: 16px; /* 버튼 내부 텍스트의 글꼴 크기 (16px) */
-       margin: 20px 0;
+       margin: 40px 0;
        float:right ;
     }
     .btn:hover {
@@ -135,6 +142,8 @@
   <table>
     <thead>
     <tr>
+      <th class="index-cell">No</th> <!-- 인덱스 열 추가 -->
+
       <th class="title-cell">제목</th>
       <th class="writer-cell nowrap-cell">작성자</th>
       <th class="view-count-cell nowrap-cell">조회수</th>
@@ -142,8 +151,9 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="post : ${posts}">
-      <td class="title-cell">
+    <tr th:each="post, iterStat : ${posts}">
+      <td class="index-cell" th:text="${#lists.size(posts) - iterStat.index}"></td>
+      <td class="title-cell nowrap-cell">
         <a th:href="@{/noticeboard/{id}(id=${post.postId})}" th:text="${post.title}"></a>
       </td>
       <td class="writer-cell nowrap-cell" th:text="${post.writerName}"></td>
@@ -198,9 +208,11 @@
          tableBody.appendChild(row); // 테이블에 추가
        } else {
          // 검색 결과가 있을 경우, 각각의 결과를 테이블에 추가
+         let totalResults = data.length;
          data.forEach(post => {
            const row = document.createElement('tr'); // 새로운 <tr> 생성
            row.innerHTML = `
+             <td class="index-cell">${totalResults--}</td> <!-- 내림차순 인덱스 -->
              <td><a href="/noticeboard/${post.postId}">${post.title}</a></td> <!-- 게시글 제목 -->
              <td class="writer-cell nowrap-cell">${post.writerName}</td>
              <td class="view-count-cell nowrap-cell">${post.viewCount}</td>
