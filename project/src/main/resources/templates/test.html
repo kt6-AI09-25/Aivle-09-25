@@ -6,7 +6,7 @@
   <title>면접 녹화 및 결과 페이지</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* 비디오 컨테이너 (카운트다운, 타이머 오버레이를 위해) */
+    /* 비디오 컨테이너 (카운트다운, 타이머 오버레이, 질문 오버레이를 위해) */
     .video-container {
       position: relative;
       display: block;
@@ -21,6 +21,22 @@
       object-fit: cover;
       transform: scaleX(-1); /* 거울모드 */
     }
+    /* 질문 오버레이 (캠 화면 위에 나타남) */
+    #questionContainer {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+      text-align: center;
+    }
+    #questionContainer button {
+      margin-left: 10px;
+    }
     .controls {
       text-align: center;
       margin-top: 10px;
@@ -34,7 +50,8 @@
       display: none;
       position: fixed;
       z-index: 2;
-      left: 0; top: 0;
+      left: 0;
+      top: 0;
       width: 100%;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.5);
@@ -65,32 +82,37 @@
     #darkOverlay {
       display: none;
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(0,0,0,0.4);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.4);
       z-index: 9;
     }
     #countdownOverlay {
       display: none;
       position: absolute;
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
       font-size: 100px;
       font-weight: bold;
       color: #ccc;
       font-family: 'Arial', sans-serif;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       z-index: 10;
     }
     /* 오른쪽 상단 타이머 오버레이 */
     #timerOverlay {
       display: none;
       position: absolute;
-      top: 10px; right: 10px;
+      top: 10px;
+      right: 10px;
       font-size: 24px;
       color: #fff;
       font-weight: bold;
       font-family: 'Arial', sans-serif;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
       z-index: 10;
     }
   </style>
@@ -108,6 +130,12 @@
   <div id="darkOverlay"></div>
   <div id="countdownOverlay">5</div>
   <div id="timerOverlay">00:00</div>
+  <!-- 질문 오버레이 -->
+  <div id="questionContainer">
+    <div id="questionText"></div>
+    <button id="questionNextBtn" style="display: none;">다음</button>
+    <button id="evaluateBtn" style="display: none;">평가받기</button>
+  </div>
 </div>
 
 <!-- (디버그용 숨겨진 타이머) -->
@@ -116,14 +144,16 @@
 <!-- 마이크 게이지 -->
 <div id="audioMeter"></div>
 
-<!-- 버튼 컨트롤 -->
+<!-- 버튼 컨트롤 (평가받기 버튼는 질문 오버레이로 이동시킴, 기존 버튼은 숨김) -->
 <div class="controls">
   <button id="startBtn">면접 시작</button>
   <button id="stopBtn" disabled>면접 종료</button>
-  <button id="viewResultsBtn">평가받기</button>
+  <!-- 기존 평가받기 버튼은 숨김 -->
+  <button id="viewResultsBtn" style="display:none;">평가받기</button>
 </div>
 
 <script>
+  /***** 기존 녹화 및 업로드 관련 코드 *****/
   let stream;               // 카메라/마이크 스트림
   let mediaRecorder;        // MediaRecorder 객체
   let recordedChunks = [];  // 녹화 데이터 조각 저장
@@ -245,7 +275,7 @@
           };
           mediaRecorder.onstop = async function() {
             console.log("녹화가 중지되었습니다.");
-            // 업로드는 "평가받기" 버튼을 통해 별도로 진행
+            // 업로드는 평가 버튼(질문 오버레이의 평가받기)에서 진행
           };
           // 녹화 시작
           mediaRecorder.start();
@@ -259,6 +289,9 @@
           // 버튼 상태 갱신
           stopBtn.disabled = false;
           stopBtn.textContent = "면접 종료";
+          // 시작 시, 질문 오버레이 표시 (첫 질문)
+          currentQuestionIndex = 0;
+          showQuestion(currentQuestionIndex);
         }
       }, 1000);
     } catch (error) {
@@ -297,7 +330,7 @@
     console.log("영상이 로컬에 저장되었습니다.");
   }
 
-  // 녹화본 업로드 및 결과 페이지 이동 함수
+  // 녹화본 업로드 및 결과 페이지 이동 함수 (myresult.html로 이동)
   async function uploadAndGoToResults() {
     if (recordedChunks.length === 0) {
       alert("녹화된 파일이 없습니다.");
@@ -320,8 +353,8 @@
         console.log("녹화본 업로드 성공:", uploadedFilePath);
         // 녹화된 영상도 로컬에 저장
         saveVideoLocally();
-        // 결과 페이지로 이동 (쿼리 파라미터 전달)
-        window.location.href = `/files/upload/results?filePath=${encodeURIComponent(uploadedFilePath)}`;
+        // 결과 페이지로 이동 (myresult.html로)
+        window.location.href = `/myresult.html?filePath=${encodeURIComponent(uploadedFilePath)}`;
       } else {
         console.error("서버 응답 오류:", response.statusText);
         alert("녹화본 업로드에 실패했습니다.");
@@ -335,10 +368,71 @@
     }
   }
 
-  // 버튼 이벤트 리스너 등록
+  /***** 면접 질문 기능 *****/
+  // 9개의 공통 면접 질문 배열
+  const commonQuestions = [
+    "자기소개를 해주세요.",
+    "우리 회사에 지원한 동기는 무엇인가요?",
+    "당신의 강점과 약점은 무엇인가요?",
+    "이전에 어떤 프로젝트를 수행했는지 설명해 주세요.",
+    "팀 내 갈등 상황을 어떻게 해결했는지 이야기해 주세요.",
+    "앞으로의 경력 계획은 무엇인가요?",
+    "문제를 해결했던 경험을 구체적으로 말씀해 주세요.",
+    "리더십 경험에 대해 말씀해 주세요.",
+    "당신이 가장 자랑스러웠던 성과는 무엇인가요?"
+  ];
+
+  // 9개 질문 중 3개를 중복 없이 무작위로 선택하는 함수
+  function getRandomQuestions(num) {
+    const shuffled = commonQuestions.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, num);
+  }
+
+  const selectedQuestions = getRandomQuestions(3);
+  let currentQuestionIndex = 0;
+
+  // 질문 오버레이 관련 요소 (이미 HTML에 추가되어 있음)
+  const questionContainer = document.getElementById("questionContainer");
+  const questionText = document.getElementById("questionText");
+  const questionNextBtn = document.getElementById("questionNextBtn");
+  const evaluateBtn = document.getElementById("evaluateBtn");
+
+  // 질문을 표시하는 함수
+  function showQuestion(index) {
+    if (index < selectedQuestions.length) {
+      questionText.textContent = selectedQuestions[index];
+      questionContainer.style.display = "block";
+      // 초기에는 버튼 모두 숨김
+      questionNextBtn.style.display = "none";
+      evaluateBtn.style.display = "none";
+      // 10초 후에 버튼 표시: 마지막 질문이면 평가받기, 아니면 다음 버튼
+      setTimeout(() => {
+        if (index < selectedQuestions.length - 1) {
+          questionNextBtn.style.display = "inline-block";
+        } else {
+          evaluateBtn.style.display = "inline-block";
+        }
+      }, 10000);
+    }
+  }
+
+  // "다음" 버튼 클릭 시 다음 질문으로 전환
+  questionNextBtn.addEventListener("click", () => {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < selectedQuestions.length) {
+      showQuestion(currentQuestionIndex);
+    }
+  });
+
+  // "평가받기" 버튼 클릭 시 업로드 및 결과 페이지 이동
+  evaluateBtn.addEventListener("click", () => {
+    uploadAndGoToResults();
+  });
+
+  /***** 버튼 이벤트 리스너 등록 *****/
   startBtn.addEventListener('click', startPresentation);
   stopBtn.addEventListener('click', stopPresentation);
-  viewResultsBtn.addEventListener('click', uploadAndGoToResults);
+  // 기존 viewResultsBtn는 숨김(평가받기 버튼은 질문 오버레이에서 처리)
 </script>
 </body>
 </html>
