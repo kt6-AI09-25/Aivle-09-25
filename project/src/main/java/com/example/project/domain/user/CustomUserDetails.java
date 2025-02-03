@@ -19,9 +19,9 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     @Getter
     private final LocalDateTime banEndTime;
     private final Collection<? extends GrantedAuthority> authorities;
-    private final Map<String, Object> attributes; // ✅ OAuth2User 속성 저장
+    private final Map<String, Object> attributes; // OAuth2User 속성 저장
 
-    // ✅ 생성자에서 쉼표 오류 수정
+    // 생성자에서 쉼표 오류 수정
     public CustomUserDetails(String username, String password, Integer state, LocalDateTime banEndTime, Collection<? extends GrantedAuthority> authorities, Map<String, Object> attributes) {
         this.username = username;
         this.password = password;
@@ -76,12 +76,12 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public Map<String, Object> getAttributes() {
-        return attributes; // ✅ OAuth2User에서 필요한 속성 값 제공
+        return attributes; // OAuth2User에서 필요한 속성 값 제공
     }
 
     @Override
     public String getName() {
-        return username; // ✅ OAuth2User에서 이름을 반환하는 메서드
+        return username; // OAuth2User에서 이름을 반환하는 메서드
     }
 }
 

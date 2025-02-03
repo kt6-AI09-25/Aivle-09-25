@@ -89,7 +89,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:8080"); // 클라이언트 URL
+        configuration.addAllowedOrigin("http://aivle-ai9-25-bigproject-buasgtbpbgh8aagh.koreacentral-01.azurewebsites.net"); // 클라이언트 URL
         configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
         configuration.addAllowedHeader("*"); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 쿠키 및 인증정보 허용
@@ -114,7 +114,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/shared-worker.js")
-                        .allowedOrigins("http://localhost:8080") // 허용할 클라이언트 도메인
+                        .allowedOrigins("http://aivle-ai9-25-bigproject-buasgtbpbgh8aagh.koreacentral-01.azurewebsites.net") // 허용할 클라이언트 도메인
                         .allowedMethods("GET", "OPTIONS")
                         .allowCredentials(true);
             }
