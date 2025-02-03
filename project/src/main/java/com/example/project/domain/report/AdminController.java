@@ -7,48 +7,53 @@ import com.example.project.domain.letter.LetterDTO;
 import com.example.project.domain.letter.LetterService;
 import com.example.project.domain.noticeboard.NoticeBoardDTO;
 import com.example.project.domain.noticeboard.NoticeBoardService;
+import com.example.project.domain.user.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/admin/report")
-public class ReportController {
+@RequestMapping("/admin")
+public class AdminController {
     private final ReportService reportService;
     private final NoticeBoardService noticeBoardService;
     private final CommentService commentService;
     private final LetterService letterService;
+    private  final CustomUserDetailsService customUserDetailsService;
 
-    @GetMapping
+    @GetMapping("/report")
     public String list(Model model) {
         model.addAttribute("reports", reportService.getAllReports());
         return "admin/report/list";
     }
 
-    @GetMapping("/new")
+    @GetMapping("/report/new")
     public String createForm(Model model) {
         model.addAttribute("report", new ReportDto.Request());
         return "admin/report/createform";
     }
 
-    @PostMapping
+    @PostMapping("/report")
     public String createReport(@ModelAttribute ReportDto.Request request) {
         reportService.createReport(request);
         return "redirect:/admin/report";
     }
 
-    @PostMapping("/{id}/update")
+    @PostMapping("/report/{id}/update")
     public String updateReport(@PathVariable Long id,
                                @RequestParam ReportProcessTypes reportProcessType) {
         reportService.updateReportProcessTypeAndState(id, reportProcessType);
         return "redirect:/admin/report";
     }
 
-    @GetMapping("/test/{id}")
+    @GetMapping("/report/test/{id}")
     public String reportTest(@PathVariable Long id, Model model) {
         NoticeBoardDTO.Response post = noticeBoardService.getPostById(id);
         model.addAttribute("post", post);
@@ -59,7 +64,7 @@ public class ReportController {
         return "admin/report/test";
     }
 
-    @GetMapping("/{report_type}/{reported_id}")
+    @GetMapping("/report/{report_type}/{reported_id}")
     public String commentDetail(@PathVariable Integer report_type, @PathVariable Long reported_id, Model model) {
         if (report_type == 1) {
             NoticeBoardDTO.Response post = noticeBoardService.getPostById(reported_id);
@@ -90,5 +95,31 @@ public class ReportController {
         } else {
             return "admin/report/list";
         }
+    }
+
+    @GetMapping("")
+    public String adminMainPage() {
+        return "admin/report/main";
+    }
+
+    @GetMapping("/members")
+    public String membersPage(){
+        return "admin/report/members";
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<Map<String, Long>> getUserStats() {
+        long totalUsers = customUserDetailsService.getTotalUsers();
+        long todayJoinedUsers = customUserDetailsService.getTodayJoinedUsers();
+        long totalPosts = noticeBoardService.getTotalPosts();
+        long unprocessedReports = reportService.getUnprocessedReports();
+
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("totalUsers", totalUsers);
+        stats.put("todayJoinedUsers", todayJoinedUsers);
+        stats.put("totalPosts", totalPosts);
+        stats.put("unprocessedReports", unprocessedReports);
+
+        return ResponseEntity.ok(stats);
     }
 }

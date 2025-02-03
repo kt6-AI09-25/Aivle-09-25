@@ -72,8 +72,8 @@
     <div class="sidebar">
         <h2>Admin</h2>
         <ul class="menu">
-            <li><a href="main.html" class="active">메인</a></li>
-            <li><a href="members.html">회원 관리</a></li>
+            <li><a href="/admin" class="active">메인</a></li>
+            <li><a href="/admin/members">회원 관리</a></li>
             <li><a href="/admin/report">게시판 신고 관리</a></li>
             <li><a href="presentations.html">발표 내용 조회</a></li>
             <li><a href="statistics.html">통계 페이지</a></li>
@@ -93,25 +93,27 @@
         <!-- 카드 형태의 주요 지표 -->
         <div class="dashboard-cards">
             <!-- 예시 카드 1: 전체 회원 수 -->
+            <!-- <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-03 10:40 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
             <div class="card">
                 <h3>전체 회원 수</h3>
-                <p>120명</p>
+                <p id="total-users">로딩 중...</p>
             </div>
             <!-- 예시 카드 2: 오늘 신규 가입 -->
             <div class="card">
                 <h3>오늘 신규 가입</h3>
-                <p>5명</p>
+                <p id="today-joined">로딩 중...</p>
             </div>
             <!-- 예시 카드 3: 미처리 신고 -->
             <div class="card">
                 <h3>미처리 신고</h3>
-                <p>3건</p>
+                <p id="unprocessed-reports">로딩 중...</p>
             </div>
             <!-- 예시 카드 4: 발표 등록 수 -->
             <div class="card">
                 <h3>발표 등록 수</h3>
-                <p>45건</p>
+                <p id="total-posts">로딩 중...</p>
             </div>
+            <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-03 10:40 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
         </div>
 
         <!-- 최근 활동 목록 -->
@@ -165,6 +167,34 @@
                 }
               });
             }
+            //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-03 10:40 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            async function fetchUserStats() {
+                try {
+                    const response = await fetch('/admin/statistics');
+                    if (!response.ok) {
+                        throw new Error('데이터를 불러오는 데 실패했습니다.');
+                    }
+
+                    const data = await response.json();
+
+                    // 받아온 데이터를 화면에 반영
+                    document.getElementById('total-users').textContent = `${data.totalUsers}명`;
+                    document.getElementById('today-joined').textContent = `${data.todayJoinedUsers}명`;
+                    document.getElementById('unprocessed-reports').textContent = `${data.unprocessedReports}건`;
+                    document.getElementById('total-posts').textContent = `${data.totalPosts}건`;
+
+                } catch (error) {
+                    console.error('회원 데이터 가져오기 오류:', error);
+                    document.getElementById('total-users').textContent = '불러오기 실패';
+                    document.getElementById('today-joined').textContent = '불러오기 실패';
+                }
+            }
+
+            // 페이지 로딩 후 데이터 가져오기
+            document.addEventListener('DOMContentLoaded', fetchUserStats);
+
+            //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-03 10:40 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         </script>
 
     </div>

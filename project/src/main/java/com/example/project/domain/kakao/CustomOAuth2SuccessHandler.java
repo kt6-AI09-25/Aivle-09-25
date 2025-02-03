@@ -66,8 +66,11 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         request.getSession().setMaxInactiveInterval(30 * 60); // 30분 유지
 
         // 성공 후 리디렉트
-        response.sendRedirect("/");
-
+        if ("ADMIN".equals(user.getRole())) {
+            response.sendRedirect("/admin");
+        } else {
+            response.sendRedirect("/");
+        }
     }
 
     @Transactional
