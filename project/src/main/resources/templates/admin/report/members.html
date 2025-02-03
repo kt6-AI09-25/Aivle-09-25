@@ -4,6 +4,7 @@
     <meta charset="UTF-8"/>
     <title>관리자 페이지 - 회원 관리</title>
     <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/style.css">
     <style>
         /* 기본 스타일 */
 
@@ -96,15 +97,21 @@
 </head>
 <body>
 <!-- 사이드바 -->
+<div th:replace="navbar.html"></div>
 <div class="sidebar">
     <h2>Admin</h2>
     <ul class="menu">
-        <li><a href="main.html">메인</a></li>
-        <li><a href="members.html" class="active">회원 관리</a></li>
+        <li><a href="/admin">메인</a></li>
+        <li><a href="/admin/members" class="active">회원 관리</a></li>
         <li><a href="/admin/report">게시판 신고 관리</a></li>
         <li><a href="presentations.html">발표 내용 조회</a></li>
         <li><a href="statistics.html">통계 페이지</a></li>
     </ul>
+
+    <footer class="sidebar-footer">
+        <!-- 홈페이지 링크 -->
+        <a href="/">홈페이지로 돌아가기</a>
+    </footer>
 </div>
 
 <!-- 메인 컨텐츠 -->

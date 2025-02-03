@@ -5,6 +5,7 @@
   <title>Report List</title>
   <!-- 관리자 공통 CSS -->
   <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/style.css">
 
   <style>
     /* 처리 상태에 따른 배경색 (그대로 유지하거나 색상 조정 가능) */
@@ -59,12 +60,13 @@
   </style>
 </head>
 <body>
+<div th:replace="navbar.html"></div>
 <!-- 사이드바 -->
 <div class="sidebar">
   <h2>Admin</h2>
   <ul class="menu">
-    <li><a href="index.html">메인</a></li>
-    <li><a href="members.html">회원 관리</a></li>
+    <li><a href="/admin">메인</a></li>
+    <li><a href="/admin/members">회원 관리</a></li>
     <li><a href="/admin/report" class="active">게시판 신고 관리</a></li>
     <li><a href="presentations.html">발표 내용 조회</a></li>
     <li><a href="statistics.html">통계 페이지</a></li>
