@@ -65,11 +65,10 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
         request.getSession().setMaxInactiveInterval(30 * 60); // 30분 유지
 
-        // 성공 후 리디렉트
         if ("ADMIN".equals(user.getRole())) {
-            response.sendRedirect("/admin");
+            response.sendRedirect("/admin");  // 어드민이면 관리자 페이지 이동
         } else {
-            response.sendRedirect("/");
+            response.sendRedirect("/");  // 일반 사용자는 대시보드 이동
         }
     }
 
