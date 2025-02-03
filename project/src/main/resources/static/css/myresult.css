@@ -1,57 +1,139 @@
+/* 기본 설정 */
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
 }
 
-.content {
-    flex: 1; /* Footer를 아래로 밀기 위한 공간 차지 */
-}
-
-.spacer {
-    height: 500px; /* 빈 공간 채우기 */
-}
-
-.centered-content {
-    text-align: center;
-    margin: 0 auto;
-}
-
-.analysis-section {
-    width: 1027px; /* 고정된 길이 */
-    margin: 0 auto;
-}
-
-.analysis-result {
-    font-size: 1.75em;
-    font-weight: bold;
-    margin-bottom: 15px;
-    text-align: left;
-    user-select: none; /* 드래그 방지 */
-}
-
-.analysis-line {
-    width: 100%;
-    height: 0.9px;
-    background-color: #666;
-    margin: 5px 0;
-    user-select: none; /* 드래그 방지 */
-}
-
-/* 버튼 컨테이너 */
-.button-container {
+/* 네비게이션 */
+nav {
+    background-color: #fff;
+    padding: 0 20px;
     display: flex;
-    gap: 10px;
+    align-items: center;
+    justify-content: space-between; /* 버튼과 로고 양끝 정렬 */
+    border-bottom: 1px solid #e0e0e0;
+    min-height: 60px;
+    position: relative;
+}
+
+.logo {
+    display: inline-block;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+    margin-right: 20px;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+    padding: 8px 20px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+nav ul li a:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* 인증 버튼 영역 (로그인, 회원가입, 로그아웃) */
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.auth-buttons span {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* 로그인/회원가입 버튼 */
+.auth-buttons a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    padding: 8px 15px;
+    border: 1px solid #007bff;
+    border-radius: 25px;
+    background-color: transparent;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.auth-buttons a:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* 로그아웃 버튼 - 동일한 디자인 적용 */
+#logoutBtn {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    padding: 8px 15px;
+    border: 1px solid #007bff;
+    border-radius: 25px;
+    background-color: transparent;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 14px;
+    cursor: pointer;
+}
+#logoutBtn:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* 컨테이너 및 제목 */
+h1 {
+    text-align: center;
     margin-top: 20px;
 }
 
-/*
-  (1) 글자 굵기를 400(일반)로 설정
-  (2) 기본 텍스트 색은 회색(#bbb)
-  (3) 호버 시 검정(#000)
-*/
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+/* 사용법 박스 (예: "왜 이용해야 하는지" 아래 3개 박스) */
+.feature1, .feature2, .feature3 {
+    display: inline-block;
+    background-color: #f0f0f0;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    width: 32%;
+    height: 300px;
+}
+
+/* 기본 버튼 (mui-button) */
 .mui-button {
     padding: 10px 20px;
     background-color: transparent;
@@ -60,28 +142,24 @@ html, body {
     border-radius: 4px;
     cursor: pointer;
     font-size: 1em;
-    font-weight: 550; /* 글자 굵기 조정 */
+    font-weight: 550;
     text-align: center;
+    transition: color 0.3s;
 }
 .mui-button:hover {
-    color: #000; /* 호버 시 검정색 */
-    background-color: transparent;
+    color: #000;
 }
-
-/*
-  활성화된 버튼(사용자가 누른 상태)
-  → 호버 없이도 검정색 유지
-*/
 .mui-button.active-button {
     color: #000;
 }
 
+/* 썸네일 컨테이너 */
 .thumbnail-container {
     width: 1027px;
     margin: 10px auto 0 auto;
     display: flex;
     justify-content: flex-start;
-    user-select: none; /* 드래그 방지 */
+    user-select: none;
 }
 .thumbnail-container img {
     flex-shrink: 0;
@@ -89,9 +167,10 @@ html, body {
     height: 327px;
     cursor: pointer;
     border: 1px solid #ccc;
-    display: none; /* 기본은 숨김 → JS에서 제어 */
+    display: none;
 }
 
+/* 모달 (공통) */
 .modal {
     display: none;
     position: fixed;
@@ -102,8 +181,14 @@ html, body {
     height: 100%;
     overflow: hidden;
     background-color: rgba(0, 0, 0, 0.8);
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter: blur(2px);
 }
-
+.modal.active {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
 .modal-content {
     position: absolute;
     top: 50%;
@@ -114,22 +199,35 @@ html, body {
     height: 92%;
     display: flex;
     flex-direction: column;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.3s ease-out;
 }
-
+@keyframes slideDown {
+    from {
+        transform: translate(-50%, -60%);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+}
 .module-titleArea {
-    background-color: #fff;
+    background: linear-gradient(135deg, #ffffff, #f2f2f2);
     color: #333;
     height: 72px;
     line-height: 72px;
-    padding: 0 15px; /* 좌우 공백 제거 */
+    padding: 0 15px;
     border-bottom: 1px solid #ccc;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: left;
     display: flex;
-    align-items: center; /* 텍스트 수직 중앙 정렬 */
-    user-select: none; /* 드래그 방지 */
+    align-items: center;
+    user-select: none;
 }
 
+/* 메뉴 바 (탭) */
 .menu-bar {
     background-color: #f8f8f8;
     height: 44px;
@@ -137,7 +235,7 @@ html, body {
     display: flex;
     gap: 10px;
     padding: 0 10px;
-    user-select: none; /* 드래그 방지 */
+    user-select: none;
 }
 .menu-bar a {
     text-decoration: none;
@@ -145,7 +243,7 @@ html, body {
     padding: 5px 10px;
     cursor: pointer;
     transition: color 0.3s ease;
-    user-select: none; /* 드래그 방지 */
+    user-select: none;
 }
 .menu-bar a:hover {
     color: #000;
@@ -157,90 +255,92 @@ html, body {
     display: none;
 }
 
+/* 모달 본문 */
 .modal-body {
-    display: none; /* 기본적으로 숨김 */
+    display: none;
     flex: 1;
-    overflow: hidden;
+    overflow-y: auto;
 }
 .modal-body.split {
     display: flex;
 }
 
+/* 모달 왼쪽/오른쪽 영역 */
 .modal-left {
     flex: 1;
     overflow-y: auto;
     padding: 20px;
     border-right: 1px solid #ccc;
-    scrollbar-width: none; /* 스크롤바 숨김 */
+    scrollbar-width: none;
     -ms-overflow-style: none;
-    user-select: none; /* 드래그 방지 */
+    user-select: none;
 }
 .modal-left::-webkit-scrollbar {
     display: none;
 }
-
 .modal-right {
     flex: 1;
     overflow-y: auto;
     padding: 20px;
-    scrollbar-width: none; /* 스크롤바 숨김 */
+    scrollbar-width: none;
     -ms-overflow-style: none;
-    user-select: none; /* 드래그 방지 */
+    user-select: none;
 }
 .modal-right::-webkit-scrollbar {
     display: none;
 }
 
+/* 모달 안쪽 비디오 */
 .modal-left video {
     display: block;
     width: 100%;
     max-width: 480px;
-    user-select: none; /* 드래그 방지 */
+    user-select: none;
 }
 
+/* 평가 내용 카드 */
 .modal-right .frame-card {
     background: #fff;
     padding: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    user-select: none; /* 드래그 방지 */
+    user-select: none;
 }
 
-.modal-close {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    color: #666;
-    font-size: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    background-color: transparent;
-    border: none;
-    user-select: none; /* 드래그 방지 */
-}
-.modal-close:hover {
-    color: #000;
-}
-
+/* 탭 별 컨텐츠 */
 .summary-content {
     display: block;
     padding: 20px;
-    user-select: none; /* 드래그 방지 */
+    user-select: none;
 }
 .detail-content {
     display: none;
-    user-select: none; /* 드래그 방지 */
+    user-select: none;
 }
-
 .motion-content, .voice-content, .gaze-content {
     display: none;
-    user-select: none; /* 드래그 방지 */
+    user-select: none;
 }
 .motion-content.active, .voice-content.active, .gaze-content.active {
     display: block;
-    user-select: none; /* 드래그 방지 */
+    user-select: none;
 }
 
 .chart-container {
     margin-top: 20px;
     height: 300px;
+}
+
+/* 반응형 (768px 이하) */
+@media (max-width: 768px) {
+    .modal-body.split {
+        flex-direction: column;
+    }
+    .modal-left,
+    .modal-right {
+        border: none;
+        padding: 15px;
+    }
+    .modal-left {
+        border-bottom: 1px solid #ccc;
+    }
 }

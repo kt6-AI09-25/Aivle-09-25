@@ -4,46 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>메인 페이지</title>
-    <link rel="stylesheet" href="/css/style.css"> <!-- CSS 파일 링크 -->
+    <link rel="stylesheet" href="/css/style.css"> <!-- 기존 CSS -->
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+        /* 추가 인라인 스타일 - 이전/다음 화살표 버튼 및 토글 버튼 그룹 */
+
+        /* 화살표 버튼: #prepStepsContainer 내부의 왼쪽 상단에 위치 */
+        #prevStep, #nextStep {
+          position: absolute;
+          top: 10px;
+          background: transparent;
+          border: none;
+          font-size: 2rem;
+          color: #d3d3d3; /* 기본 연한 회색 */
+          cursor: pointer;
+          transition: color 0.3s;
+          z-index: 10;
+        }
+        /* 이전 버튼: 컨테이너 내부 왼쪽 상단 */
+        #prevStep {
+          left: 10px;
+        }
+        /* 다음 버튼: 이전 버튼 오른쪽에 배치 */
+        #nextStep {
+          left: 50px;
+        }
+        #prevStep:hover, #nextStep:hover {
+          color: #000; /* 호버 시 검정색 */
         }
 
-        .container {
-            max-width: 1200px;
-            padding: 20px;
-            margin: auto;
-            text-align: center;
-            flex: 1;
-            overflow-y: auto;
-            height: auto;
+        /* 토글 버튼 그룹: 두 버튼(면접준비, 발표준비)을 하나의 그룹처럼 보이게 */
+        #toggleButtons {
+          display: inline-flex;
+          border: 2px solid #007bff;
+          border-radius: 5px;
+          overflow: hidden;
+          margin-bottom: 20px;
+          border-radius: 50px;
+        }
+        #toggleButtons button {
+          border: none;
+          background: none;
+          padding: 10px 20px;
+          cursor: pointer;
+          transition: background 0.3s, color 0.3s;
+          font-size: 1rem;
+          color: #007bff;
+          border-radius: 50px;
+        }
+        /* 활성 상태 */
+        #toggleButtons button.active {
+          background-color: #007bff;
+          color: #fff;
         }
 
-        h1 {
-            margin-bottom: 20px;
-        }
 
-        h2 {
-            margin-top: 30px;
-            margin-bottom: 15px;
-        }
+      /* 화살표 버튼을 prepStepsContainer 바깥쪽으로 이동 */
+#prevStep, #nextStep {
+    position: absolute;
+    top: -35px;  /* 컨테이너 위쪽으로 이동 */
+    font-size: 2rem;
+    color: #d3d3d3;  /* 기본 연한 회색 */
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 10;
+}
 
-        .features {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: nowrap;
-            gap: 10px;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+/* 이전 버튼: 컨테이너 바깥 왼쪽 */
+#prevStep {
+    left: 10px;  /* 컨테이너 왼쪽 바깥으로 이동 */
+}
+
+/* 다음 버튼: 컨테이너 바깥 오른쪽 */
+#nextStep {
+    right: 1300px;  /* 컨테이너 오른쪽 바깥으로 이동 */
+}
+
+#prevStep:hover, #nextStep:hover {
+    color: #000; /* 호버 시 검정색 */
+}
+
+/* prepStepsContainer 위치 조정 */
+#prepStepsContainer {
+    position: relative; /* 화살표가 prepStepsContainer 바깥에 배치되도록 */
+    max-width: 1150px;
+    margin: 50px auto 0 auto; /* 상단 여백 조정 */
+    background-color: #f1f8fe;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
 
         .feature1 {
             background-color: #f1f8fe;
@@ -65,77 +121,23 @@
             font-size: 1rem;
             color: #333;
         }
-
-        #startButton {
-            padding: 10px 20px;
-            font-size: 16px;
-            margin-top: 20px;
-        }
-
-        .footer {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f1f1f1;
-            text-align: center;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            margin: 15% auto;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 8px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .image-container {
-            margin: 20px 0;
-        }
-
-        .image-container img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            overflow-x: hidden;
-        }
     </style>
 </head>
 <body>
+<!-- 네비게이션 (Thymeleaf include) -->
 <div th:replace="navbar.html"></div>
-<div class="header" style="background-color: #d2dfff; text-align: center; padding: 50px 20px; display: flex; align-items: center; justify-content: center; gap: 50px;">
+
+<!-- 헤더 영역 -->
+<div class="header" style="background: linear-gradient(to bottom,
+  #1B1F3B 0%,
+  #232A45 20%,
+  #2C3E50 40%,
+  #40556D 60%,
+  #6A85A0 75%,
+  #f1f8fe 100%);; text-align: center; padding: 50px 20px; display: flex; align-items: center; justify-content: center; gap: 50px;">
     <div class="text" style="max-width: 800px; margin-right: 8px;">
         <h1 style="font-size: 2.5rem; color: #007bff;">AI 발표분석 서비스입니다!!!</h1>
-        <h2 style="font-size: 1.75rem; color: #333; margin-top: 10px;">당신의 발표능력을 향상시켜보세요</h2>
+        <h2 style="font-size: 1.75rem; color: white; margin-top: 10px;">당신의 발표능력을 향상시켜보세요</h2>
         <button id="startButton" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; margin-top: 20px;">시작하기</button>
     </div>
     <div class="image-container">
@@ -143,10 +145,7 @@
     </div>
 </div>
 
-
-
-</div>
-
+<!-- "왜 이용해야 하는지" 설명 섹션 -->
 <section style="text-align: center; padding: 50px 20px;">
     <h2 style="font-size: 1.5rem; margin-bottom: 20px;">왜 이용해야 하는지 설명</h2>
     <div class="features">
@@ -165,89 +164,178 @@
     </div>
 </section>
 
+<!-- 준비 방법 섹션: 토글 버튼 그룹 및 단계별 내용 -->
 <section style="text-align: center; padding: 50px 20px;">
-    <h2 style="font-size: 1.5rem; margin-bottom: 20px;">아래 사용법에 대한 설명</h2>
-
-
-    <div class="feature2" style="background-color: #f1f8fe; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: inline-block; width:1100px ">사용법</div>
-</section>
-
-<section style="text-align: center; padding: 50px 20px;">
-    <h2 style="font-size: 1.5rem; margin-bottom: 20px;">사용법 예시</h2>
-    <div style="display: flex; justify-content: space-around; align-items: center; gap: 20px; max-width: 1200px; margin: 0 auto;">
-        <div class="feature3" style="background-color: #f1f8fe; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); width: 45%; min-width: 300px;">사용법 예시</div>
-        <div class="feature3" style="background-color: #f1f8fe; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); width: 45%; min-width: 300px;">접수 예시</div>
+    <h2 style="font-size: 1.5rem; margin-bottom: 20px;">준비 방법</h2>
+    <!-- 토글 버튼 그룹 (면접준비 / 발표준비) -->
+    <div id="toggleButtons">
+        <button id="interviewPrepBtn" class="active">면접준비</button>
+        <button id="presentationPrepBtn">발표준비</button>
+    </div>
+    <!-- 단계별 내용 컨테이너 -->
+    <div id="prepStepsContainer">
+        <!-- 이전/다음 버튼을 컨테이너 내부 좌측 상단에 배치 -->
+        <button id="prevStep">&#60;</button>
+        <button id="nextStep">&#62;</button>
+        <!-- 단계별 내용은 아래 스크립트에서 동적으로 채워집니다 -->
     </div>
 </section>
 
+<!-- "사용법 예시" 섹션 -->
+<section style="text-align: center; padding: 50px 20px;">
+    <h2 style="font-size: 1.5rem; margin-bottom: 20px;">사용법 예시</h2>
+    <div style="display: flex; justify-content: space-around; align-items: center; gap: 20px; max-width: 1200px; margin: 0 auto;">
+        <div class="feature3" style="background-color: #f1f8fe; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 45%; min-width: 300px;">
+            사용법 예시
+        </div>
+        <div class="feature3" style="background-color: #f1f8fe; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 45%; min-width: 300px;">
+            접수 예시
+        </div>
+    </div>
+</section>
+
+<!-- 푸터 (Thymeleaf include) -->
 <div th:replace="footer.html"></div>
 
-<!-- Font Awesome for Social Media Icons -->
+<!-- 단계별 사용법 및 토글 스크립트 -->
+<script>
+    // 면접준비 및 발표준비 단계별 데이터
+    var interviewSteps = [
+      { title: "면접 Step 1: 준비", description: "면접 준비에 필요한 사항을 확인합니다. (예: 자기소개 준비, 복장 점검 등)" },
+      { title: "면접 Step 2: 진행", description: "면접 시 예상 질문에 대한 답변 연습을 진행합니다." },
+      { title: "면접 Step 3: 피드백", description: "면접 후 피드백을 통해 개선점을 확인합니다." }
+    ];
+    var presentationSteps = [
+      { title: "발표 Step 1: 준비", description: "발표 자료 준비 및 슬라이드 구성, 리허설 진행." },
+      { title: "발표 Step 2: 진행", description: "실제 발표 시 음성, 제스처, 표현력을 점검합니다." },
+      { title: "발표 Step 3: 분석", description: "발표 후 녹화본을 분석하여 개선점을 파악합니다." }
+    ];
+    var currentCategory = "interview"; // 기본은 면접준비
+    var currentStep = 0;
 
-<!-- 폰트자리 -->
+  function showStep() {
+    var steps = (currentCategory === "interview") ? interviewSteps : presentationSteps;
+    var container = document.getElementById("prepStepsContainer");
+
+    container.innerHTML =
+        "<button id='prevStep'>&#60;</button>" +
+        "<button id='nextStep'>&#62;</button>" +
+        "<h3 style='color: #007bff; font-size: 1.5rem; margin-bottom: 10px; margin-top: 50px;'>" +
+        steps[currentStep].title +
+        "</h3><p style='font-size: 1rem; color: #333; text-align: center;'>" +
+        steps[currentStep].description +
+        "</p>";
+
+    // 다시 버튼 클릭 이벤트 등록
+    document.getElementById("prevStep").addEventListener("click", function() {
+        if (currentStep > 0) {
+            currentStep--;
+        } else {
+            currentStep = steps.length - 1; // Step 1에서 왼쪽 화살표를 누르면 Step 3으로
+        }
+        showStep();
+    });
+
+    document.getElementById("nextStep").addEventListener("click", function() {
+        if (currentStep < steps.length - 1) {
+            currentStep++;
+        } else {
+            currentStep = 0; // Step 3에서 오른쪽 화살표를 누르면 Step 1로
+        }
+        showStep();
+    });
+}
+
+    // 토글 버튼 이벤트
+    document.getElementById("interviewPrepBtn").addEventListener("click", function() {
+      currentCategory = "interview";
+      currentStep = 0;
+      showStep();
+      this.classList.add("active");
+      document.getElementById("presentationPrepBtn").classList.remove("active");
+      document.getElementById("categoryToggle").innerText = "면접준비"; // 만약 별도의 텍스트가 필요하면 설정
+    });
+    document.getElementById("presentationPrepBtn").addEventListener("click", function() {
+      currentCategory = "presentation";
+      currentStep = 0;
+      showStep();
+      this.classList.add("active");
+      document.getElementById("interviewPrepBtn").classList.remove("active");
+      document.getElementById("categoryToggle").innerText = "발표준비"; // 만약 별도의 텍스트가 필요하면 설정
+    });
+    // 초기 단계 표시
+    showStep();
+</script>
+
+<!-- 기존 인증 및 기타 스크립트 -->
 <script>
     var isLoggedIn = false; // 로그인 상태 플래그
-
-    // 백엔드에서 로그인 상태 동기화
     fetch('/auth/status')
+      .then(response => response.json())
+      .then(data => {
+        isLoggedIn = data.isLoggedIn;
+        if (isLoggedIn) {
+          document.getElementById("nickname").innerText = data.username;
+          document.getElementById("nickname").style.display = "inline";
+          document.getElementById("logoutBtn").style.display = "inline-block";
+          document.querySelector(".signup-button").style.display = "none";
+          document.querySelector(".login-button").style.display = "none";
+        }
+      });
+    document.getElementById("startButton").onclick = function () {
+      if (isLoggedIn) {
+        window.location.href = "/choice";
+      } else {
+        alert("로그인 후 이용해 주세요.");
+        document.getElementById("loginModal").style.display = "block";
+      }
+    };
+    document.getElementById("goToSignup").onclick = function () {
+      document.getElementById("loginModal").style.display = "none";
+      document.getElementById("signupModal").style.display = "block";
+    };
+    document.getElementById("signupForm").onsubmit = function (event) {
+      event.preventDefault();
+      const data = {
+        username: document.querySelector('#signupForm [name="username"]').value,
+        password: document.querySelector('#signupForm [name="password"]').value,
+        nickname: document.querySelector('#signupForm [name="nickname"]').value,
+      };
+      fetch('/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).then((response) => {
+        if (response.ok) {
+          alert("회원가입 성공!");
+          document.getElementById("signupModal").style.display = "none";
+          document.getElementById("loginModal").style.display = "block";
+        } else {
+          alert("회원가입 실패. 아이디가 이미 존재합니다.");
+        }
+      });
+    };
+    document.getElementById("loginForm").onsubmit = function (event) {
+      event.preventDefault();
+      const data = new FormData(document.getElementById("loginForm"));
+      const username = data.get("username");
+      fetch('/login', { method: 'POST', body: data })
         .then(response => response.json())
         .then(data => {
-            isLoggedIn = data.isLoggedIn;
-
-            if (isLoggedIn) {
-                document.getElementById("nickname").innerText = data.username;
-                document.getElementById("nickname").style.display = "inline";
-                document.getElementById("logoutBtn").style.display = "inline";
-                document.querySelector(".signup-button").style.display = "none";
-                document.querySelector(".login-button").style.display = "none";
-
-                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-16 14:48 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                // SharedWorker에 연결 요청
-                worker.port.postMessage({ type: "connect", username: data.username });
-                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 14:48 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            }
-        });
-
-    // "시작하기" 버튼 클릭 시 페이지 이동 처리
-    document.getElementById("startButton").onclick = function () {
-        if (isLoggedIn) {
-            window.location.href = "/choice"; // 로그인 상태일 때 test.html로 이동
-        } else {
-            alert("로그인 후 이용해 주세요."); // 로그인 필요 알림
-            document.getElementById("loginModal").style.display = "block"; // 로그인 모달 열기
-        }
-    };
-
-    // 로그인 모달에서 회원가입 버튼 클릭 시
-    document.getElementById("goToSignup").onclick = function () {
-        document.getElementById("loginModal").style.display = "none"; // 로그인 모달 닫기
-        document.getElementById("signupModal").style.display = "block"; // 회원가입 모달 열기
-    };
-
-    // 회원가입 처리
-    document.getElementById("signupForm").onsubmit = function (event) {
-        event.preventDefault();
-
-        const data = {
-            username: document.querySelector('#signupForm [name="username"]').value,
-            password: document.querySelector('#signupForm [name="password"]').value,
-            nickname: document.querySelector('#signupForm [name="nickname"]').value,
-        };
-
-        fetch('/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        }).then((response) => {
-            if (response.ok) {
-                alert("회원가입 성공!");
-                document.getElementById("signupModal").style.display = "none";
-                document.getElementById("loginModal").style.display = "block";
+          if (data.message === "Login successful") {
+            alert("로그인 성공!");
+            if (data.role === "ADMIN") {
+              window.location.href = "/admin";
             } else {
-                alert("회원가입 실패. 아이디가 이미 존재합니다.");
+              window.location.href = "/";
             }
+          } else {
+            alert("로그인 실패. 아이디 또는 비밀번호를 확인하세요.");
+          }
         });
     };
+
+
 
     // 로그인 처리
     document.getElementById("loginForm").onsubmit = function (event) {
@@ -279,22 +367,20 @@
     };
 
     // 모달 닫기
+
     document.getElementById("closeLogin").onclick = function () {
-        document.getElementById("loginModal").style.display = "none";
+      document.getElementById("loginModal").style.display = "none";
     };
-
     document.getElementById("closeSignup").onclick = function () {
-        document.getElementById("signupModal").style.display = "none";
+      document.getElementById("signupModal").style.display = "none";
     };
-
-    // 모달 외부 클릭 시 닫기
     window.onclick = function (event) {
-        if (event.target === document.getElementById("loginModal")) {
-            document.getElementById("loginModal").style.display = "none";
-        }
-        if (event.target === document.getElementById("signupModal")) {
-            document.getElementById("signupModal").style.display = "none";
-        }
+      if (event.target === document.getElementById("loginModal")) {
+        document.getElementById("loginModal").style.display = "none";
+      }
+      if (event.target === document.getElementById("signupModal")) {
+        document.getElementById("signupModal").style.display = "none";
+      }
     };
 </script>
 </body>
