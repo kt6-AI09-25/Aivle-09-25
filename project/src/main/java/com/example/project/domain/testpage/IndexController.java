@@ -35,6 +35,11 @@ public class IndexController {
         return "board"; // test.html 반환
     }
 
+    @GetMapping("/choice")
+    public String choice() {
+        return "choice"; // test.html 반환
+    }
+
     @GetMapping("/myresult")
     public String myResult() {
         return "myresult"; // myresult.html 반환
