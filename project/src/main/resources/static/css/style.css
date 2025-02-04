@@ -157,7 +157,7 @@ nav ul li a:hover {
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 12%; /* 수직 중앙 정렬 */
+    top: 50%; /* 수직 중앙 정렬 */
     left: 50%; /* 수평 중앙 정렬 */
     transform: translate(-50%, -50%); /* 정확히 중앙으로 이동 */
 }
