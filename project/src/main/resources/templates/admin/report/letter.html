@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Letter Report Detail</title>
+  <link rel="stylesheet" href="/css/style.css">
+
   <style>
     table {
         border-collapse: separate; /* 테두리를 잘 보이게 설정 */
@@ -18,6 +20,7 @@
   </style>
 </head>
 <body>
+<div th:replace="navbar.html"></div>
 <h1>Letter Detail</h1>
 <p><strong>From:</strong> <span th:text="${letter.senderName}"></span></p>
 <p><strong>To:</strong> <span th:text="${letter.receiverUsername}"></span></p>

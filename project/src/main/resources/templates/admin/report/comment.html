@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Comment Report Detail</title>
+    <link rel="stylesheet" href="/css/style.css">
     <style>
         table {
             border-collapse: separate; /* 테두리를 잘 보이게 설정 */
@@ -18,6 +19,7 @@
     </style>
 </head>
 <body>
+<div th:replace="navbar.html"></div>
 <!-- 게시글 정보 -->
 <h1 th:text="${post.title}"></h1>
 <p><strong>Writer:</strong> <span th:text="${post.writerName}"></span></p>
