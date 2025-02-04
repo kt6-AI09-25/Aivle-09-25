@@ -172,6 +172,28 @@
   <a href="/noticeboard/new" class="btn">Create New Post</a>
 
 </div>
+<!-- <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-03 11:05 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
+
+<!-- 페이지네이션 -->
+<div class="pagination">
+  <ul>
+    <li th:if="${currentPage > 0}">
+      <a th:href="@{/noticeboard(page=${currentPage - 1})}">이전</a>
+    </li>
+
+    <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+      <a th:href="@{/noticeboard(page=${i})}" th:text="${i + 1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+    </li>
+
+    <li th:if="${currentPage + 1 < totalPages}">
+      <a th:href="@{/noticeboard(page=${currentPage + 1})}">다음</a>
+    </li>
+  </ul>
+</div>
+
+
+<!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-03 11:05 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+
 <script>
   // 검색 버튼에 클릭 이벤트를 추가
  document.getElementById('search-button').addEventListener('click', function () {
