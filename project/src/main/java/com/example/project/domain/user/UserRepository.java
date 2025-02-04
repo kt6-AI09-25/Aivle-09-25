@@ -1,6 +1,6 @@
 package com.example.project.domain.user;
 
-import com.example.project.domain.noticeboard.NoticeBoard;
+import com.example.project.domain.report.AdminDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +20,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT COUNT(u) FROM User u")
     long countAllUsers();
+
+
+    @Query("SELECT new com.example.project.domain.report.AdminDTO(u.username, u.nickname, u.date_join, u.last_login, " +
+            "(SELECT COUNT(n) FROM NoticeBoard n WHERE n.writer.username = u.username), u.role) " +
+            "FROM User u")
+    List<AdminDTO> findAllUsersForAdmin();
+
+
 }

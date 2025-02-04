@@ -6,8 +6,12 @@ import com.example.project.domain.comment.CommentService;
 import com.example.project.domain.letter.LetterDTO;
 import com.example.project.domain.letter.LetterService;
 import com.example.project.domain.noticeboard.NoticeBoardDTO;
+import com.example.project.domain.noticeboard.NoticeBoardRepository;
 import com.example.project.domain.noticeboard.NoticeBoardService;
 import com.example.project.domain.user.CustomUserDetailsService;
+import com.example.project.domain.user.UpdateUserRole;
+import com.example.project.domain.user.User;
+import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,7 +31,9 @@ public class AdminController {
     private final NoticeBoardService noticeBoardService;
     private final CommentService commentService;
     private final LetterService letterService;
-    private  final CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final UserRepository userRepository;
+    private final NoticeBoardRepository noticeBoardRepository;
 
     @GetMapping("/report")
     public String list(Model model) {
@@ -160,4 +167,26 @@ public class AdminController {
 
         return ResponseEntity.ok(stats);
     }
+
+    @GetMapping("/member/list")
+    public List<AdminDTO> getAllUsers() {
+        return userRepository.findAllUsersForAdmin();
+    }
+
+    @PostMapping("/users/{username}/role")
+    public String updateUserRole(@PathVariable String username, @RequestParam String role) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        if (role.equalsIgnoreCase("ADMIN")) {
+            customUserDetailsService.updateUserRole(user, UpdateUserRole.관리자로_변경);
+        } else if (role.equalsIgnoreCase("USER")) {
+            customUserDetailsService.updateUserRole(user, UpdateUserRole.일반유저로_변경);
+        } else {
+            return "잘못된 역할 값입니다.";
+        }
+
+        return "권한이 변경되었습니다.";
+    }
+
 }
