@@ -40,7 +40,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/login", "/register", "/", "/oauth2/**", "/favicon.ico", "/auth/status", "/logout") // OAuth2 로그인 경로에서 CSRF 제외
+                        .ignoringRequestMatchers("/login", "/register", "/", "/oauth2/**", "/favicon.ico", "/auth/status", "/logout", "/noticeboard/**", "/letters/**")
                 )
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
