@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
+
     @Query("SELECT COUNT(u) FROM User u WHERE u.date_join BETWEEN :startOfDay AND :endOfDay")
     long countUsersByDateJoinBetween(@Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
 
