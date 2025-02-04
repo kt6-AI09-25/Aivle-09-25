@@ -1,5 +1,7 @@
 package com.example.project.domain.user;
 
+import com.example.project.domain.report.ReportProcessTypes;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -52,4 +54,19 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         return userRepository.countUsersByDateJoinBetween(startOfDay, endOfDay);
     }
+
+    @Transactional
+    public void updateUserRole(User user, UpdateUserRole userRole) {
+
+        if (userRole == UpdateUserRole.관리자로_변경) {
+            user.setRole("ADMIN");
+        } else if (userRole == UpdateUserRole.일반유저로_변경) {
+            user.setRole("USER");
+        } else {
+            throw new IllegalArgumentException("Unknown UpdateUserRoleType");
+        }
+
+        userRepository.save(user);
+    }
+
 }
