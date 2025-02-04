@@ -1,9 +1,11 @@
 package com.example.project.domain.file;
 
+import com.example.project.domain.score.ScoreService;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,7 @@ import reactor.core.publisher.Mono;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +26,12 @@ public class FileService {
 
     private final UserRepository userRepository;
     private final FileRepository fileRepository;
+    private final ScoreService scoreService;
 
-    // 파일 저장 경로를 @Value로 주입받기(서버 배포시에 경로 수정 예정)
+    // 파일 저장 경로를 @Value로 주입받기(서버 배포 시 경로 수정 예정)
     @Value("${file.storage.directory}")
     private String storageDirectory;
+
 
     private final WebClient webClient = WebClient.builder()
             .baseUrl("http://127.0.0.1:8000")
@@ -44,17 +48,19 @@ public class FileService {
         // 파일 저장
         String storedFilePath = saveFile(file);
 
-        // FastAPI 서버로 비동기 파일 전송
-        sendFileToFastAPI(storedFilePath).subscribe();
-
-        // File 엔티티 생성 및 저장
+        // 파일 엔티티 생성 및 저장
         com.example.project.domain.file.File fileEntity = new com.example.project.domain.file.File();
         fileEntity.setFilePath(storedFilePath);
         fileEntity.setUploadedAt(LocalDateTime.now());
         fileEntity.setUser(user);
-        fileRepository.save(fileEntity);
+        fileRepository.save(fileEntity); // 파일 정보 DB 저장
 
-        // DTO 반환
+        // FastAPI 서버로 비동기 파일 전송 (파일 ID도 전달)
+        sendFileToFastAPI(storedFilePath).subscribe(response -> {
+            scoreService.saveScoreData(response, user, fileEntity); // 파일 정보와 함께 점수 저장
+        });
+
+
         return FileDTO.Response.builder()
                 .fileId(fileEntity.getFileId())
                 .filePath(fileEntity.getFilePath())
@@ -67,6 +73,7 @@ public class FileService {
                 .getAuthentication()
                 .getName();
     }
+
 
     private String saveFile(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
@@ -90,7 +97,7 @@ public class FileService {
         return storedFilePath;
     }
 
-    private Mono<String> sendFileToFastAPI(String filePath) {
+    private Mono<Map<String, Object>> sendFileToFastAPI(String filePath) {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("file", new FileSystemResource(filePath)); // 저장된 파일 첨부
 
@@ -99,8 +106,13 @@ public class FileService {
                 .contentType(MediaType.MULTIPART_FORM_DATA) // 멀티파트 데이터 전송 설정
                 .bodyValue(body) // 요청 바디에 파일 추가
                 .retrieve() // 요청 실행
-                .bodyToMono(String.class) // 응답 본문을 String으로 변환
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 .doOnSuccess(response -> System.out.println("FastAPI 응답: " + response))
                 .doOnError(error -> System.err.println("FastAPI 서버로 파일 전송 실패: " + error.getMessage()));
+    }
+
+    public com.example.project.domain.file.File getFileById(Long fileId) {
+        return fileRepository.findById(fileId)
+                .orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다."));
     }
 }
