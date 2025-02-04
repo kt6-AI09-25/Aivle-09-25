@@ -2,8 +2,10 @@ package com.example.project.domain.noticeboard;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -20,6 +22,10 @@ public interface NoticeBoardRepository extends JpaRepository<NoticeBoard, Long> 
 
     @Query("SELECT COUNT(n) FROM NoticeBoard n")
     long countAllPosts();
+
+    @Query("SELECT COUNT(n) FROM NoticeBoard n WHERE n.writer.username = :username")
+    long countUsersPosts(@Param("username") String username);
+
 
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-03 11:05 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
