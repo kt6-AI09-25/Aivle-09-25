@@ -6,8 +6,19 @@
     <title>분석 결과 및 평가 기록</title>
     <!-- 기존 style.css -->
     <link rel="stylesheet" href="/css/style.css">
-    <!-- 새로 분리한 analysis.css -->
     <link rel="stylesheet" href="/css/myresult.css">
+
+
+    <style>
+        /* 이미 myresult.css에 .no-videos-message가 있다면, 그대로 적용해도 좋습니다.
+           폰트 크기는 필요시 조정 가능합니다. */
+        .no-videos-message {
+            text-align: center;
+            color: #666666;
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+    </style>
 </head>
 <body>
 <!-- 네비게이션 (Thymeleaf include) -->
@@ -21,17 +32,65 @@
             <div class="analysis-line"></div>
             <!-- 발표영상, 면접영상 선택 버튼 -->
             <div class="button-container">
-                <button class="mui-button" id="presentationVideoButton">발표영상</button>
+                <!-- 기본 로딩 시 발표영상 버튼이 active-button 클래스가 되도록 설정 -->
+                <button class="mui-button active-button" id="presentationVideoButton">발표영상</button>
                 <button class="mui-button" id="interviewVideoButton">면접영상</button>
             </div>
         </div>
 
         <!-- 썸네일 컨테이너 -->
         <div class="thumbnail-container">
-            <!-- 녹화된 발표영상 썸네일 -->
-            <img src="/video/recorded_presentation.jpg" alt="Recorded Presentation Thumbnail" id="presentationThumbnail">
-            <!-- 녹화된 면접영상 썸네일 -->
-            <img src="/video/recorded_interview.jpg" alt="Recorded Interview Thumbnail" id="interviewThumbnail">
+            <!-- 발표영상 섹션 -->
+            <div id="presentationVideos">
+                <!-- 영상 데이터가 있을 때 썸네일들을 출력 -->
+                <div th:if="${presentationVideos != null and !#lists.isEmpty(presentationVideos)}">
+                    <div th:each="video, iterStat : ${presentationVideos}">
+                        <img th:if="${video.thumbnailUrl != null}"
+                             th:src="@{${video.thumbnailUrl}}"
+                             alt="발표영상 썸네일"
+                             th:attr="data-videoUrl=${video.videoUrl}"
+                             class="video-thumbnail" />
+                        <!-- 한 행에 3개씩 정렬: 3번째 요소마다 clear -->
+                        <div th:if="${iterStat.index % 3 == 2}" style="clear: both;"></div>
+                    </div>
+                </div>
+                <!-- 영상 데이터가 없을 경우 메시지 출력 -->
+                <div th:if="${presentationVideos == null or #lists.isEmpty(presentationVideos)}">
+                    <!-- h1 태그로 가운데 정렬 & #666666 색상 적용 -->
+                    <h1 class="no-videos-message">저장된 발표영상이 없습니다.</h1>
+                    <!-- 임시로 모달 열기 버튼 -->
+                    <div style="text-align: center; margin: 20px 0;">
+                        <button type="button" class="mui-button" onclick="openAnalysisModal()">
+                            결과모달 열기 (임시)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 면접영상 섹션 -->
+            <div id="interviewVideos" style="display: none;">
+                <!-- 영상 데이터가 있을 때 썸네일들을 출력 -->
+                <div th:if="${interviewVideos != null and !#lists.isEmpty(interviewVideos)}">
+                    <div th:each="video, iterStat : ${interviewVideos}">
+                        <img th:if="${video.thumbnailUrl != null}"
+                             th:src="@{${video.thumbnailUrl}}"
+                             alt="면접영상 썸네일"
+                             th:attr="data-videoUrl=${video.videoUrl}"
+                             class="video-thumbnail" />
+                        <div th:if="${iterStat.index % 3 == 2}" style="clear: both;"></div>
+                    </div>
+                </div>
+                <!-- 영상 데이터가 없을 경우 메시지 출력 -->
+                <div th:if="${interviewVideos == null or #lists.isEmpty(interviewVideos)}">
+                    <h1 class="no-videos-message">저장된 면접영상이 없습니다.</h1>
+                    <!-- 임시로 모달 열기 버튼 -->
+                    <div style="text-align: center; margin: 20px 0;">
+                        <button type="button" class="mui-button" onclick="openAnalysisModal()">
+                            결과모달 열기 (임시)
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="spacer"></div>
@@ -56,9 +115,9 @@
                 <!-- 세부분석 -->
                 <div id="detailContent" class="detail-content">
                     <div class="menu-bar hidden" id="menuBar2">
-                        <a href="#" id="motion" class="active">머리움직임</a>
-                        <a href="#" id="voice">음성크기</a>
-                        <a href="#" id="gaze">시선처리</a>
+                        <a href="#" id="motion" class="active">모션점수</a>
+                        <a href="#" id="voice">표정점수</a>
+                        <a href="#" id="gaze">언어점수</a>
                     </div>
                     <div class="modal-body split">
                         <div class="modal-left">
@@ -70,13 +129,13 @@
                         <div class="modal-right">
                             <div class="frame-card">
                                 <div id="motionContent" class="motion-content active">
-                                    <p>머리움직임 평가 내용이 여기에 표시됩니다.</p>
+                                    <p>모션 평가 내용이 여기에 표시됩니다.</p>
                                 </div>
                                 <div id="voiceContent" class="voice-content">
-                                    <p>음성크기 평가 내용이 여기에 표시됩니다.</p>
+                                    <p>표정 평가 내용이 여기에 표시됩니다.</p>
                                 </div>
                                 <div id="gazeContent" class="gaze-content">
-                                    <p>시선처리 평가 내용이 여기에 표시됩니다.</p>
+                                    <p>언어 평가 내용이 여기에 표시됩니다.</p>
                                     <div class="chart-container">
                                         <canvas id="gazeChart"></canvas>
                                     </div>
@@ -108,7 +167,8 @@
             <div class="video-thumbnail" th:if="${evaluatingScore.status == 'IN_PROGRESS'}">
                 <span class="loading">평가 진행 중...</span>
             </div>
-            <div class="video-thumbnail" th:if="${evaluatingScore.status == 'COMPLETED' or evaluatingScore.fileId != null}" th:attr="data-scoreid=${evaluatingScore.scoreId}" onclick="openScoreModal(this)">
+            <div class="video-thumbnail" th:if="${evaluatingScore.status == 'COMPLETED' or evaluatingScore.fileId != null}"
+                 th:attr="data-scoreid=${evaluatingScore.scoreId}" onclick="openScoreModal(this)">
                 <video width="300" height="180"
                        th:src="@{/myresults/upload/results/{fileId}(fileId=${evaluatingScore.fileId})}"
                        poster="/video/recorded_thumbnail.jpg" controls>
@@ -171,51 +231,43 @@
 
     const presentationVideoButton = document.getElementById('presentationVideoButton');
     const interviewVideoButton = document.getElementById('interviewVideoButton');
-    const presentationThumbnail = document.getElementById('presentationThumbnail');
-    const interviewThumbnail = document.getElementById('interviewThumbnail');
+    const presentationVideos = document.getElementById('presentationVideos');
+    const interviewVideos = document.getElementById('interviewVideos');
 
-    const presentationVideoSrc = "/video/recorded_presentation.mp4";
-    const interviewVideoSrc = "/video/recorded_interview.mp4";
+    // 이미 HTML에서 발표영상 버튼에 active-button 클래스를 추가했으므로
+    // 화면이 로드되었을 때 발표영상이 디폴트로 표시됨.
+    // 아래 로직 또한 '처음 로딩 시' 발표영상 버튼을 활성화 상태로 두기 위함
+    // (필요에 따라 중복 여부 확인 후 제거 가능)
+    presentationVideoButton.classList.add('active-button');
+    presentationVideos.style.display = 'block';
+    interviewVideos.style.display = 'none';
 
-    presentationThumbnail.style.display = "block";
-    interviewThumbnail.style.display = "none";
-    presentationVideoButton.classList.add("active-button");
-    interviewVideoButton.classList.remove("active-button");
-
+    // 발표영상 버튼 클릭 시
     presentationVideoButton.addEventListener('click', () => {
-      presentationThumbnail.style.display = "block";
-      interviewThumbnail.style.display = "none";
-      presentationVideoButton.classList.add("active-button");
-      interviewVideoButton.classList.remove("active-button");
+      presentationVideos.style.display = 'block';
+      interviewVideos.style.display = 'none';
+      presentationVideoButton.classList.add('active-button');
+      interviewVideoButton.classList.remove('active-button');
     });
 
+    // 면접영상 버튼 클릭 시
     interviewVideoButton.addEventListener('click', () => {
-      presentationThumbnail.style.display = "none";
-      interviewThumbnail.style.display = "block";
-      interviewVideoButton.classList.add("active-button");
-      presentationVideoButton.classList.remove("active-button");
-    });
-
-    presentationThumbnail.addEventListener('click', () => {
-      analysisVideo.src = presentationVideoSrc;
-      openAnalysisModal();
-    });
-
-    interviewThumbnail.addEventListener('click', () => {
-      analysisVideo.src = interviewVideoSrc;
-      openAnalysisModal();
+      presentationVideos.style.display = 'none';
+      interviewVideos.style.display = 'block';
+      interviewVideoButton.classList.add('active-button');
+      presentationVideoButton.classList.remove('active-button');
     });
 
     function openAnalysisModal() {
-      analysisModal.style.display = "block";
+      analysisModal.style.display = 'block';
       resetToSummary();
       analysisModal.querySelector('.modal-content').focus();
     }
 
     detailAnalysis.addEventListener('click', function(event) {
       event.preventDefault();
-      summaryContent.style.display = "none";
-      detailContent.style.display = "block";
+      summaryContent.style.display = 'none';
+      detailContent.style.display = 'block';
       menuBar2.classList.remove('hidden');
       summaryResult.classList.remove('active');
       detailAnalysis.classList.add('active');
@@ -227,8 +279,8 @@
     });
 
     function resetToSummary() {
-      summaryContent.style.display = "block";
-      detailContent.style.display = "none";
+      summaryContent.style.display = 'block';
+      detailContent.style.display = 'none';
       menuBar2.classList.add('hidden');
       detailAnalysis.classList.remove('active');
       summaryResult.classList.add('active');
@@ -310,43 +362,43 @@
     });
 
     function closeAnalysisModal() {
-      analysisModal.style.display = "none";
+      analysisModal.style.display = 'none';
       resetToSummary();
       analysisVideo.pause();
-      analysisVideo.src = "";
+      analysisVideo.src = '';
     }
 
     /***** 평가 기록 영역 (백엔드) *****/
     function openScoreModal(element) {
-      const scoreId = element.getAttribute("data-scoreid");
+      const scoreId = element.getAttribute('data-scoreid');
       fetch(`/scores/details?scoreId=${scoreId}`)
         .then(response => response.json())
         .then(data => {
-          document.getElementById("modalTotalScore").textContent = data.totalScore;
-          document.getElementById("modalMotionScore").textContent = data.motionScore;
-          document.getElementById("modalExpressionScore").textContent = data.expressionScore;
-          document.getElementById("modalLanguageScore").textContent = data.languageScore;
-          document.getElementById("modalTempo").textContent = data.tempo;
-          document.getElementById("modalDate").textContent = data.date;
-          document.getElementById("modalVideo").src = `/myresults/upload/results/${data.fileName}`;
+          document.getElementById('modalTotalScore').textContent = data.totalScore;
+          document.getElementById('modalMotionScore').textContent = data.motionScore;
+          document.getElementById('modalExpressionScore').textContent = data.expressionScore;
+          document.getElementById('modalLanguageScore').textContent = data.languageScore;
+          document.getElementById('modalTempo').textContent = data.tempo;
+          document.getElementById('modalDate').textContent = data.date;
+          document.getElementById('modalVideo').src = `/myresults/upload/results/${data.fileName}`;
 
-          displayTimes("motionTimesList", data.motionTimes);
-          displayTimes("expressionTimesList", data.expressionTimes);
-          displayTimes("languageTimesList", data.languageTimes);
+          displayTimes('motionTimesList', data.motionTimes);
+          displayTimes('expressionTimesList', data.expressionTimes);
+          displayTimes('languageTimesList', data.languageTimes);
 
-          document.getElementById("commonModal").classList.add("active");
+          document.getElementById('commonModal').classList.add('active');
         })
         .catch(error => {
-          console.error("데이터 로드 실패:", error);
-          alert("평가 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.");
+          console.error('데이터 로드 실패:', error);
+          alert('평가 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
         });
     }
 
     function displayTimes(elementId, timesArray) {
       const listElement = document.getElementById(elementId);
-      listElement.innerHTML = "";
+      listElement.innerHTML = '';
       timesArray.forEach(time => {
-        const li = document.createElement("li");
+        const li = document.createElement('li');
         li.textContent = `${time.actionName || time.expressionName || time.languageName}: ${time.actionTime || time.expressionTime || time.languageTime}초`;
         listElement.appendChild(li);
       });
@@ -363,8 +415,8 @@
     });
 
     function closeScoreModal() {
-      commonModal.classList.remove("active");
-      document.getElementById("modalVideo").src = "";
+      commonModal.classList.remove('active');
+      document.getElementById('modalVideo').src = '';
     }
 </script>
 </body>
