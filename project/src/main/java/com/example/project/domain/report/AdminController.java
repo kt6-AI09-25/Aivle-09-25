@@ -96,6 +96,44 @@ public class AdminController {
             return "admin/report/list";
         }
     }
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>어드민 신고관리 02-04 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    @GetMapping("/report/check/{report_type}/{reported_id}")
+    @ResponseBody // (또는 return 타입을 ResponseEntity로)
+    public ResponseEntity<Void> checkReportedItem(@PathVariable Integer report_type,
+                                                  @PathVariable Long reported_id) {
+        if (report_type == 1) {
+            // 게시글 존재 여부
+            NoticeBoardDTO.Response post = noticeBoardService.getPostById(reported_id);
+            if (post == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok().build();
+
+        } else if (report_type == 2) {
+            // 댓글 존재 여부
+            // commentService에 getCommentById(...)가 있어야 합니다.
+            CommentDTO.Response comment = commentService.getCommentById(reported_id);
+            if (comment == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok().build();
+
+        } else if (report_type == 3) {
+            // 쪽지 존재 여부
+            LetterDTO.Response letter = letterService.getLetterById(reported_id);
+            if (letter == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok().build();
+
+        } else {
+            // 그 외 타입은 없다고 가정
+            return ResponseEntity.notFound().build();
+        }
+    }
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>어드민 신고관리 02-04 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
 
     @GetMapping("")
     public String adminMainPage() {

@@ -101,13 +101,14 @@
 
       <!-- 신고물 링크 -->
       <td>
-        <a th:href="@{/admin/report/{report_type}/{reported_id}
-            (report_type=${report.report_type}, reported_id=${report.reported_id})}"
+        <a href="#"
+           th:onclick="'checkAndMove(' + ${report.report_type} + ',' + ${report.reported_id} + ')'"
+
            th:text="'신고물 상세보기: '
-               + (${report.report_type == 1} ? '게시글 '
-               : (${report.report_type == 2} ? '댓글 '
-               : (${report.report_type == 3} ? '쪽지 ' : '기타')))
-               + ${report.reported_id}">
+       + (${report.report_type} == 1 ? '게시글 '
+       : (${report.report_type} == 2 ? '댓글 '
+       : (${report.report_type} == 3 ? '쪽지 ' : '기타')))
+       + ${report.reported_id}">
         </a>
       </td>
 
@@ -143,5 +144,26 @@
     </tbody>
   </table>
 </div>
+
+<script>
+  function checkAndMove(reportType, reportedId) {
+    // 1) 백엔드에 존재 여부 체크
+    fetch(`/admin/report/check/${reportType}/${reportedId}`)
+      .then(response => {
+        if (!response.ok) {
+          // 2) 404라면 -> 이미 삭제된 글
+          alert("이미 삭제된 글입니다.");
+          return;
+        }
+        // 3) 200 OK => 실제 상세 페이지로 이동
+        window.location.href = `/admin/report/${reportType}/${reportedId}`;
+      })
+      .catch(error => {
+        console.error(error);
+        alert("서버와 통신 중 오류가 발생했습니다.");
+      });
+  }
+</script>
+
 </body>
 </html>
