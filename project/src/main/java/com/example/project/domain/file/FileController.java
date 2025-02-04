@@ -57,7 +57,6 @@ public class FileController {
 
         Resource resource = new FileSystemResource(videoFile);
 
-        // 동영상의 미디어 타입을 자동 감지
         String contentType;
         try {
             Path path = Paths.get(filePath);
@@ -69,6 +68,7 @@ public class FileController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(contentType != null ? contentType : "video/webm"));
         headers.setContentDispositionFormData("inline", videoFile.getName());
+
 
         return ResponseEntity.ok()
                 .headers(headers)

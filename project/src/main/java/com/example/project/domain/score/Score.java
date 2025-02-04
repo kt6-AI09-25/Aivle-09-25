@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -47,16 +48,19 @@ public class Score {
     private String languageFrequency;
 
     @OneToMany(mappedBy = "score", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MotionTimes> motionTimes;
+    private Set<MotionTimes> motionTimes;
 
     @OneToMany(mappedBy = "score", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExpressionTimes> expressionTimes;
+    private Set<ExpressionTimes> expressionTimes;
 
     @OneToMany(mappedBy = "score", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LanguageTimes> languageTimes;
+    private Set<LanguageTimes> languageTimes;
 
     @Column(name = "tempo", nullable = false)
     private Double tempo;
+
+    @Column(name = "script", nullable = false)
+    private String script;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id", nullable = false)

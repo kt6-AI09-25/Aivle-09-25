@@ -19,7 +19,7 @@ public class ExpressionTimes {
 
     @ManyToOne
     @JoinColumn(name = "score_id", nullable = false)
-    private Score scoreId;
+    private Score score;
 
     @Column(name = "expression_name", nullable = false, length = 50)
     private String expressionName;

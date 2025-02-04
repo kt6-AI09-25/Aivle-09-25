@@ -34,6 +34,7 @@ public class ScoreService {
         score.setTempo(Optional.ofNullable((Double) result.get("tempo")).orElse(0.0));
         score.setUser(user);
         score.setFile(file);
+        score.setScript(Optional.ofNullable((String) result.get("script")).orElse(""));
 
         // MotionTimes 저장 (리스트 저장)
         List<MotionTimes> motionTimesList = new ArrayList<>();
@@ -44,7 +45,7 @@ public class ScoreService {
                     MotionTimes motionTime = new MotionTimes();
                     motionTime.setActionName(actionName);
                     motionTime.setActionTime(actionTime != null ? actionTime : 0);
-                    motionTime.setScoreId(score);
+                    motionTime.setScore(score);
                     motionTimesList.add(motionTime);
                 }
             });
@@ -59,7 +60,7 @@ public class ScoreService {
                     ExpressionTimes expressionTimeEntity = new ExpressionTimes();
                     expressionTimeEntity.setExpressionName(expressionName);
                     expressionTimeEntity.setExpressionTime(expressionTime != null ? expressionTime : 0);
-                    expressionTimeEntity.setScoreId(score);
+                    expressionTimeEntity.setScore(score);
                     expressionTimesList.add(expressionTimeEntity);
                 }
             });
@@ -74,7 +75,7 @@ public class ScoreService {
                     LanguageTimes languageTimeEntity = new LanguageTimes();
                     languageTimeEntity.setLanguageName(languageName);
                     languageTimeEntity.setLanguageTime(languageTime != null ? languageTime : 0);
-                    languageTimeEntity.setScoreId(score);
+                    languageTimeEntity.setScore(score);
                     languageTimesList.add(languageTimeEntity);
                 }
             });
@@ -109,9 +110,10 @@ public class ScoreService {
                     result.put("tempo", score.getTempo());
                     result.put("status", score.getStatus());
                     result.put("fileName", score.getFile() != null ? score.getFile().getFilePath() : "파일 없음");
+                    result.put("script", score.getScript());
                     return result;
                 })
-                .orElse(null); // 없으면 null 반환
+                .orElseGet(HashMap::new); // ✅
     }
 
     public Long getLoggedInUserId(String username) {
