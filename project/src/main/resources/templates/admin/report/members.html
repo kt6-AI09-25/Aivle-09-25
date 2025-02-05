@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>관리자 페이지 - 회원 관리</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* 기본 스타일 */
+
+
+
+        /* 회원 관리 섹션 컨테이너 (배경 박스) */
+        .members-section {
+          background-color: #fff;
+          border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          padding: 20px;
+        }
+        .members-section h3 {
+          margin-bottom: 16px;
+          font-size: 1.2rem;
+          font-weight: bold;
+        }
+
+        /* 테이블 래퍼(가로 스크롤 등 필요 시) */
+        .table-wrapper {
+          overflow-x: auto;  /* 표가 너무 넓으면 가로 스크롤 허용 */
+        }
+
+        /* 테이블 스타일 */
+        table {
+          width: 100%;
+          border-collapse: collapse;  /* 테두리를 겹치지 않고 합침 */
+          background-color: #fff;
+          min-width: 700px;           /* 너무 좁아지지 않도록 최소 너비 */
+        }
+        thead {
+          background-color: #f8f8f8;
+        }
+        th, td {
+          padding: 14px 16px;
+          border-bottom: 1px solid #ddd;
+          text-align: center;
+          vertical-align: middle;
+          font-size: 0.95rem;
+        }
+        th {
+          white-space: nowrap;
+          border-bottom: .1px solid #333;
+        }
+        tbody tr:hover {
+          background-color: #f9f9f9;  /* 행에 마우스 오버 시 하이라이트 */
+        }
+
+        /* 버튼 스타일 */
+        button {
+          padding: 6px 12px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.85rem;
+        }
+        .block-btn {
+          background-color: #f0ad4e; /* 주황색 */
+          color: #fff;
+        }
+        .delete-btn {
+          background-color: #d9534f; /* 빨간색 */
+          color: #fff;
+        }
+        button:hover {
+          opacity: 0.9;
+        }
+
+
+        select {
+          padding: 4px;
+          font-size: 0.85rem;
+          margin-right: 6px;
+        }
+
+        /* 반응형 조정 (화면 폭이 좁아질 경우 폰트 크기 조금 줄이기 등) */
+        @media (max-width: 768px) {
+          .page-title {
+            font-size: 1.3rem;
+          }
+          th, td {
+            font-size: 0.9rem;
+            padding: 10px;
+          }
+          .members-section {
+            padding: 15px;
+          }
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<!-- 사이드바 -->
+<div th:replace="navbar.html"></div>
+<div class="sidebar">
+    <h2>Admin</h2>
+    <ul class="menu">
+        <li><a href="/admin">메인</a></li>
+        <li><a href="/admin/members" class="active">회원 관리</a></li>
+        <li><a href="/admin/report">게시판 신고 관리</a></li>
+        <li><a href="presentations.html">발표 내용 조회</a></li>
+        <li><a href="statistics.html">통계 페이지</a></li>
+    </ul>
+
+    <footer class="sidebar-footer">
+        <!-- 홈페이지 링크 -->
+        <a href="/">홈페이지로 돌아가기</a>
+    </footer>
+</div>
+
+<!-- 메인 컨텐츠 -->
+<div class="content">
+    <h1 class="page-title">회원 관리</h1>
+    <div class="title-line"></div>
+
+    <!-- 회원 관리 섹션 -->
+    <div class="members-section">
+        <h3>회원 목록</h3>
+        <!-- 테이블 래퍼 -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th>회원 ID</th>
+                    <th>닉네임</th>
+                    <th>가입일</th>
+                    <th>게시글 수</th>
+                    <th id="sortLastLogin" style="cursor: pointer;">마지막 접속일</th>
+                    <th>권한 설정</th>
+                    <th>탈퇴 </th>
+                </tr>
+                </thead>
+                <tbody id="userTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div><!-- /.members-section -->
+</div><!-- /.content -->
+
+<script>
+    $(document).ready(function () {
+        loadUsers();
+    });
+
+    function loadUsers() {
+    $.ajax({
+        url: "/admin/member/list",
+        type: "GET",
+        success: function (users) {
+            let tbody = $("#userTableBody");
+            tbody.empty();
+            users.forEach(user => {
+                let safeUsername = user.username.replace(/[@.]/g, "_"); // 특수 문자 변환
+                let row = `<tr>
+                    <td>${user.username}</td>
+                    <td>${user.nickname}</td>
+                    <td>${new Date(user.dateJoin).toLocaleDateString()}</td>
+                    <td>${user.postCount}</td>
+                    <td>${new Date(user.lastLogin).toLocaleDateString()}</td>
+                    <td>
+                        <select id="roleSelect_${safeUsername}">
+                            <option value="USER" ${user.role === 'USER' ? 'selected' : ''}>일반 회원</option>
+                            <option value="ADMIN" ${user.role === 'ADMIN' ? 'selected' : ''}>관리자 회원</option>
+                        </select>
+                        <button class="block-btn" onclick="updateUserRole('${user.username}')">변경</button>
+                    </td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteUser('${user.username}')">탈퇴</button>
+                    </td>
+                </tr>`;
+                tbody.append(row);
+            });
+        },
+        error: function () {
+            alert("회원 목록을 불러오는 데 실패했습니다.");
+        }
+    });
+}
+
+let isAscending = true; // 정렬 방향 (true: 오름차순, false: 내림차순)
+
+    $(document).ready(function () {
+        loadUsers();
+
+        // "마지막 접속일" 클릭 이벤트 추가
+        $("#sortLastLogin").on("click", function () {
+            sortUsersByLastLogin();
+        });
+    });
+
+    function loadUsers() {
+        $.ajax({
+            url: "/admin/member/list",
+            type: "GET",
+            success: function (users) {
+                renderUserTable(users);
+            },
+            error: function () {
+                alert("회원 목록을 불러오는 데 실패했습니다.");
+            }
+        });
+    }
+
+    function renderUserTable(users) {
+        let tbody = $("#userTableBody");
+        tbody.empty();
+
+        users.forEach(user => {
+            let safeUsername = user.username.replace(/[@.]/g, "_"); // 특수 문자 변환
+            let row = `<tr data-last-login="${user.lastLogin}">
+                <td>${user.username}</td>
+                <td>${user.nickname}</td>
+                <td>${new Date(user.dateJoin).toLocaleDateString()}</td>
+                <td>${user.postCount}</td>
+                <td>${new Date(user.lastLogin).toLocaleDateString()}</td>
+                <td>
+                    <select id="roleSelect_${safeUsername}">
+                        <option value="USER" ${user.role === 'USER' ? 'selected' : ''}>일반 회원</option>
+                        <option value="ADMIN" ${user.role === 'ADMIN' ? 'selected' : ''}>관리자 회원</option>
+                    </select>
+                    <button class="block-btn" onclick="updateUserRole('${user.username}')">변경</button>
+                </td>
+                <td>
+                    <button class="delete-btn" onclick="deleteUser('${user.username}')">탈퇴</button>
+                </td>
+            </tr>`;
+            tbody.append(row);
+        });
+    }
+
+    function sortUsersByLastLogin() {
+        let rows = $("#userTableBody tr").get();
+
+        rows.sort((a, b) => {
+            let dateA = new Date($(a).data("last-login"));
+            let dateB = new Date($(b).data("last-login"));
+            return isAscending ? dateA - dateB : dateB - dateA;
+        });
+
+        isAscending = !isAscending; // 정렬 방향 변경
+
+        $("#userTableBody").empty().append(rows);
+
+        // 정렬 아이콘 변경 (⬍ = 기본 / ⬆ = 내림차순 / ⬇ = 오름차순)
+        $("#sortLastLogin").html(`마지막 접속일 ${isAscending ? '⬇' : '⬆'}`);
+    }
+
+
+    function updateUserRole(username) {
+    const selectedRole = $("#roleSelect_" + username.replace(/[@.]/g, "_")).val(); // 특수 문자 처리
+
+    $.ajax({
+        url: `/admin/users/${username}/role`,
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify({ role: selectedRole }),
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-CSRF-TOKEN", $("meta[name='_csrf']").attr("content"));
+        },
+        success: function (response) {
+            alert(response);
+            loadUsers(); // 변경 후 목록 새로고침
+        },
+        error: function (xhr) {
+            console.error("권한 변경 실패:", xhr);
+            alert("권한 변경에 실패했습니다.");
+        }
+    });
+}
+
+
+function deleteUser(username) {
+    if (!confirm("정말로 이 사용자를 삭제하시겠습니까?")) return;
+
+    $.ajax({
+        url: `/admin/users/${username}`,
+        type: "DELETE",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-CSRF-TOKEN", $("meta[name='_csrf']").attr("content")); // CSRF 토큰 추가
+        },
+        success: function (response) {
+            alert(response);
+            loadUsers(); // 삭제 후 목록 새로고침
+        },
+        error: function (xhr) {
+            console.error("회원 삭제 실패:", xhr);
+            alert("회원 삭제에 실패했습니다.");
+        }
+    });
+}
+
+</script>
+</body>
+</html>

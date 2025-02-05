@@ -68,6 +68,7 @@
       color: #333; /* 헤더 글자색 */
       font-weight: bold;
       text-align: left;
+      border-bottom: 0.5px solid #333;
     }
 
     table tr:hover {
@@ -92,6 +93,12 @@
       text-align: center;
     }
 
+    .index-cell {
+    width: 5%; /* 인덱스 열 너비 */
+    text-align: center; /* 가운데 정렬 */
+    font-weight: bold; /* 굵게 표시 */
+  }
+
     .nowrap-cell {
       white-space: nowrap; /* 줄바꿈 방지 */
       overflow: hidden; /* 넘치는 텍스트 숨김 */
@@ -108,19 +115,70 @@
        text-decoration: none; /* 링크일 경우 기본 밑줄 제거 */
        border-radius: 8px; /* 버튼의 모서리를 둥글게 (5px 반경) */
        font-size: 16px; /* 버튼 내부 텍스트의 글꼴 크기 (16px) */
-       margin: 20px 0;
+       margin: 40px 0;
        float:right ;
     }
     .btn:hover {
       background-color: #0056b3; /* 버튼 hover 효과 */
     }
+
+    .pagination {
+  text-align: center;  /* 중앙 정렬 */
+  margin: 30px 0;      /* 바깥 여백 */
+  font-family: Arial, sans-serif;
+}
+
+/* ul 기본 스타일 제거 */
+.pagination ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* li는 가로로 나란히 배치 */
+.pagination li {
+  display: inline-block;
+}
+
+/* 페이지 링크 공통 스타일 */
+.pagination a {
+  display: inline-block;
+  margin: 0 5px;
+  padding: 8px 12px;
+
+  border: 1px solid #ddd;
+  border-radius: 4px;
+
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* 현재 페이지 활성화 스타일 */
+.pagination a.active {
+  background-color: #0066cc;
+  border-color: #0066cc;
+  color: #fff;
+}
+
+/* 마우스 오버 시 효과 */
+.pagination a:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+  cursor: pointer;
+}
+
+/* 이전/다음 버튼 스타일(필요 시 조정) */
+.pagination .prev,
+.pagination .next {
+  font-weight: bold;
+}
   </style>
 </head>
 <body>
 <div th:replace="navbar.html"></div> <!-- 네비게이션 바 포함 -->
 <h1>Notice Board</h1>
 <div class="notice-board">
-
 <!--검색바-->
   <div class="search-bar">
     <select id="filter-select" class="search-filter">
@@ -135,6 +193,8 @@
   <table>
     <thead>
     <tr>
+<!--      <th class="index-cell">No</th> &lt;!&ndash; 인덱스 열 추가 &ndash;&gt;-->
+
       <th class="title-cell">제목</th>
       <th class="writer-cell nowrap-cell">작성자</th>
       <th class="view-count-cell nowrap-cell">조회수</th>
@@ -142,8 +202,9 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="post : ${posts}">
-      <td class="title-cell">
+    <tr th:each="post, iterStat : ${posts}">
+<!--      <td class="index-cell" th:text="${#lists.size(posts) - iterStat.index}"></td>-->
+      <td class="title-cell nowrap-cell">
         <a th:href="@{/noticeboard/{id}(id=${post.postId})}" th:text="${post.title}"></a>
       </td>
       <td class="writer-cell nowrap-cell" th:text="${post.writerName}"></td>
@@ -158,10 +219,55 @@
     </tr>
     </tbody>
   </table>
+  <div class="pagination">
+    <ul>
+      <!-- 이전 페이지 버튼 -->
+      <li th:if="${currentPage > 0}">
+        <a th:href="@{/noticeboard(page=${currentPage - 1})}" class="prev">&lt;</a>
+      </li>
+
+      <!-- 페이지 번호 -->
+      <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+        <!-- 현재 페이지일 경우 'active' 클래스를 부여 -->
+        <a th:href="@{/noticeboard(page=${i})}"
+           th:text="${i + 1}"
+           th:classappend="${i == currentPage} ? 'active' : ''">
+        </a>
+      </li>
+
+      <!-- 다음 페이지 버튼 -->
+      <li th:if="${currentPage + 1 < totalPages}">
+        <a th:href="@{/noticeboard(page=${currentPage + 1})}" class="next">&gt;</a>
+      </li>
+    </ul>
+  </div>
 
   <a href="/noticeboard/new" class="btn">Create New Post</a>
 
 </div>
+<!-- <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-03 11:05 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
+
+<!-- 페이지네이션 -->
+
+<!--<div class="pagination">-->
+<!--  <ul>-->
+<!--    <li th:if="${currentPage > 0}">-->
+<!--      <a th:href="@{/noticeboard(page=${currentPage - 1})}">이전</a>-->
+<!--    </li>-->
+
+<!--    <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">-->
+<!--      <a th:href="@{/noticeboard(page=${i})}" th:text="${i + 1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>-->
+<!--    </li>-->
+
+<!--    <li th:if="${currentPage + 1 < totalPages}">-->
+<!--      <a th:href="@{/noticeboard(page=${currentPage + 1})}">다음</a>-->
+<!--    </li>-->
+<!--  </ul>-->
+<!--</div>-->
+
+
+<!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-03 11:05 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+
 <script>
   // 검색 버튼에 클릭 이벤트를 추가
  document.getElementById('search-button').addEventListener('click', function () {
@@ -174,6 +280,11 @@
      alert("검색어를 입력하세요."); // 사용자에게 경고
      return; // 검색 중단
    }
+   // **검색 후 페이지네이션을 숨기기** (DOM에서 선택 후 display = 'none')
+   const pagination = document.querySelector('.pagination');
+    if (pagination) {
+      pagination.style.display = 'none';
+    }
 
    // 서버에 검색 요청을 보냄
    fetch(`${filterUrl}?keyword=${encodeURIComponent(query)}`)
@@ -198,6 +309,7 @@
          tableBody.appendChild(row); // 테이블에 추가
        } else {
          // 검색 결과가 있을 경우, 각각의 결과를 테이블에 추가
+         let totalResults = data.length;
          data.forEach(post => {
            const row = document.createElement('tr'); // 새로운 <tr> 생성
            row.innerHTML = `

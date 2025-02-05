@@ -1,6 +1,7 @@
 package com.example.project.domain.comment;
 
 import com.example.project.domain.noticeboard.NoticeBoard;
+import com.example.project.domain.noticeboard.NoticeBoardDTO;
 import com.example.project.domain.noticeboard.NoticeBoardRepository;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
@@ -144,4 +145,14 @@ public class CommentService {
         return comment.getCommenter();
     }
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-09 11:25 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>신고게시판 관리 02 - 04>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    public CommentDTO.Response getCommentById(Long id) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+        return convertToResponseDTO(comment);
+    }
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>신고게시판 관리 02 - 04>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
+
+

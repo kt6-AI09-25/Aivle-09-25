@@ -6,6 +6,7 @@ import com.example.project.domain.noticeboard.NoticeBoardDTO.*;
 import com.example.project.domain.report.ReportDto;
 import com.example.project.domain.report.ReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +24,6 @@ public class NoticeBoardController {
     private final ReportService reportService;
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-10 14:41 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-    // 게시글 목록
-    @GetMapping
-    public String list(Model model) {
-        List<NoticeBoardDTO.Response> posts = noticeBoardService.getAllPosts();
-        model.addAttribute("posts", posts);
-        return "noticeboard/list";
-    }
 
     // 게시글 작성 폼
     @GetMapping("/new")
@@ -158,6 +152,22 @@ public class NoticeBoardController {
             throw new IllegalArgumentException("검색어를 입력해주세요.");
         }
         return noticeBoardService.searchPostsByWriterKeyword(keyword);
+    }
+
+    @GetMapping
+    public String list(@RequestParam(defaultValue = "0") int page,
+                       @RequestParam(defaultValue = "13") int size,
+                       Model model) {
+        Page<Response> posts = noticeBoardService.getPagedPosts(page, size);
+
+        System.out.println("Total Elements: " + posts.getTotalElements()); // 디버깅 로그 추가
+        System.out.println("Total Pages: " + posts.getTotalPages());
+        System.out.println("Current Page: " + posts.getNumber());
+
+        model.addAttribute("posts", posts);
+        model.addAttribute("currentPage", posts.getNumber());
+        model.addAttribute("totalPages", posts.getTotalPages());
+        return "noticeboard/list";
     }
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-16 11:05 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

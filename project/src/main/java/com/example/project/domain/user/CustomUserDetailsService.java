@@ -1,13 +1,16 @@
 package com.example.project.domain.user;
 
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Map;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -35,8 +38,32 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getPassword(),
                 user.getState(),
                 user.getBan_end_time(),
-                Collections.singletonList(new SimpleGrantedAuthority(user.getRole()))
+                Collections.singletonList(new SimpleGrantedAuthority(user.getRole())),
+                Map.of()
         );
     }
-}
 
+    public long getTotalUsers() {
+        return userRepository.countAllUsers();
+    }
+
+    public long getTodayJoinedUsers() {
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // 오늘 00:00:00
+        LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59); // 오늘 23:59:59
+
+        return userRepository.countUsersByDateJoinBetween(startOfDay, endOfDay);
+    }
+
+    @Transactional
+    public void updateUserRole(User user, UpdateUserRole userRole) {
+
+        if (userRole == UpdateUserRole.관리자로_변경) {
+            user.setRole("ADMIN");
+        } else if (userRole == UpdateUserRole.일반유저로_변경) {
+            user.setRole("USER");
+        } else {
+            throw new IllegalArgumentException("Unknown UpdateUserRoleType");
+        }
+        userRepository.save(user);
+    }
+}

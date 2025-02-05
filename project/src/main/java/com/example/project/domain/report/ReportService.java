@@ -2,14 +2,11 @@ package com.example.project.domain.report;
 
 import com.example.project.domain.comment.CommentService;
 import com.example.project.domain.letter.LetterService;
-import com.example.project.domain.noticeboard.NoticeBoard;
-import com.example.project.domain.noticeboard.NoticeBoardRepository;
 import com.example.project.domain.noticeboard.NoticeBoardService;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -116,5 +113,9 @@ public class ReportService {
                 .report_process_type(report.getReport_process_type())
                 .reported_user(report.getReported_user())
                 .build();
+    }
+
+    public long getUnprocessedReports() {
+        return reportRepository.countUnprocessedReports();
     }
 }

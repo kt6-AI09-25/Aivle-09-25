@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>발표 녹화 및 분석</title>
   <link rel="stylesheet" href="css/style.css">
+
   <link rel="stylesheet" href="css/pr_test.css">
+
   <style>
     /* 비디오 컨테이너 */
     .video-container {
@@ -14,6 +16,7 @@
       margin: 20px auto;
       width: 900px;
       height: 500px;
+      border: 2px solid black;
 
     }
     .video-container video {
@@ -68,7 +71,6 @@
   </style>
 </head>
 <body>
-<div th:replace="navbar.html"></div>
 
 <!-- 로딩 화면 -->
 <div id="loadingModal">로딩 중입니다...</div>
@@ -122,9 +124,9 @@
       return;
     }
 
-        // 버튼 상태
-        startBtn.disabled = true;
-        stopBtn.disabled = true;
+    // 버튼 상태 변경
+    startBtn.disabled = true;
+    stopBtn.disabled = true;
 
     // 카운트다운 시작
     countdownOverlay.style.display = 'block';
@@ -177,7 +179,6 @@
     }
 }
 
-
   // 📤 녹화본 업로드 및 결과 페이지 이동
   async function uploadAndGoToResults() {
     if (recordedChunks.length === 0) {
@@ -207,7 +208,7 @@
 
         if (!uploadResponse.ok) throw new Error("파일 업로드 실패");
 
-        const uploadResult = await uploadResponse.json();
+      const uploadResult = await uploadResponse.json();
         console.log("✅ 업로드 성공:", uploadResult);
 
         // 🔹 결과 페이지로 이동
