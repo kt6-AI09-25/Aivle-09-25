@@ -5,7 +5,6 @@ importScripts('/js/stomp.min.js');
 console.log("SockJS and StompJS loaded in SharedWorker");
 
 let stompClient = null;
-let connectionId = null; // 고유 식별자 저장
 let connectedUsername = null; // 현재 연결된 사용자 추적
 const connectedPorts = []; // SharedWorker와 연결된 모든 포트
 
@@ -30,13 +29,12 @@ onconnect = function (event) {
         if (data.type === "connect") {
             if (data.username === connectedUsername) {
                 console.log("Duplicate connect request ignored for user:", data.username);
-                return; // 중복 요청 무시
+                return;
             }
             initializeWebSocket(data.username, port);
             console.log("WebSocket initialization request for username:", data.username);
         } else if (data.type === 'navigate') {
             if (stompClient && stompClient.connected && data.username) {
-                // 사용자 상태를 active로 전송
                 stompClient.send('/app/user-status', {}, JSON.stringify({ userId: data.username, status: 'active' }));
             }
         } else if (data.type === "send") {
@@ -52,12 +50,13 @@ onconnect = function (event) {
 
 function initializeWebSocket(username, port) {
     console.log("Initializing WebSocket connection for user:", username);
+
     if (stompClient && stompClient.connected && connectedUsername === username) {
         console.log("WebSocket already connected for user:", username);
         return;
     }
 
-    // 이전 연결 정리
+    // 기존 연결이 있으면 정리
     if (stompClient && stompClient.connected) {
         disconnectWebSocket();
     }
@@ -69,16 +68,10 @@ function initializeWebSocket(username, port) {
     stompClient.connect({}, () => {
         console.log("WebSocket connected for user:", username);
 
-        // 서버에서 고유 식별자 생성 요청
+        // 서버에 현재 사용자 상태 전송
         stompClient.send('/app/status', {}, JSON.stringify({ username }));
 
-        // 고유 식별자를 수신
-        stompClient.subscribe('/user/queue/connectionId', (message) => {
-            connectionId = message.body; // 서버에서 받은 connectionId 저장
-            console.log("Received connectionId from server:", connectionId);
-        });
-
-        // 활성 사용자 목록 구독
+        // 활성 사용자 목록 구독 (이전 코드 유지)
         stompClient.subscribe('/topic/status', (message) => {
             const activeUsers = JSON.parse(message.body);
             console.log("Active users received:", activeUsers);
@@ -88,11 +81,11 @@ function initializeWebSocket(username, port) {
         });
 
         // 강제 로그아웃 메시지 구독
-        stompClient.subscribe('/user/queue/logout', () => {
-            console.log("Forced logout message received.");
+        console.log(`Subscribing to force logout channel: /user/queue/logout`);
+
+        stompClient.subscribe(`/user/queue/logout`, (message) => {
+            console.log(`Forced logout message received:`, message);
             port.postMessage({ type: "forceLogout" });
-        }, (error) => {
-            console.error("Subscription to /user/queue/logout failed:", error);
         });
 
         // 연결 완료 이벤트 전송
@@ -101,6 +94,7 @@ function initializeWebSocket(username, port) {
         console.error("WebSocket connection error:", error);
     });
 }
+
 
 function sendMessage(destination, payload) {
     if (stompClient && stompClient.connected) {
