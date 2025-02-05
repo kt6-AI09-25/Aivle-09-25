@@ -39,13 +39,13 @@ public class ScoreController {
             userId = scoreService.getLoggedInUserId(username);
         }
 
+        // 이전 평가 점수
         List<ScoreDTO> previousScores = scoreService.getPreviousScores(userId)
                 .stream().map(ScoreDTO::fromEntity).toList();
 
+        // 현재 평가 점수 조회
         Map<String, Object> evaluatingScore = scoreService.getEvaluatingScore(userId);
-
-        // ✅
-        if (evaluatingScore == null) {
+        if (evaluatingScore == null || evaluatingScore.isEmpty()) {
             evaluatingScore = new HashMap<>();
         }
 
