@@ -24,10 +24,7 @@ public interface NoticeBoardRepository extends JpaRepository<NoticeBoard, Long> 
 
     Page<NoticeBoard> findAll(Pageable pageable);
 
-
     @Query("SELECT COUNT(n) FROM NoticeBoard n WHERE n.writer.username = :username")
     long countUsersPosts(@Param("username") String username);
-
-
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-04 11:05 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
