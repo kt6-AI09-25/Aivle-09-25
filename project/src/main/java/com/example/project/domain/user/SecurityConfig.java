@@ -40,13 +40,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/login", "/register", "/", "/oauth2/**", "/favicon.ico", "/auth/status", "/logout", "/noticeboard/**", "/letters/**")
+                        .ignoringRequestMatchers("/login", "/register", "/", "/oauth2/**", "/favicon.ico", "/auth/status", "/logout", "/noticeboard/**", "/letters/**","/myresults/upload/**")
                 )
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register", "/", "/login", "/ws/**", "/auth/status", "/favicon.ico").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/shared-worker.js", "/favicon.ico", "/myresults/**" ).permitAll()// 정적 리소스 허용
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/shared-worker.js", "/favicon.ico").permitAll()// 정적 리소스 허용
+                        .requestMatchers("/myresults/upload/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
