@@ -201,4 +201,9 @@ public class AdminController {
         userRepository.delete(user); // 사용자 삭제
         return ResponseEntity.ok("사용자가 삭제되었습니다.");
     }
+
+    @GetMapping("/activity")
+    public String activity() {
+        return "admin/activitytest";
+    }
 }
