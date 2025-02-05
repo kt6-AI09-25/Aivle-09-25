@@ -69,23 +69,19 @@
 
         <!-- 카드 형태의 주요 지표 -->
         <div class="dashboard-cards">
-            <!-- 예시 카드 1: 전체 회원 수 -->
             <!-- <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-03 10:40 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
             <div class="card">
                 <h3>전체 회원 수</h3>
                 <p id="total-users">로딩 중...</p>
             </div>
-            <!-- 예시 카드 2: 오늘 신규 가입 -->
             <div class="card">
                 <h3>오늘 신규 가입</h3>
                 <p id="today-joined">로딩 중...</p>
             </div>
-            <!-- 예시 카드 3: 미처리 신고 -->
             <div class="card">
                 <h3>미처리 신고</h3>
                 <p id="unprocessed-reports">로딩 중...</p>
             </div>
-            <!-- 예시 카드 4: 발표 등록 수 -->
             <div class="card">
                 <h3>발표 등록 수</h3>
                 <p id="total-posts">로딩 중...</p>
@@ -94,26 +90,11 @@
         </div>
 
         <!-- 최근 활동 목록 -->
-        <div class="recent-activities">
-            <h3>최근 활동</h3>
-            <ul class="activities-list">
-                <!-- 예시로 회원가입/신고/발표등록 등을 표시 -->
-                <li>
-                    <span class="activity-title">user10님이 회원가입</span>
-                    <span class="activity-time">2025-01-26 12:30</span>
-                </li>
-                <li>
-                    <span class="activity-title">user07님이 발표를 등록</span>
-                    <span class="activity-time">2025-01-26 11:20</span>
-                </li>
-                <li>
-                    <span class="activity-title">user05님 게시글 신고 접수</span>
-                    <span class="activity-time">2025-01-26 10:10</span>
-                </li>
-                <li>
-                    <span class="activity-title">user02님 댓글 신고 접수</span>
-                    <span class="activity-time">2025-01-25 23:59</span>
-                </li>
+        <!-- 변경된 코드: 현재 접속 중인 사용자 목록 -->
+        <div class="online-users">
+            <h3>현재 접속 중인 사용자</h3>
+            <ul id="activeUsersList" class="users-list">
+                <li>로딩 중...</li>
             </ul>
         </div>
 
