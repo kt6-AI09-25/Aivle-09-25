@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <title>관리자 페이지 - 회원 관리</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* 기본 스타일 */
+
+
+
+        /* 회원 관리 섹션 컨테이너 (배경 박스) */
+        .members-section {
+          background-color: #fff;
+          border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          padding: 20px;
+        }
+        .members-section h3 {
+          margin-bottom: 16px;
+          font-size: 1.2rem;
+          font-weight: bold;
+        }
+
+        /* 테이블 래퍼(가로 스크롤 등 필요 시) */
+        .table-wrapper {
+          overflow-x: auto;  /* 표가 너무 넓으면 가로 스크롤 허용 */
+        }
+
+        /* 테이블 스타일 */
+        table {
+          width: 100%;
+          border-collapse: collapse;  /* 테두리를 겹치지 않고 합침 */
+          background-color: #fff;
+          min-width: 700px;           /* 너무 좁아지지 않도록 최소 너비 */
+        }
+        thead {
+          background-color: #f8f8f8;
+        }
+        th, td {
+          padding: 14px 16px;
+          border-bottom: 1px solid #ddd;
+          text-align: center;
+          vertical-align: middle;
+          font-size: 0.95rem;
+        }
+        th {
+          white-space: nowrap;
+          border-bottom: .1px solid #333;
+        }
+        tbody tr:hover {
+          background-color: #f9f9f9;  /* 행에 마우스 오버 시 하이라이트 */
+        }
+
+        /* 버튼 스타일 */
+        button {
+          padding: 6px 12px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.85rem;
+        }
+        .block-btn {
+          background-color: #f0ad4e; /* 주황색 */
+          color: #fff;
+        }
+        .delete-btn {
+          background-color: #d9534f; /* 빨간색 */
+          color: #fff;
+        }
+        button:hover {
+          opacity: 0.9;
+        }
+
+        /* 차단 기간 select */
+        select {
+          padding: 4px;
+          font-size: 0.85rem;
+          margin-right: 6px;
+        }
+
+        /* 반응형 조정 (화면 폭이 좁아질 경우 폰트 크기 조금 줄이기 등) */
+        @media (max-width: 768px) {
+          .page-title {
+            font-size: 1.3rem;
+          }
+          th, td {
+            font-size: 0.9rem;
+            padding: 10px;
+          }
+          .members-section {
+            padding: 15px;
+          }
+        }
+    </style>
+</head>
+<body>
+<!-- 사이드바 -->
+<div th:replace="navbar.html"></div>
+<div class="sidebar">
+    <h2>Admin</h2>
+    <ul class="menu">
+        <li><a href="/admin" class="active">메인</a></li>
+        <li><a href="/admin/members">회원 관리</a></li>
+        <li><a href="/admin/report">게시판 신고 관리</a></li>
+        <li><a href="presentations.html" class="active">발표 내용 조회</a></li>
+        <li><a href="statistics.html">통계 페이지</a></li>
+    </ul>
+
+    <footer class="sidebar-footer">
+        <!-- 홈페이지 링크 -->
+        <a href="/">홈페이지로 돌아가기</a>
+    </footer>
+</div>
+
+<!-- 메인 컨텐츠 -->
+<div class="content">
+
+    <h1 class="page-title">발표 내용 조회</h1>
+    <div class="title-line"></div>
+
+    <div class="dashboard-cards">
+        <!-- 예시 카드 1: 전체 회원 수 -->
+        <div class="card">
+            <h3>행동 점수 평균</h3>
+            <p>95점</p>
+        </div>
+        <!-- 예시 카드 2: 오늘 신규 가입 -->
+        <div class="card">
+            <h3>표정 점수 평균</h3>
+            <p>95점</p>
+        </div>
+        <!-- 예시 카드 3: 미처리 신고 -->
+        <div class="card">
+            <h3>언어 점수 평균</h3>
+            <p>95점</p>
+        </div>
+        <!-- 예시 카드 4: 발표 등록 수 -->
+        <div class="card">
+            <h3>총합 점수 평균</h3>
+            <p>285점</p>
+        </div>
+    </div>
+    <div class="members-section">
+
+        <!-- 테이블 래퍼 -->
+        <!-- 카드 형태의 주요 지표 -->
+
+        <h3>발표 점수 목록</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th>회원 ID</th>
+                    <th>발표 날짜</th>
+                    <th>행동 점수</th>
+                    <th>표정 점수</th>
+                    <th>언어 점수</th>
+                    <th>점수 총합</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- 예시 회원 1 -->
+                <tr>
+                    <td>gildong</td>
+                    <td>2024-02-04</td>
+                    <td>95</td>
+                    <td>95</td>
+                    <td>95</td>
+                    <td>285</td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <canvas id="myChart" width="400" height="200" style="background-color: #fff; margin-top: 20px;"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        window.onload = () => {
+          const ctx = document.getElementById('myChart').getContext('2d');
+
+          // 0~99까지 1단위 라벨 생성
+          const labels = [];
+            labels.push("0~100".toString());
+
+          // 100~300까지 20단위 라벨 생성
+          for (let i = 100; i < 300; i += 20) {
+            labels.push(`${i}~${i + 20}`);
+          }
+
+          // 임의 데이터(라벨 갯수만큼 무작위 값 생성)
+          const dataValues = labels.map(() => Math.floor(Math.random() * 500));
+
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: '점수',
+                data: dataValues,
+                backgroundColor: 'rgba(54, 162, 235, 0.7)'
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        }
+    </script>
+</div><!-- /.content -->
+</body>
+</html>
