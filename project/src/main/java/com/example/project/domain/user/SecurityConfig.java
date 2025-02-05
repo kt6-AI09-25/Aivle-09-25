@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register", "/", "/login", "/ws/**", "/auth/status", "/favicon.ico").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/shared-worker.js", "/favicon.ico", "/myresults/**").permitAll()// 정적 리소스 허용
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/shared-worker.js", "/favicon.ico", "/myresults/**" ).permitAll()// 정적 리소스 허용
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
