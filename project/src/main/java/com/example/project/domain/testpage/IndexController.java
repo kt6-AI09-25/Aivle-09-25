@@ -50,6 +50,11 @@ public class IndexController {
         return "choice"; // test.html 반환
     }
 
+    @GetMapping("/pr_test")
+    public String pr_test() {
+        return "pr_test"; // templates/test.html을 렌더링
+    }
+
     @GetMapping("/myresult")
     public String myResult(
             @RequestParam(value = "userId", required = false) Long userId,
