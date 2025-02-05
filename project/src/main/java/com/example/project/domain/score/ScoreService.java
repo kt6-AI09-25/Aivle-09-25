@@ -21,7 +21,7 @@ public class ScoreService {
 
     @Transactional
     public void saveScoreData(Map<String, Object> result, User user, File file) {
-        // 1. Score 엔티티 생성 및 데이터 저장
+        // Score 엔티티 생성 및 데이터 저장
         Score score = new Score();
         score.setStatus("COMPLETED");
         score.setTotalScore(Optional.ofNullable((Double) result.get("totalScore")).orElse(0.0));
@@ -36,7 +36,7 @@ public class ScoreService {
         score.setFile(file);
         score.setScript(Optional.ofNullable((String) result.get("script")).orElse(""));
 
-        // MotionTimes 저장 (리스트 저장)
+        // MotionTimes 저장
         List<MotionTimes> motionTimesList = new ArrayList<>();
         Map<String, List<Double>> motionTimes = (Map<String, List<Double>>) result.get("motionTimes");
         if (motionTimes != null) {
@@ -88,18 +88,16 @@ public class ScoreService {
     }
 
     /**
-     * 특정 사용자의 이전 점수를 가져오는 메서드
+     * 특정 사용자의 이전 점수를 가져오는 메서드.
      */
     public List<Score> getPreviousScores(Long userId) {
-        return scoreRepository.findByUserId(userId);
+        return scoreRepository.findByUserIdWithDetails(userId);
     }
 
-    /**
-     * 특정 사용자의 현재 평가 중인 점수를 가져오는 메서드
-     */
+
     public Map<String, Object> getEvaluatingScore(Long userId) {
         return scoreRepository.findByUserIdAndStatus(userId, "IN_PROGRESS")
-                .stream().findFirst() //  리스트에서 첫 번째 값 가져오기
+                .stream().findFirst()
                 .map(score -> {
                     Map<String, Object> result = new HashMap<>();
                     result.put("scoreId", score.getScoreId());
@@ -108,13 +106,24 @@ public class ScoreService {
                     result.put("expressionScore", score.getExpressionScore());
                     result.put("languageScore", score.getLanguageScore());
                     result.put("tempo", score.getTempo());
-                    result.put("status", score.getStatus());
-                    result.put("fileName", score.getFile() != null ? score.getFile().getFilePath() : "파일 없음");
+                    result.put("motionFrequency", score.getMotionFrequency());
+                    result.put("expressionFrequency", score.getExpressionFrequency());
+                    result.put("languageFrequency", score.getLanguageFrequency());
                     result.put("script", score.getScript());
+                    result.put("date", score.getDate().toString()); // 이유찬 수정
+                    result.put("userId", score.getUser().getId());   // 이유찬 수정
+                    if (score.getFile() != null) {
+                        result.put("fileId", score.getFile().getFileId());
+                        result.put("fileName", score.getFile().getFilePath());
+                    } else {
+                        result.put("fileId", null);
+                        result.put("fileName", "파일 없음");
+                    }
                     return result;
                 })
-                .orElseGet(HashMap::new); // ✅
+                .orElseGet(HashMap::new);
     }
+
 
     public Long getLoggedInUserId(String username) {
         return userRepository.findByUsername(username)
