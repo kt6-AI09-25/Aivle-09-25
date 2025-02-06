@@ -4,9 +4,11 @@ import com.example.project.domain.file.File;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -189,4 +191,49 @@ public class ScoreService {
         }
         return null;
     }
+
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-06 09:42 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    public Double getAverageMotionScore() {
+        return scoreRepository.getAverageMotionScore();
+    }
+
+    public Double getAverageExpressionScore() {
+        return scoreRepository.getAverageExpressionScore();
+    }
+
+    public Double getAverageLanguageScore() {
+        return scoreRepository.getAverageLanguageScore();
+    }
+
+    public List<Map<String, Object>> getRecentScoresCount() {
+        // 최근 7일 날짜 리스트 생성
+        LocalDate today = LocalDate.now();
+        Map<LocalDate, Integer> dateCountMap = new LinkedHashMap<>();
+
+        for (int i = 6; i >= 0; i--) {  // 7일 전부터 오늘까지
+            dateCountMap.put(today.minusDays(i), 0);
+        }
+
+        // DB에서 가져온 데이터 반영
+        List<Object[]> results = scoreRepository.getRecentScoresCount();
+        for (Object[] result : results) {
+            LocalDate date = ((java.sql.Date) result[0]).toLocalDate();
+            int count = ((Number) result[1]).intValue();
+            dateCountMap.put(date, count);
+        }
+
+        // 최종적으로 날짜와 개수를 리스트로 변환하여 반환
+        List<Map<String, Object>> response = new ArrayList<>();
+        for (Map.Entry<LocalDate, Integer> entry : dateCountMap.entrySet()) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("date", entry.getKey().toString()); // 날짜
+            data.put("count", entry.getValue()); // 등록 개수
+            response.add(data);
+        }
+
+        return response;
+    }
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

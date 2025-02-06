@@ -136,4 +136,24 @@ public class ScoreController {
         return ResponseEntity.ok(response);
     }
 
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-06 09:42 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    @GetMapping("/averages")
+    @ResponseBody
+    public ResponseEntity<Map<String, Double>> getAverageScores() {
+        Map<String, Double> averages = new HashMap<>();
+        averages.put("motionScore", scoreService.getAverageMotionScore());
+        averages.put("expressionScore", scoreService.getAverageExpressionScore());
+        averages.put("languageScore", scoreService.getAverageLanguageScore());
+        return ResponseEntity.ok(averages);
+    }
+
+    @GetMapping("/recent-counts")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, Object>>> getRecentScoresCount() {
+        return ResponseEntity.ok(scoreService.getRecentScoresCount());
+    }
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 }

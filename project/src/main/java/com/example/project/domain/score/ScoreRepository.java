@@ -20,4 +20,24 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "WHERE s.user.id = :userId")
     List<Score> findByUserIdWithDetails(@Param("userId") Long userId);
 
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-06 09:42 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    @Query("SELECT AVG(s.motionScore) FROM Score s")
+    Double getAverageMotionScore();
+
+    @Query("SELECT AVG(s.expressionScore) FROM Score s")
+    Double getAverageExpressionScore();
+
+    @Query("SELECT AVG(s.languageScore) FROM Score s")
+    Double getAverageLanguageScore();
+
+    @Query("SELECT DATE(s.date) as date, COUNT(s) as count " +
+            "FROM Score s " +
+            "WHERE s.date >= CURRENT_DATE - 7 " +
+            "GROUP BY DATE(s.date) " +
+            "ORDER BY DATE(s.date) ASC")
+    List<Object[]> getRecentScoresCount();
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 }
