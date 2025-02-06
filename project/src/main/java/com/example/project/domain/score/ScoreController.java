@@ -174,8 +174,25 @@ public class ScoreController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/all")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, Object>>> getAllScores() {
+        List<Score> scores = scoreService.getAllScores();
 
+        // 필요한 데이터만 추려서 반환
+        List<Map<String, Object>> response = scores.stream().map(score -> {
+            Map<String, Object> data = new HashMap<>();
+            data.put("scoreId", score.getScoreId());
+            data.put("totalScore", score.getTotalScore());
+            data.put("motionScore", score.getMotionScore());
+            data.put("expressionScore", score.getExpressionScore());
+            data.put("languageScore", score.getLanguageScore());
+            return data;
+        }).toList();
 
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        return ResponseEntity.ok(response);
+    }
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 }

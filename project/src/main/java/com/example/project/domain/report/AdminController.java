@@ -8,6 +8,9 @@ import com.example.project.domain.letter.LetterService;
 import com.example.project.domain.noticeboard.NoticeBoardDTO;
 import com.example.project.domain.noticeboard.NoticeBoardRepository;
 import com.example.project.domain.noticeboard.NoticeBoardService;
+import com.example.project.domain.score.Score;
+import com.example.project.domain.score.ScoreDTO;
+import com.example.project.domain.score.ScoreService;
 import com.example.project.domain.user.CustomUserDetailsService;
 import com.example.project.domain.user.UpdateUserRole;
 import com.example.project.domain.user.User;
@@ -34,7 +37,7 @@ public class AdminController {
     private final LetterService letterService;
     private final CustomUserDetailsService customUserDetailsService;
     private final UserRepository userRepository;
-    private final NoticeBoardRepository noticeBoardRepository;
+    private final ScoreService scoreService;
 
     @GetMapping("/report")
     public String list(Model model) {
@@ -207,5 +210,9 @@ public class AdminController {
         return ResponseEntity.ok("사용자가 삭제되었습니다.");
     }
 
-
+    @GetMapping("/visualization")
+    public String showScoreVisualization(@RequestParam(value = "scoreId", required = false) Long scoreId, Model model) {
+        model.addAttribute("scoreId", scoreId);
+        return "/admin/temp_graph";
+    }
 }
