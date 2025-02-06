@@ -264,5 +264,9 @@ public class ScoreService {
                 .orElse("알 수 없음");
     }
 
+    public List<Score> getAllScores() {
+        return scoreRepository.findAll();
+    }
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
