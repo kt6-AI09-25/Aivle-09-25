@@ -20,255 +20,468 @@
 <div id="loginModal" class="modal">
   <div class="modal-content">
     <span class="close" id="closeLogin">&times;</span>
-    <h2>로그인</h2>
+    <h2><img src="/images/logo2.png" alt="Logo" id="logoIcon" /></h2>
     <form id="loginForm">
-      <input type="text" name="username" placeholder="아이디" required autocomplete="on"> <!-- autocomplete 추가 -->
-      <input type="password" name="password" placeholder="비밀번호" required autocomplete="on"> <!-- autocomplete 추가 -->
-      <div>
-        <input type="checkbox" id="rememberId"> <label for="rememberId">아이디 저장</label>
+      <input type="text" name="username" placeholder="아이디" required autocomplete="on" />
+      <div class="password-container">
+        <input type="password" name="password" id="loginpassword" placeholder="비밀번호" required autocomplete="on" />
+        <img src="/images/hide.png" id="logintogglePassword" class="toggle-password" alt="Hide/Show Password" />
       </div>
-      <button type="button" id="kakaoLoginBtn" class="kakao-login-button">
-        <img src="/images/kakao_login_medium_narrow.png" alt="카카오 로그인" style="height: 30px;"> <!-- 카카오 로그인 이미지 -->
-      </button>
-      <button type="submit">로그인</button>
-      <button type="button" id="goToSignup">회원가입</button>
+
+      <!-- 로그인 버튼 추가 -->
+      <button type="submit" id="loginBtn2" class="login-button">로그인</button>
+
+      <!-- 간편 로그인 구분선 위에 추가된 회원 가입 안내 -->
+      <div class="join-container">
+        <span class="join-text">아직 회원이 아니신가요?</span>
+        <a href="#" id="goToSignup" class="signup-link">회원 가입</a>
+      </div>
+
+      <!-- 간편 로그인 구분선 -->
+      <div class="divider-container">
+        <div class="divider-line"></div>
+        <div class="divider-text">간편 로그인</div>
+        <div class="divider-line"></div>
+      </div>
+      <button type="button" id="kakaoLoginBtn" class="kakao-login-button"><img src="/images/kakao_logo.png" alt="Kakao로 로그인" style="height: 13px;" /> Kakao로 로그인</button>
     </form>
   </div>
 </div>
 
 <!-- 회원가입 모달 -->
-<div id="signupModal" class="modal" style="display: none;">
-  <div class="modal-content">
+<div id="signupModal" class="modal2" style="display: none;">
+  <div class="modal2-content">
     <span class="close" id="closeSignup">&times;</span>
     <h2>회원가입</h2>
+    <br />
     <form id="signupForm">
-      <input type="text" name="nickname" placeholder="닉네임" required autocomplete="off"> <!-- autocomplete 추가 -->
-      <input type="text" name="username" placeholder="아이디" required autocomplete="off"> <!-- autocomplete 추가 -->
-      <input type="password" name="password" placeholder="비밀번호" required autocomplete="off"> <!-- autocomplete 추가 -->
-      <button type="submit">가입완료</button>
+      <input type="text" name="nickname" placeholder="닉네임" required autocomplete="off" />
+      <input type="text" name="username" placeholder="아이디" required autocomplete="off" />
+      <!-- 비밀번호 입력 필드 + 토글 아이콘 -->
+      <div class="password-container">
+        <input type="password" name="password" id="password" placeholder="비밀번호" required autocomplete="off" />
+        <img src="/images/hide.png" id="togglePassword" class="toggle-password" alt="비밀번호 보이기/숨기기" />
+      </div>
+      <!-- 비밀번호 조건 -->
+      <div class="password-rules">
+        <div class="password-rule">
+          <img src="/images/check1.png" class="check-icon" alt="Check Icon" />
+          <p>영문/숫자/특수문자 중, 2가지 이상 포함</p>
+        </div>
+        <div class="password-rule">
+          <img src="/images/check1.png" class="check-icon" alt="Check Icon" />
+          <p>8자 이상 32자 이하 입력 (공백 제외)</p>
+        </div>
+        <div class="password-rule">
+          <img src="/images/check1.png" class="check-icon" alt="Check Icon" />
+          <p>연속 3자 이상 동일한 문자/숫자 제외</p>
+        </div>
+      </div>
+      <br />
+      <!-- 비밀번호 확인 필드 + 토글 아이콘 -->
+      <div class="password-container">
+        <input type="password" name="passwordConfirm" id="passwordConfirm" placeholder="비밀번호 확인" required autocomplete="off" />
+        <img src="/images/hide.png" id="togglePasswordConfirm" class="toggle-password" alt="비밀번호 보이기/숨기기" />
+      </div>
+
+      <!-- 비밀번호 확인 메시지 -->
+      <div id="passwordMatchMessage" class="password-rule" style="display: none;">
+        <img id="passwordMatchIcon" src="/images/check1.png" class="check-icon" alt="Check Icon" />
+        <p id="passwordMatchText"></p>
+      </div>
+      <br />
+      <!-- 회원가입 버튼 추가 -->
+      <button type="submit" id="joinBtn" class="join-button">회원가입</button>
     </form>
+
+    <!-- 로그인 안내 문구 -->
+    <div class="login-container">
+      <span class="login-text">이미 회원이신가요?</span>
+      <a href="#" id="goToLogin" class="login-link">로그인</a>
+    </div>
   </div>
 </div>
 
 <!-- JavaScript 코드 추가 -->
 <script>
-  var signupModal = document.getElementById("signupModal");
-  var loginModal = document.getElementById("loginModal");
-  var isLoggedIn = false;
 
-  // 백엔드에서 로그인 상태 동기화
-  fetch('/auth/status')
-      .then(response => response.json())
-      .then(data => {
-          isLoggedIn = data.isLoggedIn;
-          if (isLoggedIn) {
-              document.getElementById("nickname").innerText = data.username;
-              document.getElementById("nickname").style.display = "inline";
-              document.getElementById("logoutBtn").style.display = "inline";
-              document.querySelector(".signup-button").style.display = "none";
-              document.querySelector(".login-button").style.display = "none";
-          }
-      });
+  // 비밀번호 확인 로직 (업데이트된 부분 포함)
 
-  // 회원가입 버튼 클릭 시 모달 열기
-  document.getElementById("signupBtn").onclick = function() {
-      signupModal.style.display = "block";
+function checkPasswordMatch() {
+  const password = document.getElementById('password').value
+  const passwordConfirm = document.getElementById('passwordConfirm').value
+  const passwordMatchMessage = document.getElementById('passwordMatchMessage')
+  const passwordMatchIcon = document.getElementById('passwordMatchIcon')
+  const passwordMatchText = document.getElementById('passwordMatchText')
+  const joinBtn = document.getElementById('joinBtn')
+
+  if (passwordConfirm) {
+    if (password === passwordConfirm) {
+      passwordMatchMessage.style.display = 'flex'
+      passwordMatchIcon.src = '/images/check2.png'
+      passwordMatchText.textContent = '확인 완료'
+      passwordMatchText.style.color = '#2ecc71' // 성공 색상
+      passwordMatchIcon.style.width = '16px'
+      passwordMatchIcon.style.height = '16px'
+      joinBtn.disabled = false // 비밀번호가 일치하면 버튼 활성화
+    } else {
+      passwordMatchMessage.style.display = 'flex'
+      passwordMatchIcon.src = '/images/check3.png'
+      passwordMatchText.textContent = '비밀번호가 일치하지 않습니다.'
+      passwordMatchText.style.color = '#f44336' // 에러 색상
+      passwordMatchIcon.style.width = '9px'
+      passwordMatchIcon.style.height = '9px'
+      joinBtn.disabled = true // 비밀번호 불일치 시 버튼 비활성화
+    }
+  } else {
+    passwordMatchMessage.style.display = 'none'
+    joinBtn.disabled = true // 비밀번호 확인란이 비어 있으면 버튼 비활성화
+  }
+}
+
+// 비밀번호와 비밀번호 확인 필드에서 입력이 변경될 때마다 확인
+document.getElementById('password').addEventListener('input', checkPasswordMatch)
+document.getElementById('passwordConfirm').addEventListener('input', checkPasswordMatch)
+
+const passwordField = document.getElementById('password')
+const joinBtn = document.getElementById('joinBtn')
+const ruleIcons = document.querySelectorAll('.password-rule img')
+const ruleTexts = document.querySelectorAll('.password-rule p') // 조건 텍스트
+
+// 비밀번호 규칙 체크 함수
+function checkPasswordRules() {
+  const password = passwordField.value.trim()
+  let conditionsMet = [false, false, false]
+
+  // 1️⃣ 영문/숫자/특수문자 중 2가지 이상 포함
+  if ((/[a-zA-Z]/.test(password) && /\d/.test(password)) || (/[a-zA-Z]/.test(password) && /[^a-zA-Z0-9]/.test(password)) || (/\d/.test(password) && /[^a-zA-Z0-9]/.test(password))) {
+    conditionsMet[0] = true
   }
 
-  // 로그인 버튼 클릭 시 모달 열기
-  document.getElementById("loginBtn").onclick = function() {
-      loginModal.style.display = "block";
+  // 2️⃣ 8자 이상 32자 이하 (공백 제외)
+  if (password.length >= 8 && password.length <= 32 && !/\s/.test(password)) {
+    conditionsMet[1] = true
   }
 
-  // 모달 닫기
-  document.getElementById("closeSignup").onclick = function() {
-      signupModal.style.display = "none";
-      document.getElementById("signupForm").reset(); // 회원가입 입력 필드 초기화
+  // 3️⃣ 연속 3자 이상 동일한 문자/숫자 제외
+  if (!/(.)\1\1/.test(password)) {
+    conditionsMet[2] = true
   }
 
-  document.getElementById("closeLogin").onclick = function() {
-      loginModal.style.display = "none";
-      document.getElementById("loginForm").reset(); // 로그인 입력 필드 초기화
+  // UI 업데이트
+  conditionsMet.forEach((met, index) => {
+    if (password === '') {
+      ruleIcons[index].src = '/images/check1.png' // 입력 없음 (기본 상태)
+      ruleTexts[index].style.color = '#868e96' // 기본 색
+      ruleIcons[index].style.width = '16px'
+      ruleIcons[index].style.height = '16px'
+    } else if (met) {
+      ruleIcons[index].src = '/images/check2.png' // 조건 충족 (초록색)
+      ruleTexts[index].style.color = '#2ecc71'
+      ruleIcons[index].style.width = '16px'
+      ruleIcons[index].style.height = '16px'
+    } else {
+      ruleIcons[index].src = '/images/check3.png' // 조건 불충족 (빨간색)
+      ruleTexts[index].style.color = '#F44336'
+      ruleIcons[index].style.width = '9px'
+      ruleIcons[index].style.height = '9px'
+    }
+  })
+
+  // 모든 조건 만족 시 회원가입 버튼 활성화
+  joinBtn.disabled = !conditionsMet.every(Boolean)
+}
+
+// 비밀번호 입력 시 조건 실시간 체크
+passwordField.addEventListener('input', checkPasswordRules)
+
+// 비밀번호 보이기/숨기기 토글 기능
+document.getElementById('togglePassword').onclick = function () {
+  const passwordField = document.getElementById('password')
+  const toggleIcon = document.getElementById('togglePassword')
+
+  if (passwordField.type === 'password') {
+    passwordField.type = 'text' // 비밀번호를 텍스트로 보이게 설정
+    toggleIcon.src = '/images/show.png' // 아이콘을 show로 변경
+  } else {
+    passwordField.type = 'password' // 비밀번호를 숨김으로 설정
+    toggleIcon.src = '/images/hide.png' // 아이콘을 hide로 변경
   }
+}
+// 비밀번호 보이기/숨기기 토글 기능 (비밀번호 확인 필드)
+document.getElementById('togglePasswordConfirm').onclick = function () {
+  const passwordConfirmField = document.getElementById('passwordConfirm')
+  const toggleConfirmIcon = document.getElementById('togglePasswordConfirm')
 
-  // 모달 외부 클릭으로 절대 닫히지 않도록 설정
-  signupModal.addEventListener('click', function(event) {
-      if (event.target === signupModal) {
-          event.stopPropagation();
-      }
-  });
-
-  loginModal.addEventListener('click', function(event) {
-      if (event.target === loginModal) {
-          event.stopPropagation();
-      }
-  });
-
-  // 모든 보호된 링크 클릭 시 로그인 요구
-  document.querySelectorAll('.protected').forEach(function(link) {
-      link.onclick = function(event) {
-          if (!isLoggedIn) {
-              event.preventDefault(); // 기본 링크 동작 방지
-              alert("로그인 후 이용해 주세요."); // 로그인 필요 알림
-              loginModal.style.display = "block"; // 로그인 모달 열기
-          }
-      }
-  });
-
-  // 회원가입 폼 제출 처리
-  document.getElementById("signupForm").onsubmit = function(event) {
-      event.preventDefault(); // 기본 제출 이벤트 방지
-      var nickname = document.getElementById("nickname").value; // 입력된 닉네임 가져오기
-
-      // 회원가입 완료 메시지 표시
-      alert("회원가입이 완료되었습니다.");
-
-      // 모달 닫기 및 로그인 모달 열기
-      signupModal.style.display = "none";
-      loginModal.style.display = "block"; // 로그인 모달 열기
-
-      // 세션 스토리지에 닉네임 저장
-      sessionStorage.setItem("nickname", nickname);
+  if (passwordConfirmField.type === 'password') {
+    passwordConfirmField.type = 'text' // 비밀번호 확인을 텍스트로 표시
+    toggleConfirmIcon.src = '/images/show.png' // 아이콘 변경
+  } else {
+    passwordConfirmField.type = 'password' // 비밀번호 확인을 숨김으로 설정
+    toggleConfirmIcon.src = '/images/hide.png' // 아이콘 변경
   }
+}
+// 비밀번호 보이기/숨기기 토글 기능 (로그인 필드)
+document.getElementById('logintogglePassword').onclick = function () {
+  const loginpasswordConfirmField = document.getElementById('loginpassword')
+  const logintoggleConfirmIcon = document.getElementById('logintogglePassword')
 
-  // 로그인 폼 제출 처리
-  document.getElementById("loginForm").onsubmit = function(event) {
-      event.preventDefault(); // 기본 제출 이벤트 방지
-
-      // 로그인 처리 로직 추가 (예: AJAX 요청)
-      // 예시: 로그인 성공 시
-      isLoggedIn = true; // 로그인 상태 업데이트
-      sessionStorage.setItem("isLoggedIn", "true"); // 세션 스토리지에 로그인 상태 저장
-
-      // 예시 닉네임 (실제 구현 시 서버에서 받아온 닉네임으로 변경)
-      var nickname = sessionStorage.getItem("nickname") || "사용자닉네임";
-      document.getElementById("nickname").innerText = nickname; // 닉네임 표시
-      document.getElementById("nickname").style.display = "inline"; // 닉네임 보이기
-      document.getElementById("logoutBtn").style.display = "inline"; // 로그아웃 버튼 보이기
-      document.querySelector(".signup-button").style.display = "none"; // 회원가입 버튼 숨기기
-      document.querySelector(".login-button").style.display = "none"; // 로그인 버튼 숨기기
-
-      // 로그인 모달 닫기
-      loginModal.style.display = "none";
+  if (loginpasswordConfirmField.type === 'password') {
+    loginpasswordConfirmField.type = 'text' // 비밀번호 확인을 텍스트로 표시
+    logintoggleConfirmIcon.src = '/images/show.png' // 아이콘 변경
+  } else {
+    loginpasswordConfirmField.type = 'password' // 비밀번호 확인을 숨김으로 설정
+    logintoggleConfirmIcon.src = '/images/hide.png' // 아이콘 변경
   }
+}
+var signupModal = document.getElementById("signupModal");
+var loginModal = document.getElementById("loginModal");
+var isLoggedIn = false;
 
-  // 카카오 로그인 버튼 클릭 처리
-  document.getElementById("kakaoLoginBtn").onclick = function () {
-    window.location.href = "/oauth2/authorization/kakao"; // Spring Security OAuth2 경로
-  };
+// 백엔드에서 로그인 상태 동기화
+fetch('/auth/status')
+.then(response => response.json())
+.then(data => {
+isLoggedIn = data.isLoggedIn;
+if (isLoggedIn) {
+  document.getElementById("nickname").innerText = data.username;
+  document.getElementById("nickname").style.display = "inline";
+  document.getElementById("logoutBtn").style.display = "inline";
+  document.querySelector(".signup-button").style.display = "none";
+  document.querySelector(".login-button").style.display = "none";
+}
+});
 
-  // 로그아웃 함수 정의
-  function handleLogout() {
-      fetch('/logout', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-      })
-      .then(response => {
-          if (response.ok) {
-              isLoggedIn = false;
-              sessionStorage.removeItem("isLoggedIn"); // 세션 스토리지에서 로그인 상태 삭제
-              sessionStorage.removeItem("nickname");  // 세션 스토리지에서 닉네임 삭제
+// 회원가입 버튼 클릭 시 모달 열기
+document.getElementById("signupBtn").onclick = function() {
+signupModal.style.display = "block";
+}
 
-              // UI 업데이트
-              document.getElementById("nickname").style.display = "none"; // 닉네임 숨기기
-              document.getElementById("logoutBtn").style.display = "none"; // 로그아웃 버튼 숨기기
-              document.querySelector(".signup-button").style.display = "inline"; // 회원가입 버튼 보이기
-              document.querySelector(".login-button").style.display = "inline"; // 로그인 버튼 보이기
+// 로그인 버튼 클릭 시 모달 열기
+document.getElementById("loginBtn").onclick = function() {
+loginModal.style.display = "block";
+}
 
-              alert("로그아웃되었습니다.");
+// 회원가입 페이지 이동 처리
+document.getElementById('goToSignup').onclick = function () {
+ document.getElementById("loginModal").style.display = "none"; // 로그인 모달 닫기
+ signupModal.style.display = "block"; // 회원가입 페이지로 이동
+}
 
-              window.location.href = "/"; // 로그아웃 후 홈으로 리디렉션
-          } else {
-              alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
-          }
-      })
-      .catch(error => {
-          console.error("Logout Error:", error);
-          alert("로그아웃 중 오류가 발생했습니다.");
-      });
-  }
+// 로그인 페이지 이동 처리
+document.getElementById('goToLogin').onclick = function () {
+ document.getElementById("signupModal").style.display = "none"; // 회원가입 모달 닫기
+ loginModal.style.display = "block"; // 로그인 페이지로 이동
+}
 
-  // 강제 로그아웃 함수 정의
-  function forceLogout() {
-      fetch('/logout', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-      })
-      .then(response => {
-          if (response.ok) {
-              isLoggedIn = false;
-              sessionStorage.removeItem("isLoggedIn"); // 세션 스토리지에서 로그인 상태 삭제
-              sessionStorage.removeItem("nickname");  // 세션 스토리지에서 닉네임 삭제
+// 모달 닫기
+document.getElementById("closeSignup").onclick = function() {
+signupModal.style.display = "none";
+document.getElementById("signupForm").reset(); // 회원가입 입력 필드 초기화
+}
 
-              // UI 업데이트
-              document.getElementById("nickname").style.display = "none"; // 닉네임 숨기기
-              document.getElementById("logoutBtn").style.display = "none"; // 로그아웃 버튼 숨기기
-              document.querySelector(".signup-button").style.display = "inline"; // 회원가입 버튼 보이기
-              document.querySelector(".login-button").style.display = "inline"; // 로그인 버튼 보이기
+document.getElementById("closeLogin").onclick = function() {
+loginModal.style.display = "none";
+document.getElementById("loginForm").reset(); // 로그인 입력 필드 초기화
+}
 
-              alert("중복된 로그인이 감지되어 일괄 로그아웃 처리되었습니다.");
+// 모달 외부 클릭으로 절대 닫히지 않도록 설정
+signupModal.addEventListener('click', function(event) {
+if (event.target === signupModal) {
+event.stopPropagation();
+}
+});
 
-              window.location.href = "/";
+loginModal.addEventListener('click', function(event) {
+if (event.target === loginModal) {
+event.stopPropagation();
+}
+});
 
-          } else {
-              alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
-          }
-      })
-      .catch(error => {
-          console.error("Logout Error:", error);
-          alert("로그아웃 중 오류가 발생했습니다.");
-      });
-  }
+// 모든 보호된 링크 클릭 시 로그인 요구
+document.querySelectorAll('.protected').forEach(function(link) {
+link.onclick = function(event) {
+if (!isLoggedIn) {
+  event.preventDefault(); // 기본 링크 동작 방지
+  alert("로그인 후 이용해 주세요."); // 로그인 필요 알림
+  loginModal.style.display = "block"; // 로그인 모달 열기
+}
+}
+});
+
+// 회원가입 폼 제출 처리
+document.getElementById("signupForm").onsubmit = function(event) {
+event.preventDefault(); // 기본 제출 이벤트 방지
+var nickname = document.getElementById("nickname").value; // 입력된 닉네임 가져오기
+
+// 회원가입 완료 메시지 표시
+alert("회원가입이 완료되었습니다.");
+
+// 모달 닫기 및 로그인 모달 열기
+signupModal.style.display = "none";
+loginModal.style.display = "block"; // 로그인 모달 열기
+
+// 세션 스토리지에 닉네임 저장
+sessionStorage.setItem("nickname", nickname);
+}
+
+// 로그인 폼 제출 처리
+document.getElementById("loginForm").onsubmit = function(event) {
+event.preventDefault(); // 기본 제출 이벤트 방지
+
+// 로그인 처리 로직 추가 (예: AJAX 요청)
+// 예시: 로그인 성공 시
+isLoggedIn = true; // 로그인 상태 업데이트
+sessionStorage.setItem("isLoggedIn", "true"); // 세션 스토리지에 로그인 상태 저장
+
+// 예시 닉네임 (실제 구현 시 서버에서 받아온 닉네임으로 변경)
+var nickname = sessionStorage.getItem("nickname") || "사용자닉네임";
+document.getElementById("nickname").innerText = nickname; // 닉네임 표시
+document.getElementById("nickname").style.display = "inline"; // 닉네임 보이기
+document.getElementById("logoutBtn").style.display = "inline"; // 로그아웃 버튼 보이기
+document.querySelector(".signup-button").style.display = "none"; // 회원가입 버튼 숨기기
+document.querySelector(".login-button").style.display = "none"; // 로그인 버튼 숨기기
+
+// 로그인 모달 닫기
+loginModal.style.display = "none";
+}
+
+// 카카오 로그인 버튼 클릭 처리
+document.getElementById("kakaoLoginBtn").onclick = function () {
+window.location.href = "/oauth2/authorization/kakao"; // Spring Security OAuth2 경로
+};
+
+// 로그아웃 함수 정의
+function handleLogout() {
+fetch('/logout', {
+method: 'POST',
+headers: {
+  'Content-Type': 'application/json',
+},
+})
+.then(response => {
+if (response.ok) {
+  isLoggedIn = false;
+  sessionStorage.removeItem("isLoggedIn"); // 세션 스토리지에서 로그인 상태 삭제
+  sessionStorage.removeItem("nickname");  // 세션 스토리지에서 닉네임 삭제
+
+  // UI 업데이트
+  document.getElementById("nickname").style.display = "none"; // 닉네임 숨기기
+  document.getElementById("logoutBtn").style.display = "none"; // 로그아웃 버튼 숨기기
+  document.querySelector(".signup-button").style.display = "inline"; // 회원가입 버튼 보이기
+  document.querySelector(".login-button").style.display = "inline"; // 로그인 버튼 보이기
+
+  alert("로그아웃되었습니다.");
+
+  window.location.href = "/"; // 로그아웃 후 홈으로 리디렉션
+} else {
+  alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
+}
+})
+.catch(error => {
+console.error("Logout Error:", error);
+alert("로그아웃 중 오류가 발생했습니다.");
+});
+}
+
+// 강제 로그아웃 함수 정의
+function forceLogout() {
+fetch('/logout', {
+method: 'POST',
+headers: {
+  'Content-Type': 'application/json',
+},
+})
+.then(response => {
+if (response.ok) {
+  isLoggedIn = false;
+  sessionStorage.removeItem("isLoggedIn"); // 세션 스토리지에서 로그인 상태 삭제
+  sessionStorage.removeItem("nickname");  // 세션 스토리지에서 닉네임 삭제
+
+  // UI 업데이트
+  document.getElementById("nickname").style.display = "none"; // 닉네임 숨기기
+  document.getElementById("logoutBtn").style.display = "none"; // 로그아웃 버튼 숨기기
+  document.querySelector(".signup-button").style.display = "inline"; // 회원가입 버튼 보이기
+  document.querySelector(".login-button").style.display = "inline"; // 로그인 버튼 보이기
+
+  alert("중복된 로그인이 감지되어 일괄 로그아웃 처리되었습니다.");
+
+  window.location.href = "/";
+
+} else {
+  alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
+}
+})
+.catch(error => {
+console.error("Logout Error:", error);
+alert("로그아웃 중 오류가 발생했습니다.");
+});
+}
 
 
-  // 로그아웃 버튼 클릭 처리
-  document.getElementById("logoutBtn").onclick = handleLogout;
-  
-  
-  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-17 15:26 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-      const worker = new SharedWorker("/shared-worker.js?nocache=" + Date.now());
-    let currentUsername = null; // 사용자 이름 저장
+// 로그아웃 버튼 클릭 처리
+document.getElementById("logoutBtn").onclick = handleLogout;
 
-    worker.port.start(); // SharedWorker 시작
 
-    // SharedWorker 메시지 수신
-    worker.port.onmessage = function (event) {
-        console.log("Message received from SharedWorker:", event.data);
-        const data = event.data;
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-01-17 15:26 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+const worker = new SharedWorker("/shared-worker.js?nocache=" + Date.now());
+let currentUsername = null; // 사용자 이름 저장
 
-        if (data.type === "activeUsers") {
-            console.log("Active users received:", data.data);
-            // 여기서 활성 사용자 목록을 업데이트하거나 필요한 작업 수행
-        } else if (data.type === "connected") {
-            console.log("WebSocket connected via SharedWorker.");
-        } else if (data.type === "requestUsername" && currentUsername) {
-            // SharedWorker로 사용자 이름 다시 전달
-            worker.port.postMessage({ type: "connect", username: currentUsername });
-        } else if (data.type === "forceLogout") {
-            console.log("Forced logout received in client. Redirecting...");
-            forceLogout();
-        }
-    };
+worker.port.start(); // SharedWorker 시작
 
-    // 페이지 로드 시 사용자 상태 동기화
-    fetch('/auth/status')
-        .then(response => response.json())
-        .then(data => {
-            if (data.isLoggedIn) {
-                currentUsername = data.username; // 사용자 이름 저장
-                worker.port.postMessage({ type: "connect", username: currentUsername });
-            }
-        });
+// SharedWorker 메시지 수신
+worker.port.onmessage = function (event) {
+const data = event.data;
 
-    // 페이지 종료 시 navigate 이벤트 전송
-    window.addEventListener('beforeunload', () => {
-        worker.port.postMessage({ type: "navigate", username: currentUsername });
-    });
+if (data.type === "activeUsers") {
+updateActiveUsersList(data.data);
+// 여기서 활성 사용자 목록을 업데이트하거나 필요한 작업 수행
+} else if (data.type === "connected") {
+} else if (data.type === "requestUsername" && currentUsername) {
+// SharedWorker로 사용자 이름 다시 전달
+worker.port.postMessage({ type: "connect", username: currentUsername });
+} else if (data.type === "forceLogout") {
+forceLogout();
+}
+};
 
-    console.log("SharedWorker initialized in navbar.");
-  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-17 15:26 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// 페이지 로드 시 사용자 상태 동기화
+fetch('/auth/status')
+.then(response => response.json())
+.then(data => {
+if (data.isLoggedIn) {
+    currentUsername = data.username; // 사용자 이름 저장
+    worker.port.postMessage({ type: "connect", username: currentUsername });
+}
+});
+
+// 페이지 종료 시 navigate 이벤트 전송
+window.addEventListener('beforeunload', () => {
+worker.port.postMessage({ type: "navigate", username: currentUsername });
+});
+
+
+function updateActiveUsersList(activeUsers) {
+const userList = document.getElementById("activeUsersList");
+if (!userList) return; // 관리자 페이지가 아닐 경우 리턴
+
+userList.innerHTML = ""; // 기존 목록 초기화
+
+const usernames = Object.keys(activeUsers); // 유저 리스트 가져오기
+
+if (usernames.length === 0) {
+userList.innerHTML = "<li>현재 접속 중인 사용자가 없습니다.</li>";
+return;
+}
+
+usernames.forEach(username => {
+const listItem = document.createElement("li");
+listItem.textContent = username;
+userList.appendChild(listItem);
+});
+}
+
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-01-17 15:26 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-05 15:40 강민지>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 </script>

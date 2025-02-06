@@ -2,9 +2,11 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+
   <title>테스트 페이지</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/pr_test.css">
+
   <style>
     #myVideo {
       display: block;
@@ -13,6 +15,7 @@
       position: relative;
       width: 900px;
       height: 500px;
+      border: 2px solid black;
     }
 
     .controls {
@@ -200,11 +203,13 @@
     }
     clearInterval(timerInterval);
 
+
     document.getElementById('startBtn').disabled = false;
     document.getElementById('stopBtn').disabled = true;
   }
 
   // 녹화본 업로드 및 결과 페이지 이동
+
   async function uploadAndGoToResults() {
     if (recordedChunks.length === 0) {
       alert("녹화된 파일이 없습니다.");
@@ -218,6 +223,7 @@
     formData.append('file', blob, 'presentation.webm');
 
     try {
+
       const response = await fetch('/myresults/upload/results', {
         method: 'POST',
         body: formData
@@ -231,6 +237,7 @@
         console.error("서버 응답 오류:", response.statusText);
         alert("녹화본 업로드에 실패했습니다.");
       }
+
     } catch (error) {
       console.error("업로드 중 오류:", error);
       alert("녹화본 업로드 중 문제가 발생했습니다.");

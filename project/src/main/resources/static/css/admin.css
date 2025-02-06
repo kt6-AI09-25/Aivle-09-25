@@ -93,5 +93,81 @@
   padding: 4px 6px;
 }
 
+.dashboard-cards {
+  display: flex;
+  flex-wrap: wrap;        /* 화면이 좁아지면 다음 줄로 넘어가게 */
+  gap: 20px;             /* 카드 사이 간격 */
+  margin-bottom: 30px;
+}
+.card {
+  flex: 1;               /* 화면 크기에 따라 카드가 자동으로 늘어나도록 */
+  min-width: 200px;      /* 너무 작아지지 않도록 최소 너비 설정 */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+.card h3 {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  color: #333;
+}
+.card p {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #007bff;
+  margin: 0;
+}
+
+/* 기존 카드보다 큰 차트 카드 스타일 */
+.chart-card {
+  flex: 2;               /* 차트는 일반 카드보다 더 넓게 */
+  min-width: 100px;      /* 최소 너비 설정 */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px; /* 위쪽 여백 추가 */
+}
+
+.chart-card:nth-child(1) {
+  flex: 14;
+}
+
+/* 두 번째 차트 (중간 크기) */
+.chart-card:nth-child(2) {
+  flex: 3;
+}
+
+/* 세 번째 차트 (가장 작게) */
+.chart-card:nth-child(3) {
+  flex: 3;
+}
+
+.chart-container {
+  width: 90%; /* 부모 카드 크기에 맞게 조정 */
+  max-width: 600px;
+  height: 250px;
+}
+
+
+/* 차트가 카드 안에서 적절한 크기를 유지하도록 설정 */
+.chart-container {
+  width: 90%; /* 부모 카드 크기에 맞게 조정 */
+  max-width: 600px; /* 너무 커지지 않도록 설정 */
+  height: 250px; /* 차트 높이 조정 */
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+
+
 
 

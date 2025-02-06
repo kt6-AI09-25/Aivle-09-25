@@ -1,5 +1,72 @@
+/* 카카오 로그인 버튼 스타일 */
+.kakao-login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 텍스트와 아이콘을 중앙에 배치 */
+    width: 90%;
+    /* 모달창 너비에 맞게 버튼 너비 줄이기 */
+    padding: 10px 12px;
+    /* 버튼 높이 줄이기 */
+    border-radius: 8px;
+    background-color: rgb(255, 233, 0);
+    color: rgba(0, 0, 0, 0.9);
+    font: 500 0.875rem / 1.46 'Pretendard Variable', Figtree, 'IBM Plex Sans JP', 'Pretendard JP Variable', 'Pretendard Std Variable';
+    cursor: pointer;
+    border: none;
+    box-sizing: inherit;
+    margin: 0 auto;
+    /* 버튼을 중앙에 배치 */
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.kakao-login-button:hover {
+    background-color: rgb(255, 217, 0);
+}
+
+.kakao-login-button img {
+    margin-right: 6px;
+    height: 12px;
+    /* 아이콘 크기 줄이기 */
+    width: auto;
+    /* 너비 비율 맞추기 */
+    max-width: 100%;
+    /* 버튼 크기에 맞게 아이콘 크기 조정 */
+    object-fit: contain;
+    /* 아이콘 크기 비율 유지하면서 맞춤 */
+}
+
+.kakao-login-button span {
+    display: inline-block;
+    text-align: center;
+    /* 글자 가운데 정렬 */
+}
+
+/* 간편 로그인 구분선 스타일 */
+.divider-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background-color: #ccc;
+}
+
+.divider-text {
+    padding: 0 10px;
+    font-size: 10px;
+    color: #adb5bd;
+    font-weight: bold;
+}
+
 .modal {
     display: none;
+    /* 기본적으로 숨겨져 있음 */
     position: fixed;
     z-index: 1;
     left: 0;
@@ -15,22 +82,62 @@
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 90%;
-    max-width: 400px;
+    width: 300px;
+    /* 고정된 너비 */
+    height: 365px;
+    /* 고정된 높이 */
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 50%; /* 수직 중앙 정렬 */
-    left: 50%; /* 수평 중앙 정렬 */
-    transform: translate(-50%, -50%); /* 정확히 중앙으로 이동 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.modal2 {
+    display: none;
+    /* 기본적으로 숨겨져 있음 */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal2-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    /* 고정된 너비 */
+    height: 470px;
+    /* 고정된 높이 */
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .close {
     color: #aaa;
-    float: right;
-    font-size: 28px;
+    position: absolute;
+    /* 우측 상단에 고정 */
+    top: 10px;
+    /* 상단 여백 */
+    right: 15px;
+    /* 우측 여백 */
+    font-size: 18px;
+    /* 더 작은 크기 */
     font-weight: bold;
+    cursor: pointer;
 }
 
 .close:hover,
@@ -40,10 +147,222 @@
     cursor: pointer;
 }
 
-input[type="text"], input[type="password"] {
+input[type='text']{
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 90%;
     padding: 10px;
     margin: 10px auto;
-    border: 1px solid #ccc;
+    border: 1px solid #CED4DA;
     border-radius: 4px;
+}
+
+input[type='password'],
+input[type='loginpassword'],{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    padding: 10px;
+    margin: 10px auto;
+    border: 1px solid #CED4DA;
+    border-radius: 4px;
+}
+
+#loginBtn2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 텍스트와 아이콘을 중앙에 배치 */
+    width: 90%;
+    /* 모달창 너비에 맞게 버튼 너비 줄이기 */
+    padding: 10px 12px;
+    /* 버튼 높이 줄이기 */
+    border-radius: 8px;
+    background-color: #6495ED;
+    color: #ffffff;
+    font: 500 0.875rem / 1.46 'Pretendard Variable', Figtree, 'IBM Plex Sans JP', 'Pretendard JP Variable', 'Pretendard Std Variable';
+    cursor: pointer;
+    border: none;
+    box-sizing: inherit;
+    margin: 0 auto;
+    /* 버튼을 중앙에 배치 */
+    font-weight: bold;
+}
+
+#loginBtn2:hover {
+    background-color: #6482ed;
+}
+
+#joinBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 텍스트와 아이콘을 중앙에 배치 */
+    width: 90%;
+    /* 모달창 너비에 맞게 버튼 너비 줄이기 */
+    padding: 10px 12px;
+    /* 버튼 높이 줄이기 */
+    border-radius: 8px;
+    background-color: #6495ED;
+    color: #ffffff;
+    font: 500 0.875rem / 1.46 'Pretendard Variable', Figtree, 'IBM Plex Sans JP', 'Pretendard JP Variable', 'Pretendard Std Variable';
+    cursor: pointer;
+    border: none;
+    box-sizing: inherit;
+    margin: 0 auto;
+    /* 버튼을 중앙에 배치 */
+    font-weight: bold;
+}
+
+#joinBtn:hover {
+    background-color: #6482ed;
+}
+
+/* 비밀번호 입력란과 아이콘을 같이 배치 */
+.password-container {
+    position: relative;
+    width: 100%;
+    /* 부모 컨테이너와 맞춰서 크기 지정 */
+}
+
+.password-container input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 90%;
+
+}
+
+.password-container .toggle-password {
+    position: absolute;
+    right: 35px;
+    /* 아이콘을 오른쪽 끝으로 배치 */
+    top: 50%;
+    /* 수직 가운데 정렬 */
+    transform: translateY(-50%);
+    /* 정확한 수직 중앙 정렬 */
+    cursor: pointer;
+}
+
+h2 {
+    text-align: center;
+    /* 텍스트를 가운데 정렬 */
+    margin: 0;
+    /* 기본 마진 제거 */
+    margin-top: 20px;
+    /* 위쪽 마진을 추가 */
+}
+
+#logoIcon {
+    max-width: 100px;
+    /* 아이콘 크기 조정 (필요에 맞게 변경) */
+    height: auto;
+    /* 비율에 맞게 높이 자동 조정 */
+    margin-bottom: 0;
+    /* 아이콘 아래쪽 마진을 0으로 설정 */
+}
+
+/* 회원 가입 안내 텍스트와 링크 컨테이너 가운데 정렬 */
+.join-container {
+    text-align: center;
+    /* 가운데 정렬 */
+    margin-bottom: 25px;
+    /* 아래쪽 마진 추가 */
+}
+
+/* '아직 회원이 아니신가요?' 텍스트 색상 변경 */
+.join-text {
+    color: #555;
+    /* 원하는 색상으로 변경 */
+    font-size: 12px;
+}
+
+/* 로그인 안내 텍스트와 링크 컨테이너 가운데 정렬 */
+.login-container {
+    text-align: center;
+    /* 가운데 정렬 */
+    margin-bottom: 25px;
+    /* 아래쪽 마진 추가 */
+}
+
+/* '이미 가입하셨나요?' 텍스트 색상 변경 */
+.login-text {
+    color: #555;
+    /* 원하는 색상으로 변경 */
+    font-size: 12px;
+}
+
+/* 회원 가입 링크 스타일 */
+.signup-link {
+    color: rgb(61, 61, 61);
+    /* 검은색으로 설정 */
+    font-size: 12px;
+}
+
+.signup-link:hover {
+    color: rgb(0, 0, 0);
+}
+
+/* 로그인 링크 스타일 */
+.login-link {
+    color: rgb(61, 61, 61);
+    /* 검은색으로 설정 */
+    font-size: 12px;
+}
+
+.login-link:hover {
+    color: rgb(0, 0, 0);
+}
+
+.password-rules {
+    margin-top: -10px;
+    display: flex;
+    /* Flexbox로 가로로 배치 */
+    flex-direction: column;
+    /* 세로로 배치되도록 설정 */
+    gap: 0;
+    /* 아이템 간의 기본 간격 없애기 */
+}
+
+.password-rule {
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    color: #868e96;
+    line-height: 1;
+    /* 줄 간격을 최소화 */
+    margin-bottom: -10px;
+    /* 요소 간 간격 줄이기 */
+    padding-left: 5px;
+    /* 전체적으로 우측 이동 */
+}
+
+#passwordMatchMessage {
+    margin-top: -10px;
+    margin-bottom: -10px;
+}
+
+.password-rule img {
+    width: 16px;
+    height: 16px;
+}
+
+.check-icon[src*="check3.png"] {
+    margin-right: 5px;
+    /* 아이콘과 글자 사이 간격 추가 */
+    padding-left: 2px;
+}
+
+#passwordMatchMessage img {
+    width: 14px;
+    height: 14px;
+    margin-right: 5px;
+    /* 아이콘과 텍스트 간격 추가 */
 }

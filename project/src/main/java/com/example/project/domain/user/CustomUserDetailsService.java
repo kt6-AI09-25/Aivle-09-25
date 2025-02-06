@@ -1,6 +1,5 @@
 package com.example.project.domain.user;
 
-import com.example.project.domain.report.ReportProcessTypes;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -65,8 +64,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         } else {
             throw new IllegalArgumentException("Unknown UpdateUserRoleType");
         }
-
         userRepository.save(user);
     }
-
 }

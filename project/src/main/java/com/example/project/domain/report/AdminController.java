@@ -14,6 +14,7 @@ import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -169,24 +170,40 @@ public class AdminController {
     }
 
     @GetMapping("/member/list")
+    @ResponseBody
     public List<AdminDTO> getAllUsers() {
         return userRepository.findAllUsersForAdmin();
     }
 
-    @PostMapping("/users/{username}/role")
-    public String updateUserRole(@PathVariable String username, @RequestParam String role) {
+    @PutMapping("/users/{username}/role")
+    @PreAuthorize("hasAuthority('ADMIN')") // 관리자만 실행 가능
+    public ResponseEntity<String> updateUserRole(@PathVariable String username, @RequestBody Map<String, String> request) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        if (role.equalsIgnoreCase("ADMIN")) {
+        String role = request.get("role");
+        if ("ADMIN".equalsIgnoreCase(role)) {
             customUserDetailsService.updateUserRole(user, UpdateUserRole.관리자로_변경);
-        } else if (role.equalsIgnoreCase("USER")) {
+        } else if ("USER".equalsIgnoreCase(role)) {
             customUserDetailsService.updateUserRole(user, UpdateUserRole.일반유저로_변경);
         } else {
-            return "잘못된 역할 값입니다.";
+            return ResponseEntity.badRequest().body("잘못된 역할 값입니다.");
         }
-
-        return "권한이 변경되었습니다.";
+        return ResponseEntity.ok("권한이 변경되었습니다.");
     }
 
+    @DeleteMapping("/users/{username}")
+    @PreAuthorize("hasAuthority('ADMIN')") // 관리자만 실행 가능
+    public ResponseEntity<String> deleteUser(@PathVariable String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        userRepository.delete(user); // 사용자 삭제
+        return ResponseEntity.ok("사용자가 삭제되었습니다.");
+    }
+
+    @GetMapping("/activity")
+    public String activity() {
+        return "admin/activitytest";
+    }
 }

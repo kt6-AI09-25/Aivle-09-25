@@ -280,6 +280,11 @@
      alert("검색어를 입력하세요."); // 사용자에게 경고
      return; // 검색 중단
    }
+   // **검색 후 페이지네이션을 숨기기** (DOM에서 선택 후 display = 'none')
+   const pagination = document.querySelector('.pagination');
+    if (pagination) {
+      pagination.style.display = 'none';
+    }
 
    // 서버에 검색 요청을 보냄
    fetch(`${filterUrl}?keyword=${encodeURIComponent(query)}`)

@@ -109,14 +109,14 @@ html, body {
 }
 
 /* 모달 활성화 상태 (JS에서 토글) */
-.modal.active {
+.modala.active {
     display: block;
     opacity: 1;
     visibility: visible;
 }
 
 /* 모달 콘텐츠 기본 스타일에 애니메이션과 둥근 모서리 추가 */
-.modal-content {
+.modala {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -127,6 +127,7 @@ html, body {
     display: flex;
     flex-direction: column;
     border-radius: 10px; /* 모서리 둥글게 */
+    background-color: #fff;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* 그림자 강화 */
     animation: slideDown 0.3s ease-out; /* 슬라이드 애니메이션 */
 }
