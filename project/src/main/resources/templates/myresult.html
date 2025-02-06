@@ -4,24 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>분석 결과 및 평가 기록</title>
-    <!-- 기존 style.css -->
-    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/myresult.css">
-
     <style>
-        /* 이미 myresult.css에 .no-videos-message가 있다면, 그대로 적용해도 좋습니다.
-           폰트 크기는 필요시 조정 가능합니다. */
         .no-videos-message {
             text-align: center;
             color: #666666;
             margin: 20px 0;
             font-size: 1.2em;
         }
+        /*------------------------------- 이유찬 수정 ------------------------------ */
+        /* "현재 평가 중" 섹션을 숨기거나 표시할 때 사용할 클래스 */
+        .hidden {
+            display: none !important;
+        }
+
+        /* 간단한 로딩 모달 예시 */
+        #loadingModal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            color: #fff;
+            text-align: center;
+            padding-top: 200px;
+            font-size: 24px;
+        }
+        #loadingModal.active {
+            display: block !important;
+        }
+
+        /* 완료된 동영상을 표시할 컨테이너 예시 */
+        #completedVideoContainer {
+            margin: 20px;
+            border: 2px dashed #aaa;
+            padding: 10px;
+        }
+        #completedVideoContainer.hidden {
+            display: none;
+        }
+        /*------------------------------- 이유찬 수정 ------------------------------*/
     </style>
 </head>
 <body>
+
 <!-- 네비게이션 (Thymeleaf include) -->
 <div th:replace="navbar.html"></div>
+
+<!----------------이유찬 로딩 모달 (평가중 표시)  수정 요망 ---------------->
+<div id="loadingModal" class="hidden">
+    <p>분석 중입니다... 잠시만 기다려주세요.</p>
+</div>
+
+<!--  완료된 동영상을 표시할 컨테이너 -->
+<div id="completedVideoContainer" class="hidden">
+    <h2>평가가 완료된 영상</h2>
+    <video id="completedVideo" width="400" height="240" controls></video>
+</div>
+<!------------------------------- 이유찬 수정 ------------------------------>
 
 <!-- 분석 결과 영역 (프론트엔드 담당 코드) -->
 <main>
@@ -31,7 +72,6 @@
             <div class="analysis-line"></div>
             <!-- 발표영상, 면접영상 선택 버튼 -->
             <div class="button-container">
-                <!-- 기본 로딩 시 발표영상 버튼이 active-button 클래스가 되도록 설정 -->
                 <button class="mui-button active-button" id="presentationVideoButton">발표영상</button>
                 <button class="mui-button" id="interviewVideoButton">면접영상</button>
             </div>
@@ -41,7 +81,6 @@
         <div class="thumbnail-container">
             <!-- 발표영상 섹션 -->
             <div id="presentationVideos">
-                <!-- 영상 데이터가 있을 때 썸네일들을 출력 -->
                 <div th:if="${presentationVideos != null and !#lists.isEmpty(presentationVideos)}">
                     <div th:each="video, iterStat : ${presentationVideos}">
                         <img th:if="${video.thumbnailUrl != null}"
@@ -49,26 +88,18 @@
                              alt="발표영상 썸네일"
                              th:attr="data-videoUrl=${video.videoUrl}"
                              class="video-thumbnail" />
-                        <!-- 한 행에 3개씩 정렬: 3번째 요소마다 clear -->
                         <div th:if="${iterStat.index % 3 == 2}" style="clear: both;"></div>
                     </div>
                 </div>
-                <!-- 영상 데이터가 없을 경우 메시지 출력 -->
                 <div th:if="${presentationVideos == null or #lists.isEmpty(presentationVideos)}">
-                    <!-- h1 태그로 가운데 정렬 & #666666 색상 적용 -->
                     <h1 class="no-videos-message">저장된 발표영상이 없습니다.</h1>
-                    <!-- 임시로 모달 열기 버튼 -->
                     <div style="text-align: center; margin: 20px 0;">
-                        <button type="button" class="mui-button" onclick="openAnalysisModal()">
-                            결과모달 열기 (임시)
-                        </button>
+                        <button type="button" class="mui-button" onclick="openAnalysisModal()">결과모달 열기 (임시)</button>
                     </div>
                 </div>
             </div>
-
             <!-- 면접영상 섹션 -->
             <div id="interviewVideos" style="display: none;">
-                <!-- 영상 데이터가 있을 때 썸네일들을 출력 -->
                 <div th:if="${interviewVideos != null and !#lists.isEmpty(interviewVideos)}">
                     <div th:each="video, iterStat : ${interviewVideos}">
                         <img th:if="${video.thumbnailUrl != null}"
@@ -79,21 +110,15 @@
                         <div th:if="${iterStat.index % 3 == 2}" style="clear: both;"></div>
                     </div>
                 </div>
-                <!-- 영상 데이터가 없을 경우 메시지 출력 -->
                 <div th:if="${interviewVideos == null or #lists.isEmpty(interviewVideos)}">
                     <h1 class="no-videos-message">저장된 면접영상이 없습니다.</h1>
-                    <!-- 임시로 모달 열기 버튼 -->
                     <div style="text-align: center; margin: 20px 0;">
-                        <button type="button" class="mui-button" onclick="openAnalysisModal()">
-                            결과모달 열기 (임시)
-                        </button>
+                        <button type="button" class="mui-button" onclick="openAnalysisModal()">결과모달 열기 (임시)</button>
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="spacer"></div>
-
         <!-- 분석 결과 모달 -->
         <div id="videoModal" class="modal" role="dialog" aria-modal="true">
             <div class="modala" tabindex="-1">
@@ -105,13 +130,10 @@
                     <a href="#" id="summaryResult" class="active">종합결과</a>
                     <a href="#" id="detailAnalysis">세부분석</a>
                 </div>
-
                 <!-- 종합결과 -->
                 <div id="summaryContent" class="summary-content">
-                    <!-- 총점이 표시됩니다. -->
                     <p>이곳은 종합결과를 보여주는 영역입니다.</p>
                 </div>
-
                 <!-- 세부분석 -->
                 <div id="detailContent" class="detail-content">
                     <div class="menu-bar hidden" id="menuBar2">
@@ -121,28 +143,24 @@
                     </div>
                     <div class="modal-body split">
                         <div class="modal-left">
-                            <!-- 모달 왼쪽에 표시될 영상 -->
                             <video controls id="analysisVideo">
                                 Your browser does not support the video tag.
                             </video>
                         </div>
                         <div class="modal-right">
                             <div class="frame-card">
-                                <!-- 모션 탭: 차트 캔버스 추가 -->
                                 <div id="motionContent" class="motion-content active">
                                     <p>모션 평가 내용이 여기에 표시됩니다.</p>
                                     <div class="chart-container">
                                         <canvas id="motionChart"></canvas>
                                     </div>
                                 </div>
-                                <!-- 표정 탭: 차트 캔버스 추가 (voice → 표정) -->
                                 <div id="voiceContent" class="voice-content">
                                     <p>표정 평가 내용이 여기에 표시됩니다.</p>
                                     <div class="chart-container">
                                         <canvas id="expressionChart"></canvas>
                                     </div>
                                 </div>
-                                <!-- 언어 탭: 기존 캔버스 -->
                                 <div id="gazeContent" class="gaze-content">
                                     <p>언어 평가 내용이 여기에 표시됩니다.</p>
                                     <div class="chart-container">
@@ -165,37 +183,35 @@
             <div class="video-thumbnail" th:attr="data-scoreid=${score.scoreId}" onclick="openScoreModal(this)">
                 <video width="300" height="180"
                        th:src="@{/myresults/upload/results/{fileId}(fileId=${score.fileId})}"
-                       poster="/video/recorded_thumbnail.jpg" controls>
+                       controls>
                 </video>
             </div>
             <p><strong>날짜:</strong> <span th:text="${#temporals.format(score.date, 'yyyy-MM-dd HH:mm')}"></span></p>
             <p><strong>작성자:</strong> <span th:text="${score.userId}"></span></p>
         </div>
-
         <h1>현재 평가 중</h1>
-        <div th:if="${evaluatingScore != null}" class="video-container">
-            <div class="video-thumbnail" th:if="${evaluatingScore.status == 'IN_PROGRESS'}">
-                <span class="loading">평가 진행 중...</span>
-            </div>
-            <div class="video-thumbnail" th:if="${evaluatingScore.status == 'COMPLETED' or evaluatingScore.fileId != null}"
-                 th:attr="data-scoreid=${evaluatingScore.scoreId}"
+        <!------------------------------- 이유찬 수정 ------------------------------>
+        <div id="inProgressContainer"
+             th:if="${evaluatingScore != null and evaluatingScore['scoreId'] != null}"
+             class="video-container">
+            <!-- 평가 데이터가 있는 경우에만 이 영역이 렌더링됨 -->
+            <div class="video-thumbnail" th:attr="data-scoreid=${evaluatingScore['scoreId']}"
                  onclick="openScoreModal(this)">
                 <video width="300" height="180"
-                       th:src="@{/myresults/upload/results/{fileId}(fileId=${evaluatingScore.
-                       fileId})}"
-                       poster="/video/recorded_thumbnail.jpg" controls>
+                       th:src="@{/myresults/upload/results/{fileId}(fileId=${evaluatingScore['fileId']})}"
+                       controls>
                 </video>
             </div>
-            <p><strong>날짜:</strong> <span th:text="${#temporals.format(evaluatingScore.date, 'yyyy-MM-dd HH:mm')}"></span></p>
-            <p><strong>작성자:</strong> <span th:text="${evaluatingScore.userId}"></span></p>
+            <p><strong>날짜:</strong> <span th:text="${#temporals.format(evaluatingScore['date'], 'yyyy-MM-dd HH:mm')}"></span></p>
+            <p><strong>작성자:</strong> <span th:text="${evaluatingScore['userId']}"></span></p>
         </div>
+        <!------------------------------- 이유찬 수정 ------------------------------>
     </section>
 </main>
-
 <!-- 평가 상세 모달 (Score Modal) -->
 <div id="commonModal" class="modal" role="dialog" aria-modal="true">
     <div class="modal-content" tabindex="-1">
-        <button class="modal-close" id="scoreModalClose" aria-label="Close score modal">✖</button>
+        <button class="modal-close" id="scoreModalClose" aria-label="Close score modal">&times;</button>
         <video id="modalVideo" controls></video>
         <div class="score-details">
             <h3>총 점수: <span id="modalTotalScore"></span></h3>
@@ -204,13 +220,11 @@
             <p>언어 점수: <span id="modalLanguageScore"></span></p>
             <p>속도: <span id="modalTempo"></span></p>
             <p>날짜: <span id="modalDate"></span></p>
-            <!-- 추가된 필드들 -->
             <p>작성자: <span id="modalUserId"></span></p>
             <p>머리 움직임 유형: <span id="modalMotionFrequency"></span></p>
             <p>표정 유형: <span id="modalExpressionFrequency"></span></p>
             <p>언어 유형: <span id="modalLanguageFrequency"></span></p>
             <p>스크립트: <span id="modalScript"></span></p>
-
             <h4>머리 움직임 시간대</h4>
             <ul id="motionTimesList"></ul>
             <h4>표정 변화 시간대</h4>
@@ -220,13 +234,9 @@
         </div>
     </div>
 </div>
-
-<!-- 푸터 (Thymeleaf include) -->
 <div th:replace="footer.html"></div>
-
 <!-- 외부 Chart.js 라이브러리 -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <!-- 스크립트 (분석 결과 및 평가 기록 영역 기능 포함) -->
 <script>
     /***** 분석 결과 영역 (프론트엔드) *****/
@@ -245,79 +255,101 @@
     const gazeContent = document.getElementById('gazeContent');
     const gazeChartElement = document.getElementById('gazeChart');
     const analysisVideo = document.getElementById('analysisVideo');
-
-    // 새로 추가된 캔버스 요소들
     const motionChartElement = document.getElementById('motionChart');
     const expressionChartElement = document.getElementById('expressionChart');
-
     let gazeChartInstance = null;
     let motionChartInstance = null;
     let expressionChartInstance = null;
-
     const presentationVideoButton = document.getElementById('presentationVideoButton');
     const interviewVideoButton = document.getElementById('interviewVideoButton');
     const presentationThumbnail = document.getElementById('presentationThumbnail');
     const interviewThumbnail = document.getElementById('interviewThumbnail');
-
     const presentationVideoSrc = "/video/recorded_presentation.mp4";
     const interviewVideoSrc = "/video/recorded_interview.mp4";
-
-    // 이미 HTML에서 발표영상 버튼에 active-button 클래스를 추가했으므로
-    // 화면이 로드되었을 때 발표영상이 디폴트로 표시됨.
-    // 아래 로직 또한 '처음 로딩 시' 발표영상 버튼을 활성화 상태로 두기 위함
-    // (필요에 따라 중복 여부 확인 후 제거 가능)
     presentationVideoButton.classList.add('active-button');
-    presentationVideos.style.display = 'block';
-    interviewVideos.style.display = 'none';
-
-    // 발표영상 버튼 클릭 시
+    presentationVideos.style.display = 'block'; // 이유찬 수정
+    interviewVideos.style.display = 'none';       // 이유찬 수정
     presentationVideoButton.addEventListener('click', () => {
       presentationVideos.style.display = 'block';
       interviewVideos.style.display = 'none';
       presentationVideoButton.classList.add('active-button');
       interviewVideoButton.classList.remove('active-button');
     });
-
-    // 면접영상 버튼 클릭 시
     interviewVideoButton.addEventListener('click', () => {
       presentationVideos.style.display = 'none';
       interviewVideos.style.display = 'block';
       interviewVideoButton.classList.add('active-button');
       presentationVideoButton.classList.remove('active-button');
     });
+    /******************** 이유찬 수정 ********************/
+    /***** (1) 폴링 & 로딩 모달 전환 로직 *****/
+    function pollEvaluatingScore() {
+      fetch('/scores/results/api')
+        .then(res => res.json())
+        .then(data => {
+          // /scores/results/api -> { previousScores: [...], evaluatingScore: {...} }
+          const evalScore = data.evaluatingScore;
+          const loadingModal = document.getElementById('loadingModal');
+          const inProgressElem = document.getElementById('inProgressContainer');
+          const completedVideoContainer = document.getElementById('completedVideoContainer');
+          const completedVideo = document.getElementById('completedVideo');
 
+          if (!evalScore || !evalScore.scoreId) {
+            // "IN_PROGRESS" 자체가 없으면 => 로딩창 X, 현재평가중 X, 완료동영상 X
+            loadingModal.classList.remove('active');
+            inProgressElem?.classList.add('hidden');
+            completedVideoContainer.classList.add('hidden');
+            return;
+          }
+
+          if (evalScore.status === 'IN_PROGRESS') {
+            // 평가중 => 로딩창 표시, 현재평가중 영역 표시, 완료동영상 숨김
+            loadingModal.classList.add('active');
+            inProgressElem?.classList.remove('hidden');
+            completedVideoContainer.classList.add('hidden');
+
+          } else if (evalScore.status === 'COMPLETED') {
+            // 평가 완료 => 로딩창 숨기고, IN_PROGRESS 숨기고, 완료된 영상 보여주기
+            loadingModal.classList.remove('active');
+            inProgressElem?.classList.add('hidden');
+            completedVideoContainer.classList.remove('hidden');
+
+            // 새 동영상 주소 세팅
+            completedVideo.src = '/myresults/upload/results/' + evalScore.fileId;
+          }
+        })
+        .catch(err => console.error('IN_PROGRESS 체크 중 오류:', err));
+    }
+
+    // 페이지 로드 후 3초마다 폴링
+    document.addEventListener('DOMContentLoaded', () => {
+      setInterval(pollEvaluatingScore, 3000);
+    });
+    /******************** 이유찬 수정 ********************/
+    /***** 기존 모달/차트 로직 *****/
     function openAnalysisModal() {
       analysisModal.style.display = 'block';
-      // 종합결과 영역에 총점을 업데이트 (예시로 259 사용)
       updateSummaryContent(259);
       resetToSummary();
       analysisModal.querySelector('.modal-content').focus();
     }
-
-    // 총점 업데이트 함수 (실제 환경에서는 DB 데이터를 반영)
     function updateSummaryContent(totalScore) {
       summaryContent.innerHTML = '<h2>총 점수: ' + totalScore + '</h2>';
     }
-
- detailAnalysis.addEventListener('click', function(event) {
-  event.preventDefault();
-  summaryContent.style.display = 'none';
-  detailContent.style.display = 'block';
-  menuBar2.classList.remove('hidden');
-  summaryResult.classList.remove('active');
-  detailAnalysis.classList.add('active');
-
-  // 모션 탭을 기본 활성화하고 차트를 바로 렌더링합니다.
-  activateTab(motionButton, motionContent);
-  renderMotionChart();
-});
-
-
+    detailAnalysis.addEventListener('click', function(event) {
+      event.preventDefault();
+      summaryContent.style.display = 'none';
+      detailContent.style.display = 'block';
+      menuBar2.classList.remove('hidden');
+      summaryResult.classList.remove('active');
+      detailAnalysis.classList.add('active');
+      activateTab(motionButton, motionContent);
+      renderMotionChart();
+    });
     summaryResult.addEventListener('click', function(event) {
       event.preventDefault();
       resetToSummary();
     });
-
     function resetToSummary() {
       summaryContent.style.display = 'block';
       detailContent.style.display = 'none';
@@ -325,41 +357,31 @@
       detailAnalysis.classList.remove('active');
       summaryResult.classList.add('active');
     }
-
-    // 모션 탭 클릭 시: 모션 차트 렌더링 추가
     motionButton.addEventListener('click', function(event) {
       event.preventDefault();
       activateTab(motionButton, motionContent);
       renderMotionChart();
     });
-
-    // 표정(voice) 탭 클릭 시: 표정 차트 렌더링 추가
     voiceButton.addEventListener('click', function(event) {
       event.preventDefault();
       activateTab(voiceButton, voiceContent);
       renderExpressionChart();
     });
-
     gazeButton.addEventListener('click', function(event) {
       event.preventDefault();
       activateTab(gazeButton, gazeContent);
       renderGazeChart();
     });
-
     function activateTab(button, content) {
       motionButton.classList.remove('active');
       voiceButton.classList.remove('active');
       gazeButton.classList.remove('active');
-
       motionContent.classList.remove('active');
       voiceContent.classList.remove('active');
       gazeContent.classList.remove('active');
-
       button.classList.add('active');
       content.classList.add('active');
     }
-
-    // 모션 차트 렌더링 함수 (더미 데이터 사용)
     function renderMotionChart() {
       if (motionChartInstance) {
         motionChartInstance.destroy();
@@ -370,7 +392,7 @@
           labels: ['초기', '중간', '최종'],
           datasets: [{
             label: '모션 점수 데이터',
-            data: [20, 45, 67], // 예시 데이터; 실제 값으로 대체 가능
+            data: [20, 45, 67],
             borderColor: 'rgba(255, 99, 132, 1)',
             borderWidth: 2,
             fill: false
@@ -379,25 +401,12 @@
         options: {
           responsive: true,
           scales: {
-            x: {
-              title: {
-                display: true,
-                text: '시간'
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: '점수'
-              },
-              beginAtZero: true
-            }
+            x: { title: { display: true, text: '시간' } },
+            y: { title: { display: true, text: '점수' }, beginAtZero: true }
           }
         }
       });
     }
-
-    // 표정(voice) 차트 렌더링 함수 (더미 데이터 사용)
     function renderExpressionChart() {
       if (expressionChartInstance) {
         expressionChartInstance.destroy();
@@ -408,7 +417,7 @@
           labels: ['초기', '중간', '최종'],
           datasets: [{
             label: '표정 점수 데이터',
-            data: [30, 60, 100], // 예시 데이터; 실제 값으로 대체 가능
+            data: [30, 60, 100],
             borderColor: 'rgba(54, 162, 235, 1)',
             borderWidth: 2,
             fill: false
@@ -417,25 +426,12 @@
         options: {
           responsive: true,
           scales: {
-            x: {
-              title: {
-                display: true,
-                text: '시간'
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: '점수'
-              },
-              beginAtZero: true
-            }
+            x: { title: { display: true, text: '시간' } },
+            y: { title: { display: true, text: '점수' }, beginAtZero: true }
           }
         }
       });
     }
-
-    // 언어 차트 렌더링 함수 (기존 예시)
     function renderGazeChart() {
       if (gazeChartInstance) {
         gazeChartInstance.destroy();
@@ -455,33 +451,20 @@
         options: {
           responsive: true,
           scales: {
-            x: {
-              title: {
-                display: true,
-                text: '시간'
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: '값'
-              }
-            }
+            x: { title: { display: true, text: '시간' } },
+            y: { title: { display: true, text: '값' } }
           }
         }
       });
     }
-
     analysisModalClose.addEventListener('click', () => {
       closeAnalysisModal();
     });
-
     analysisModal.addEventListener('click', (event) => {
       if (event.target === analysisModal) {
         closeAnalysisModal();
       }
     });
-
     function closeAnalysisModal() {
       analysisModal.style.display = 'none';
       resetToSummary();
@@ -489,7 +472,7 @@
       analysisVideo.src = '';
     }
 
-    /***** 평가 기록 영역 (백엔드) *****/
+     /***** 평가 기록 영역 (백엔드) *****/
     function openScoreModal(element) {
       const scoreId = element.getAttribute('data-scoreid');
       fetch(`/scores/details?scoreId=${scoreId}`)
@@ -501,7 +484,9 @@
           document.getElementById('modalLanguageScore').textContent = data.languageScore;
           document.getElementById('modalTempo').textContent = data.tempo;
           document.getElementById('modalDate').textContent = data.date;
-          document.getElementById('modalVideo').src = `/myresults/upload/results/${data.fileName}`;
+          document.getElementById('modalUserId').textContent = data.userId;
+          // 이유찬 수정
+          document.getElementById('modalVideo').src = `/myresults/upload/results/${data.fileId}`;
 
           displayTimes('motionTimesList', data.motionTimes);
           displayTimes('expressionTimesList', data.expressionTimes);
@@ -514,27 +499,32 @@
           alert('평가 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
         });
     }
-
-    function displayTimes(elementId, timesArray) {
+    // 이유찬 수정
+    function displayTimes(elementId, timesMap) {
       const listElement = document.getElementById(elementId);
       listElement.innerHTML = '';
-      timesArray.forEach(time => {
-        const li = document.createElement('li');
-        li.textContent = `${time.actionName || time.expressionName || time.languageName}: ${time.actionTime || time.expressionTime || time.languageTime}초`;
-        listElement.appendChild(li);
+      Object.entries(timesMap).forEach(([actionName, timeList]) => {
+        if (timeList.length > 0) {
+          timeList.forEach(time => {
+            const li = document.createElement('li');
+            li.textContent = `${actionName}: ${time}초`;
+            listElement.appendChild(li);
+          });
+        } else {
+          const li = document.createElement('li');
+          li.textContent = `${actionName}: 없음`;
+          listElement.appendChild(li);
+        }
       });
     }
-
     const scoreModalClose = document.getElementById('scoreModalClose');
     scoreModalClose.addEventListener('click', closeScoreModal);
-
     const commonModal = document.getElementById('commonModal');
     commonModal.addEventListener('click', (event) => {
       if (event.target === commonModal) {
         closeScoreModal();
       }
     });
-
     function closeScoreModal() {
       commonModal.classList.remove('active');
       document.getElementById('modalVideo').src = '';

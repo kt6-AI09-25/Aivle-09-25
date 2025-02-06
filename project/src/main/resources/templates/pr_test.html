@@ -2,71 +2,68 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>발표 녹화 및 분석</title>
-  <link rel="stylesheet" href="css/style.css">
 
-  <link rel="stylesheet" href="css/pr_test.css">
+  <title>테스트 페이지</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/pr_test.css">
 
   <style>
-    /* 비디오 컨테이너 */
-    .video-container {
-      position: relative;
+    #myVideo {
       display: block;
       margin: 20px auto;
+      border: 2px solid black;
+      position: relative;
       width: 900px;
       height: 500px;
       border: 2px solid black;
+    }
 
+    .controls {
+      text-align: center;
+      margin-top: 10px;
     }
-    .video-container video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scaleX(-1);
+
+    #timer {
+      font-size: 24px;
+      color: red;
+      text-align: center;
+      margin-top: 10px;
     }
-    /* 로딩 화면 */
+
+    /* 로딩 화면 스타일 */
     #loadingModal {
-      display: none;
+      display: none; /* 기본적으로 숨김 */
       position: fixed;
-      z-index: 1000;
+      z-index: 2; /* 모달보다 위에 표시 */
       left: 0;
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
       color: white;
       text-align: center;
       padding-top: 20%;
       font-size: 24px;
     }
-    /* 카운트다운 */
-    #countdownOverlay {
-      display: none;
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 100px;
-      font-weight: bold;
-      color: #ccc;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      z-index: 10;
+
+    /* 오디오 레벨 게이지 컨테이너 */
+    #audioMeter {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 90%;
+      height: 50px;
+      margin: 20px auto;
+      position: relative;
     }
-    /* 타이머 */
-    #timerOverlay {
-      display: none;
-      position: absolute;
-      top: 10px; right: 10px;
-      font-size: 24px;
-      color: white;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-      z-index: 10;
-    }
-    /* 버튼 컨트롤 */
-    .controls {
-      text-align: center;
-      margin-top: 10px;
+
+    .bar {
+      width: 3px;
+      margin: 0 1px;
+      height: 20px;
+      background-color: #ff3b3b;
+      display: inline-block;
+      transition: height 0.1s;
     }
   </style>
 </head>
@@ -75,12 +72,14 @@
 <!-- 로딩 화면 -->
 <div id="loadingModal">로딩 중입니다...</div>
 
-<!-- 비디오 영역 -->
-<div class="video-container">
-  <video id="myVideo" autoplay playsinline muted></video>
-  <div id="countdownOverlay">3</div>
-  <div id="timerOverlay">00:00</div>
-</div>
+<!-- 비디오 화면 -->
+<video id="myVideo" autoplay playsinline></video>
+
+<!-- 마이크 게이지 -->
+<div id="audioMeter"></div>
+
+<!-- 타이머 -->
+<div id="timer">00:00</div>
 
 <!-- 버튼 컨트롤 -->
 <div class="controls">
@@ -90,153 +89,169 @@
 </div>
 
 <script>
-  let stream;               // 카메라/마이크 스트림
-  let mediaRecorder;        // MediaRecorder 객체
-  let recordedChunks = [];  // 녹화 데이터 저장
+  let stream;
+  let mediaRecorder;
+  let recordedChunks = [];
   let timerInterval;
   let seconds = 0;
-  let isRecording = false;
 
-  // 요소 참조
-  const countdownOverlay = document.getElementById('countdownOverlay');
-  const timerOverlay = document.getElementById('timerOverlay');
-  const startBtn = document.getElementById('startBtn');
-  const stopBtn = document.getElementById('stopBtn');
-  const viewResultsBtn = document.getElementById('viewResultsBtn');
-  const loadingModal = document.getElementById('loadingModal');
+  // 오디오 분석 관련
+  let audioContext;
+  let analyser;
+  let microphone;
+  const bars = [];
 
-  // 페이지 로드 시 카메라 스트림 연결
-  window.addEventListener('load', async () => {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      document.getElementById('myVideo').srcObject = stream;
-      console.log("🎥 카메라/마이크 연결 완료");
-    } catch (error) {
-      console.error("카메라/마이크 접근 오류:", error);
-      alert("카메라/마이크를 사용할 수 없습니다.");
-    }
-  });
-
-  // ⏳ 카운트다운 시작 후 녹화 시작
-  async function startPresentation() {
-    if (!stream) {
-      alert("카메라 스트림이 없습니다. 다시 시도하세요.");
-      return;
-    }
-
-    // 버튼 상태 변경
-    startBtn.disabled = true;
-    stopBtn.disabled = true;
-
-    // 카운트다운 시작
-    countdownOverlay.style.display = 'block';
-    let countdown = 3;
-    countdownOverlay.textContent = countdown;
-
-    let countdownInterval = setInterval(() => {
-      countdown--;
-      countdownOverlay.textContent = countdown;
-      if (countdown <= 0) {
-        clearInterval(countdownInterval);
-        countdownOverlay.style.display = 'none';
-
-        // 녹화 시작
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp9,opus' });
-        recordedChunks = [];
-
-        mediaRecorder.ondataavailable = event => {
-          if (event.data.size > 0) recordedChunks.push(event.data);
-        };
-
-        mediaRecorder.start();
-        isRecording = true;
-        console.log("🔴 녹화 시작됨");
-
-        // 타이머 시작
-        seconds = 0;
-        timerOverlay.textContent = "00:00";
-        timerOverlay.style.display = 'block';
-        timerInterval = setInterval(updateTimer, 1000);
-
-        // 버튼 상태 변경
-        stopBtn.disabled = false;
-      }
-    }, 1000);
-  }
-
-  // ⏹ 녹화 중지
-  function stopPresentation() {
-    if (mediaRecorder && isRecording) {
-        mediaRecorder.stop();
-        console.log("⏹ 녹화 중지됨");
-        clearInterval(timerInterval);
-        timerOverlay.style.display = 'none';
-        isRecording = false;
-
-        console.log("녹화된 데이터 크기:", recordedChunks.length); // ✅ 데이터 크기 확인
-        stopBtn.disabled = true;
-        startBtn.disabled = false;
-    }
-}
-
-  // 📤 녹화본 업로드 및 결과 페이지 이동
-  async function uploadAndGoToResults() {
-    if (recordedChunks.length === 0) {
-        alert("녹화된 파일이 없습니다.");
-        return;
-    }
-
-    viewResultsBtn.disabled = true;
-    loadingModal.style.display = "block";
-
-    // 🛠 Blob 생성 (webm 확장자 명확하게 설정)
-    const blob = new Blob(recordedChunks, { type: "video/webm" });
-
-    // 🛠 FormData에 webm 파일 올바르게 추가
-    const formData = new FormData();
-    formData.append("file", blob, "presentation.webm");  // 파일 이름 추가
-    formData.append("fileType", "video/webm");  // 파일 타입 추가
-
-    console.log("📤 업로드할 데이터:", formData); // ✅ FormData 확인
-
-    try {
-        // 🔹 FastAPI 서버로 업로드 요청
-        const uploadResponse = await fetch("/myresults/upload/results", {
-            method: "POST",
-            body: formData,
-        });
-
-        if (!uploadResponse.ok) throw new Error("파일 업로드 실패");
-
-      const uploadResult = await uploadResponse.json();
-        console.log("✅ 업로드 성공:", uploadResult);
-
-        // 🔹 결과 페이지로 이동
-        window.location.href = `/scores/results?uploadedFileId=${uploadResult.fileId}`;
-    } catch (error) {
-        console.error("❌ 오류 발생:", error);
-        alert("데이터 처리 중 문제가 발생했습니다.");
-    } finally {
-        loadingModal.style.display = "none";
-        viewResultsBtn.disabled = false;
-    }
-}
-
-
-  // ⏳ 타이머 업데이트 함수
+  // 타이머 업데이트 함수
   function updateTimer() {
     seconds++;
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    timerOverlay.textContent =
+    document.getElementById('timer').textContent =
       `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
-  // 버튼 이벤트 리스너 등록
-  startBtn.addEventListener('click', startPresentation);
-  stopBtn.addEventListener('click', stopPresentation);
-  viewResultsBtn.addEventListener('click', uploadAndGoToResults);
-</script>
+  // 오디오 레벨 바 생성
+  function createAudioBars() {
+    const audioMeter = document.getElementById('audioMeter');
+    // 혹시 기존 바가 있으면 제거
+    audioMeter.innerHTML = '';
+    for (let i = 0; i < 40; i++) {
+      const bar = document.createElement('div');
+      bar.classList.add('bar');
+      bars.push(bar);
+      audioMeter.appendChild(bar);
+    }
+  }
 
+  // 오디오 레벨 모니터링
+  function monitorAudioLevel() {
+    const dataArray = new Uint8Array(analyser.fftSize);
+    function updateAudioLevel() {
+      analyser.getByteFrequencyData(dataArray);
+      for (let i = 0; i < bars.length; i++) {
+        const barHeight = dataArray[i] / 256 * 50; // 값에 따라 바 크기 조정
+        bars[i].style.height = `${barHeight}px`;
+      }
+      requestAnimationFrame(updateAudioLevel);
+    }
+    updateAudioLevel();
+  }
+
+  // 발표 시작
+  async function startPresentation() {
+    try {
+      // 1) 스트림 가져오기 (비디오 900x500, 오디오 true)
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 900, height: 500 },
+        audio: true
+      });
+
+      const video = document.getElementById('myVideo');
+      video.width = 900;
+      video.height = 500;
+      video.srcObject = stream;
+
+      // 2) MediaRecorder
+      mediaRecorder = new MediaRecorder(stream);
+      recordedChunks = [];
+      mediaRecorder.ondataavailable = function(event) {
+        if (event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
+      mediaRecorder.start();
+
+      // 3) 타이머
+      seconds = 0;
+      document.getElementById('timer').textContent = "00:00";
+      timerInterval = setInterval(updateTimer, 1000);
+
+      // 4) 오디오 분석
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioContext.createAnalyser();
+      microphone = audioContext.createMediaStreamSource(stream);
+      microphone.connect(analyser);
+
+      createAudioBars();
+      monitorAudioLevel();
+
+      console.log("발표 녹화가 시작되었습니다.");
+
+      // 버튼 상태
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+
+    } catch (error) {
+      console.error("발표 시작 중 오류:", error);
+      alert("발표를 시작할 수 없습니다: " + error.message);
+    }
+  }
+
+  // 발표 중지
+  function stopPresentation() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      console.log("발표 녹화가 중지되었습니다.");
+    }
+    if (stream) {
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+      stream = null;
+    }
+    if (audioContext) {
+      audioContext.close();
+    }
+    clearInterval(timerInterval);
+
+
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('stopBtn').disabled = true;
+  }
+
+  // 녹화본 업로드 및 결과 페이지 이동
+
+  async function uploadAndGoToResults() {
+    if (recordedChunks.length === 0) {
+      alert("녹화된 파일이 없습니다.");
+      return;
+    }
+    document.getElementById('viewResultsBtn').disabled = true;
+    document.getElementById('loadingModal').style.display = 'block';
+
+    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+    const formData = new FormData();
+    formData.append('file', blob, 'presentation.webm');
+
+    try {
+
+      const response = await fetch('/myresults/upload/results', {
+        method: 'POST',
+        body: formData
+      });
+      if (response.ok) {
+        const result = await response.json();
+        console.log("녹화본 업로드 성공:", result.filePath);
+        // result.fileId를 사용해서 /scores/results?uploadedFileId=... 로 이동
+        window.location.href = `/scores/results?uploadedFileId=${result.fileId}`;
+      } else {
+        console.error("서버 응답 오류:", response.statusText);
+        alert("녹화본 업로드에 실패했습니다.");
+      }
+
+    } catch (error) {
+      console.error("업로드 중 오류:", error);
+      alert("녹화본 업로드 중 문제가 발생했습니다.");
+    } finally {
+      document.getElementById('loadingModal').style.display = 'none';
+      document.getElementById('viewResultsBtn').disabled = false;
+    }
+  }
+
+  // 이벤트 핸들러 연결
+  document.getElementById('startBtn').addEventListener('click', startPresentation);
+  document.getElementById('stopBtn').addEventListener('click', stopPresentation);
+  document.getElementById('viewResultsBtn').addEventListener('click', uploadAndGoToResults);
+
+</script>
 </body>
 </html>
