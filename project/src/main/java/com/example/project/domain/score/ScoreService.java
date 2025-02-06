@@ -19,26 +19,52 @@ public class ScoreService {
     private final LanguageTimesRepository languageTimesRepository;
     private final UserRepository userRepository;
 
+
     @Transactional
-    public void saveScoreData(Map<String, Object> result, User user, File file) {
-        // Score 엔티티 생성 및 데이터 저장
+    public Score createInProgressScore(User user, File file) {
         Score score = new Score();
-        score.setStatus("COMPLETED");
-        score.setTotalScore(Optional.ofNullable((Double) result.get("totalScore")).orElse(0.0));
-        score.setMotionScore(Optional.ofNullable((Double) result.get("motionScore")).orElse(0.0));
-        score.setExpressionScore(Optional.ofNullable((Double) result.get("expressionScore")).orElse(0.0));
-        score.setLanguageScore(Optional.ofNullable((Double) result.get("languageScore")).orElse(0.0));
-        score.setMotionFrequency(Optional.ofNullable((String) result.get("motionFrequency")).orElse("없음"));
-        score.setExpressionFrequency(Optional.ofNullable((String) result.get("expressionFrequency")).orElse("없음"));
-        score.setLanguageFrequency(Optional.ofNullable((String) result.get("languageFrequency")).orElse("없음"));
-        score.setTempo(Optional.ofNullable((Double) result.get("tempo")).orElse(0.0));
         score.setUser(user);
         score.setFile(file);
-        score.setScript(Optional.ofNullable((String) result.get("script")).orElse(""));
+        score.setStatus("IN_PROGRESS");
 
-        // MotionTimes 저장
+        // 필요 시 초기값 세팅 (0점, 빈 문자열 등)
+        score.setTotalScore(0.0);
+        score.setMotionScore(0.0);
+        score.setExpressionScore(0.0);
+        score.setLanguageScore(0.0);
+        score.setMotionFrequency("");
+        score.setExpressionFrequency("");
+        score.setLanguageFrequency("");
+        score.setTempo(0.0);
+        score.setScript("");
+
+        // DB 저장
+        return scoreRepository.save(score);
+    }
+
+
+    @Transactional
+    public void completeScoreData(Long scoreId, Map<String, Object> result) {
+        // 업로드 시 생성해둔 Score 조회
+        Score score = scoreRepository.findById(scoreId)
+                .orElseThrow(() -> new IllegalArgumentException("Score가 존재하지 않습니다."));
+
+        score.setStatus("COMPLETED");
+
+        // 분석 결과 반영
+        score.setTotalScore(optionalDouble(result.get("totalScore")));
+        score.setMotionScore(optionalDouble(result.get("motionScore")));
+        score.setExpressionScore(optionalDouble(result.get("expressionScore")));
+        score.setLanguageScore(optionalDouble(result.get("languageScore")));
+        score.setMotionFrequency(optionalString(result.get("motionFrequency"), "없음"));
+        score.setExpressionFrequency(optionalString(result.get("expressionFrequency"), "없음"));
+        score.setLanguageFrequency(optionalString(result.get("languageFrequency"), "없음"));
+        score.setTempo(optionalDouble(result.get("tempo")));
+        score.setScript(optionalString(result.get("script"), ""));
+
+        // ----- MotionTimes 저장 -----
         List<MotionTimes> motionTimesList = new ArrayList<>();
-        Map<String, List<Double>> motionTimes = (Map<String, List<Double>>) result.get("motionTimes");
+        Map<String, List<Double>> motionTimes = castMap(result.get("motionTimes"));
         if (motionTimes != null) {
             motionTimes.forEach((actionName, actionTimeList) -> {
                 for (Double actionTime : actionTimeList) {
@@ -51,11 +77,11 @@ public class ScoreService {
             });
         }
 
-        // ExpressionTimes 저장
+        // ----- ExpressionTimes 저장 -----
         List<ExpressionTimes> expressionTimesList = new ArrayList<>();
-        Map<String, List<Double>> expressionTimes = (Map<String, List<Double>>) result.get("expressionTimes");
-        if (expressionTimes != null) {
-            expressionTimes.forEach((expressionName, expressionTimeList) -> {
+        Map<String, List<Double>> expressionMap = castMap(result.get("expressionTimes"));
+        if (expressionMap != null) {
+            expressionMap.forEach((expressionName, expressionTimeList) -> {
                 for (Double expressionTime : expressionTimeList) {
                     ExpressionTimes expressionTimeEntity = new ExpressionTimes();
                     expressionTimeEntity.setExpressionName(expressionName);
@@ -66,11 +92,11 @@ public class ScoreService {
             });
         }
 
-        // LanguageTimes 저장
+        // ----- LanguageTimes 저장 -----
         List<LanguageTimes> languageTimesList = new ArrayList<>();
-        Map<String, List<Double>> languageTimes = (Map<String, List<Double>>) result.get("languageTimes");
-        if (languageTimes != null) {
-            languageTimes.forEach((languageName, languageTimeList) -> {
+        Map<String, List<Double>> languageMap = castMap(result.get("languageTimes"));
+        if (languageMap != null) {
+            languageMap.forEach((languageName, languageTimeList) -> {
                 for (Double languageTime : languageTimeList) {
                     LanguageTimes languageTimeEntity = new LanguageTimes();
                     languageTimeEntity.setLanguageName(languageName);
@@ -81,20 +107,23 @@ public class ScoreService {
             });
         }
 
+        // Score 저장
         scoreRepository.save(score);
+        // Times 저장
         motionTimesRepository.saveAll(motionTimesList);
         expressionTimesRepository.saveAll(expressionTimesList);
         languageTimesRepository.saveAll(languageTimesList);
     }
 
-    /**
-     * 특정 사용자의 이전 점수를 가져오는 메서드.
-     */
+
     public List<Score> getPreviousScores(Long userId) {
         return scoreRepository.findByUserIdWithDetails(userId);
     }
 
-
+    /**
+     * "IN_PROGRESS" 상태의 Score를 찾아,
+     * 현재 평가중인 정보를 맵 형태로 반환.
+     */
     public Map<String, Object> getEvaluatingScore(Long userId) {
         return scoreRepository.findByUserIdAndStatus(userId, "IN_PROGRESS")
                 .stream().findFirst()
@@ -110,20 +139,22 @@ public class ScoreService {
                     result.put("expressionFrequency", score.getExpressionFrequency());
                     result.put("languageFrequency", score.getLanguageFrequency());
                     result.put("script", score.getScript());
-                    result.put("date", score.getDate().toString()); // 이유찬 수정
-                    result.put("userId", score.getUser().getId());   // 이유찬 수정
+                    result.put("date", score.getDate());
+                    result.put("userId", score.getUser().getId());
+
                     if (score.getFile() != null) {
                         result.put("fileId", score.getFile().getFileId());
                         result.put("fileName", score.getFile().getFilePath());
+                        result.put("status", score.getStatus()); // "IN_PROGRESS"
                     } else {
                         result.put("fileId", null);
                         result.put("fileName", "파일 없음");
+                        result.put("status", "IN_PROGRESS");
                     }
                     return result;
                 })
                 .orElseGet(HashMap::new);
     }
-
 
     public Long getLoggedInUserId(String username) {
         return userRepository.findByUsername(username)
@@ -134,5 +165,28 @@ public class ScoreService {
     public Score getScoreDetails(Long scoreId) {
         return scoreRepository.findById(scoreId)
                 .orElseThrow(() -> new IllegalArgumentException("점수를 찾을 수 없습니다."));
+    }
+
+
+    // Object -> double 변환
+    private double optionalDouble(Object obj) {
+        if (obj instanceof Number) {
+            return ((Number) obj).doubleValue();
+        }
+        return 0.0;
+    }
+
+    // Object -> String 변환
+    private String optionalString(Object obj, String defaultVal) {
+        return (obj != null) ? obj.toString() : defaultVal;
+    }
+
+    // generic 형변환을 안전하게 감싸는 헬퍼
+    @SuppressWarnings("unchecked")
+    private Map<String, List<Double>> castMap(Object obj) {
+        if (obj instanceof Map<?, ?>) {
+            return (Map<String, List<Double>>) obj;
+        }
+        return null;
     }
 }
