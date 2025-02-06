@@ -6,10 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -154,6 +151,31 @@ public class ScoreController {
         return ResponseEntity.ok(scoreService.getRecentScoresCount());
     }
 
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    @GetMapping("/{scoreId}/with-top4")
+    public ResponseEntity<ScoreDTO> getScoreWithTop4(@PathVariable Long scoreId) {
+        return ResponseEntity.ok(scoreService.getScoreWithTop4(scoreId));
+    }
+
+    @GetMapping("/top4")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, Object>>> getTop4Scores() {
+        List<ScoreDTO> top4Scores = scoreService.getTop4Scores();
+
+        // 기존 DTO 변경 없이 추가 데이터를 Map 형태로 전달
+        List<Map<String, Object>> response = top4Scores.stream().map(dto -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("scoreId", dto.getScoreId());
+            map.put("totalScore", dto.getTotalScore());
+            map.put("userId", dto.getUserId());
+            map.put("username", scoreService.getUsernameByUserId(dto.getUserId())); // 추가된 필드
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 }
