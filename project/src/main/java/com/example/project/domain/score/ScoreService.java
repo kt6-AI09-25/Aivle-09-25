@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -207,16 +208,18 @@ public class ScoreService {
     }
 
     public List<Map<String, Object>> getRecentScoresCount() {
-        // 최근 7일 날짜 리스트 생성
+        // 최근 7일간의 날짜 계산
+        LocalDateTime sevenDaysAgo = LocalDate.now().minusDays(6).atStartOfDay();
         LocalDate today = LocalDate.now();
-        Map<LocalDate, Integer> dateCountMap = new LinkedHashMap<>();
 
-        for (int i = 6; i >= 0; i--) {  // 7일 전부터 오늘까지
+        // 최근 7일간의 날짜 초기화 (값이 없으면 0으로 표시)
+        Map<LocalDate, Integer> dateCountMap = new LinkedHashMap<>();
+        for (int i = 6; i >= 0; i--) {
             dateCountMap.put(today.minusDays(i), 0);
         }
 
-        // DB에서 가져온 데이터 반영
-        List<Object[]> results = scoreRepository.getRecentScoresCount();
+        // DB에서 최근 7일간의 데이터 가져오기
+        List<Object[]> results = scoreRepository.getRecentScoresCount(sevenDaysAgo);
         for (Object[] result : results) {
             LocalDate date = ((java.sql.Date) result[0]).toLocalDate();
             int count = ((Number) result[1]).intValue();

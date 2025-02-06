@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,12 +32,12 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
     @Query("SELECT AVG(s.languageScore) FROM Score s")
     Double getAverageLanguageScore();
 
-    @Query("SELECT DATE(s.date) as date, COUNT(s) as count " +
+    @Query("SELECT DATE(s.date), COUNT(s) " +
             "FROM Score s " +
-            "WHERE s.date >= CURRENT_DATE - 7 " +
+            "WHERE s.date >= :startDate " +
             "GROUP BY DATE(s.date) " +
             "ORDER BY DATE(s.date) ASC")
-    List<Object[]> getRecentScoresCount();
+    List<Object[]> getRecentScoresCount(@Param("startDate") LocalDateTime startDate);
 
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
