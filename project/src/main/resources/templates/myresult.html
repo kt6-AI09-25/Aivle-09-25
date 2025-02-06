@@ -180,6 +180,7 @@
     <section>
         <h1>이전 평가 기록</h1>
         <div th:each="score : ${previousScores}" class="video-container">
+            <div th:if="${score.status != 'IN_PROGRESS'}" class="video-container">
             <div class="video-thumbnail" th:attr="data-scoreid=${score.scoreId}" onclick="openScoreModal(this)">
                 <video width="300" height="180"
                        th:src="@{/myresults/upload/results/{fileId}(fileId=${score.fileId})}"
@@ -188,6 +189,7 @@
             </div>
             <p><strong>날짜:</strong> <span th:text="${#temporals.format(score.date, 'yyyy-MM-dd HH:mm')}"></span></p>
             <p><strong>작성자:</strong> <span th:text="${score.userId}"></span></p>
+        </div>
         </div>
         <h1>현재 평가 중</h1>
         <!------------------------------- 이유찬 수정 ------------------------------>
