@@ -184,6 +184,23 @@ nav ul li a:hover {
 
 }
 
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 애니메이션 적용 */
+.text {
+    opacity: 0;
+    animation: fadeInUp 2s ease-out forwards;
+}
+
 .feature1, .feature2, .feature3 {
 
     display: inline-block;
@@ -227,7 +244,6 @@ nav ul li a:hover {
     width: 350px;
 
     height: 350px;
-
 }
 
 .modal {
