@@ -39,6 +39,8 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "ORDER BY DATE(s.date) ASC")
     List<Object[]> getRecentScoresCount(@Param("startDate") LocalDateTime startDate);
 
+    List<Score> findTop4ByOrderByTotalScoreDesc();
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 }

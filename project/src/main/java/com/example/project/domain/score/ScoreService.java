@@ -238,5 +238,31 @@ public class ScoreService {
         return response;
     }
 
+    public List<ScoreDTO> getTop4Scores() {
+        return scoreRepository.findTop4ByOrderByTotalScoreDesc()
+                .stream()
+                .map(score -> {
+                    ScoreDTO dto = ScoreDTO.fromEntity(score);
+                    return dto;
+                })
+                .toList();
+    }
+
+    public ScoreDTO getScoreWithTop4(Long scoreId) {
+        Score score = scoreRepository.findById(scoreId)
+                .orElseThrow(() -> new RuntimeException("Score not found"));
+
+        ScoreDTO scoreDTO = ScoreDTO.fromEntity(score);
+        scoreDTO.setTop4Scores(getTop4Scores());
+
+        return scoreDTO;
+    }
+
+    public String getUsernameByUserId(Long userId) {
+        return userRepository.findById(userId)
+                .map(User::getUsername)
+                .orElse("알 수 없음");
+    }
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

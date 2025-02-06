@@ -47,6 +47,7 @@ public class ScoreDTO {
         dto.setDate(score.getDate());
         dto.setScript(score.getScript());
 
+
         // 파일 정보 설정
         if (score.getFile() != null) {
             dto.setFileId(score.getFile().getFileId());
@@ -108,4 +109,16 @@ public class ScoreDTO {
 
         return dto;
     }
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-06 09:42 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    private String username;
+
+
+
+    private List<ScoreDTO> top4Scores;
+
+    public void setTop4Scores(List<ScoreDTO> top4Scores) {
+        this.top4Scores = top4Scores;
+    }
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
