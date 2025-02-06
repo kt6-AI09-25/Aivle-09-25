@@ -91,10 +91,93 @@
 
         <!-- 최근 활동 목록 -->
         <!-- 변경된 코드: 현재 접속 중인 사용자 목록 -->
+<<<<<<< Updated upstream
         <div class="online-users">
             <h3>현재 접속 중인 사용자</h3>
             <ul id="activeUsersList" class="users-list">
                 <li>로딩 중...</li>
+=======
+<!--        <div class="online-users">-->
+<!--            <h3>현재 접속 중인 사용자</h3>-->
+<!--            <ul id="activeUsersList" class="users-list">-->
+<!--                <li>로딩 중...</li>-->
+<!--            </ul>-->
+<!--            </ul>-->
+<!--        </div>-->
+
+        <!-- 차트나 그래프를 넣고 싶다면 Chart.js 사용 가능 -->
+
+<!--        <canvas id="myChart" width="400" height="200" style="background-color: #fff; margin-top: 20px;"></canvas>-->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <div class="dashboard-cards">
+
+            <div class="chart-card">
+                <h3>차트1</h3>
+                <div class="chart-container">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>등수</h3>
+                <li>
+                    <span>길동</span>
+                </li>
+                <li>
+                    <span>길동</span>
+                </li>
+                <li>
+                    <span>길동</span>
+                </li>
+                <li>
+                    <span>길동</span>
+                </li>
+            </div>
+
+            <div class="chart-card">
+                <h3>등수</h3>
+                <ul class="activities-list">
+                <li>
+                    <span>길동</span>
+                </li>
+                <li>
+                    <span>길동</span>
+                </li>
+                <li>
+                    <span>길동</span>
+                </li>
+                <li>
+                    <span>길동</span>
+                </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="dashboard-cards">
+
+            <div class="chart-card">
+                <h3>차트2</h3>
+                <div class="chart-container">
+                    <canvas id="myChart2"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>접속중인 회원</h3>
+                <ul id="activeUsersList" class="users-list">
+                    <li>로딩 중...</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="recent-activities">
+
+                    <h3>최근 활동</h3>
+                    <ul id="activityList" class="activities-list">
+                        <li>로딩 중...</li>
+                    </ul>
+
+>>>>>>> Stashed changes
             </ul>
         </div>
 
@@ -153,6 +236,37 @@
             document.addEventListener('DOMContentLoaded', fetchUserStats);
 
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-03 10:40 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        </script>
+
+        <script>
+            async function fetchRecentActivities() {
+                try {
+                    const response = await fetch('/admin/recent-activities');
+                    if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
+
+                    const activities = await response.json();
+                    const activityList = document.getElementById("activityList");
+                    activityList.innerHTML = ""; // 기존 목록 초기화
+
+                    if (activities.length === 0) {
+                        activityList.innerHTML = "<li>최근 활동 내역이 없습니다.</li>";
+                        return;
+                    }
+
+                    activities.forEach(activity => {
+                        const listItem = document.createElement("li");
+                        let link = activity.targetId ? `<a href="/posts/${activity.targetId}">게시글 보기</a>` : "";
+                        listItem.innerHTML = `<strong>${activity.username}</strong>님이 ${activity.action} ${link} - <span class="activity-time">${activity.createdAt}</span>`;
+                        activityList.appendChild(listItem);
+                    });
+                } catch (error) {
+                    console.error("최근 활동 불러오기 실패:", error);
+                    document.getElementById("activityList").innerHTML = "<li>활동 내역을 불러오는 중 오류가 발생했습니다.</li>";
+                }
+            }
+
+            // 페이지 로딩 시 데이터 가져오기
+            document.addEventListener("DOMContentLoaded", fetchRecentActivities);
         </script>
 
     </div>
