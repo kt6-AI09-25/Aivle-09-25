@@ -73,7 +73,7 @@
           opacity: 0.9;
         }
 
-        /* 차단 기간 select */
+
         select {
           padding: 4px;
           font-size: 0.85rem;
@@ -132,7 +132,7 @@
                     <th>닉네임</th>
                     <th>가입일</th>
                     <th>게시글 수</th>
-                    <th>마지막 접속일</th>
+                    <th id="sortLastLogin" style="cursor: pointer;">마지막 접속일</th>
                     <th>권한 설정</th>
                     <th>탈퇴 </th>
                 </tr>
@@ -183,6 +183,74 @@
         }
     });
 }
+
+let isAscending = true; // 정렬 방향 (true: 오름차순, false: 내림차순)
+
+    $(document).ready(function () {
+        loadUsers();
+
+        // "마지막 접속일" 클릭 이벤트 추가
+        $("#sortLastLogin").on("click", function () {
+            sortUsersByLastLogin();
+        });
+    });
+
+    function loadUsers() {
+        $.ajax({
+            url: "/admin/member/list",
+            type: "GET",
+            success: function (users) {
+                renderUserTable(users);
+            },
+            error: function () {
+                alert("회원 목록을 불러오는 데 실패했습니다.");
+            }
+        });
+    }
+
+    function renderUserTable(users) {
+        let tbody = $("#userTableBody");
+        tbody.empty();
+
+        users.forEach(user => {
+            let safeUsername = user.username.replace(/[@.]/g, "_"); // 특수 문자 변환
+            let row = `<tr data-last-login="${user.lastLogin}">
+                <td>${user.username}</td>
+                <td>${user.nickname}</td>
+                <td>${new Date(user.dateJoin).toLocaleDateString()}</td>
+                <td>${user.postCount}</td>
+                <td>${new Date(user.lastLogin).toLocaleDateString()}</td>
+                <td>
+                    <select id="roleSelect_${safeUsername}">
+                        <option value="USER" ${user.role === 'USER' ? 'selected' : ''}>일반 회원</option>
+                        <option value="ADMIN" ${user.role === 'ADMIN' ? 'selected' : ''}>관리자 회원</option>
+                    </select>
+                    <button class="block-btn" onclick="updateUserRole('${user.username}')">변경</button>
+                </td>
+                <td>
+                    <button class="delete-btn" onclick="deleteUser('${user.username}')">탈퇴</button>
+                </td>
+            </tr>`;
+            tbody.append(row);
+        });
+    }
+
+    function sortUsersByLastLogin() {
+        let rows = $("#userTableBody tr").get();
+
+        rows.sort((a, b) => {
+            let dateA = new Date($(a).data("last-login"));
+            let dateB = new Date($(b).data("last-login"));
+            return isAscending ? dateA - dateB : dateB - dateA;
+        });
+
+        isAscending = !isAscending; // 정렬 방향 변경
+
+        $("#userTableBody").empty().append(rows);
+
+        // 정렬 아이콘 변경 (⬍ = 기본 / ⬆ = 내림차순 / ⬇ = 오름차순)
+        $("#sortLastLogin").html(`마지막 접속일 ${isAscending ? '⬇' : '⬆'}`);
+    }
 
 
     function updateUserRole(username) {
