@@ -64,7 +64,7 @@
             <li><a href="/admin" class="active">메인</a></li>
             <li><a href="/admin/members">회원 관리</a></li>
             <li><a href="/admin/report">게시판 신고 관리</a></li>
-            <li><a href="presentations.html">발표 내용 조회</a></li>
+            <li><a href="/admin/prView">발표 내용 조회</a></li>
             <li><a href="statistics.html">통계 페이지</a></li>
         </ul>
 
@@ -105,9 +105,9 @@
         <div class="dashboard-cards">
 
             <div class="chart-card">
-                <h3>차트1</h3>
+                <h3>3종류 스코어 개별 평균</h3>
                 <div class="chart-container">
-                    <canvas id="myChart"></canvas>
+                    <canvas id="myChartAvg"></canvas>
                 </div>
             </div>
 
@@ -149,9 +149,9 @@
         <div class="dashboard-cards">
 
             <div class="chart-card">
-                <h3>차트2</h3>
+                <h3>최근 7일 서비스이용</h3>
                 <div class="chart-container">
-                    <canvas id="myChart2"></canvas>
+                    <canvas id="myChartRecent"></canvas>
                 </div>
             </div>
 
@@ -171,28 +171,6 @@
         </div>
       
         <script>
-            window.onload = () => {
-              const ctx = document.getElementById('myChart').getContext('2d');
-              new Chart(ctx, {
-                type: 'bar',
-                data: {
-                  labels: ['01-20','01-21','01-22','01-23','01-24','01-25','01-26'],
-                  datasets: [{
-                    label: '일일 가입자 수',
-                    data: [3,4,2,6,5,7,5],
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
-                  }]
-                },
-                options: {
-                  responsive: true,
-                  scales: {
-                    y: {
-                      beginAtZero: true
-                    }
-                  }
-                }
-              });
-            }
             //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-03 10:40 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             async function fetchUserStats() {
@@ -220,10 +198,6 @@
             // 페이지 로딩 후 데이터 가져오기
             document.addEventListener('DOMContentLoaded', fetchUserStats);
 
-            //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-03 10:40 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        </script>
-
-        <script>
             async function fetchRecentActivities() {
                 try {
                     const response = await fetch('/admin/recent-activities');
@@ -241,7 +215,7 @@
                     activities.forEach(activity => {
                         const listItem = document.createElement("li");
                         let link = activity.targetId ? `<a href="/posts/${activity.targetId}">게시글 보기</a>` : "";
-                        listItem.innerHTML = `<strong>${activity.username}</strong>님이 ${activity.action} ${link} - <span class="activity-time">${activity.createdAt}</span>`;
+                        listItem.innerHTML = `<strong>${activity.username}</strong>님이 ${activity.action} ${link} - <span class="activity-time">${activity.formattedCreatedAt}</span>`;
                         activityList.appendChild(listItem);
                     });
                 } catch (error) {
@@ -250,9 +224,108 @@
                 }
             }
 
-            // 페이지 로딩 시 데이터 가져오기
             document.addEventListener("DOMContentLoaded", fetchRecentActivities);
+
+
+            async function fetchRecentScoresChart() {
+                try {
+                    const response = await fetch('/scores/recent-counts'); // 최근 7일간 Score 개수 가져오는 API
+                    if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
+
+                    const data = await response.json();
+
+                    const labels = data.map(item => item.date); // 날짜 리스트
+                    const counts = data.map(item => item.count); // 점수 개수 리스트
+
+                    // 차트 그리기
+                    const ctx2 = document.getElementById('myChartRecent').getContext('2d');
+                    new Chart(ctx2, {
+                        type: 'line', // 꺾은선 그래프
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: '최근 7일간 Score 등록 수',
+                                data: counts,
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderWidth: 2,
+                                tension: 0.3, // 곡선 정도 (0 = 직선)
+                                pointRadius: 5, // 포인트 크기
+                                pointBackgroundColor: 'rgba(255, 99, 132, 1)' // 포인트 색상
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('최근 7일간 Score 데이터 불러오기 실패:', error);
+                }
+            }
+
+            // 페이지 로딩 후 실행
+            document.addEventListener('DOMContentLoaded', fetchRecentScoresChart);
+
+            let myChartInstance = null;
+
+            async function fetchAverageScoresChart() {
+                try {
+                    const response = await fetch('/scores/averages'); // 3종류의 평균 스코어 가져오는 API
+                    if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
+
+                    const data = await response.json();
+
+                    const labels = ['Motion Score', 'Expression Score', 'Language Score']; // 카테고리 라벨
+                    const scores = [data.motionScore, data.expressionScore, data.languageScore]; // 평균 스코어
+
+                    // 기존 차트가 있다면 삭제 (destroy)
+                    if (myChartInstance) {
+                        myChartInstance.destroy();
+                    }
+
+                    // 차트 그리기
+                    const ctx1 = document.getElementById('myChartAvg').getContext('2d');
+                    new Chart(ctx1, {
+                        type: 'bar', // 히스토그램(막대 그래프)
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: '평균 스코어',
+                                data: scores,
+                                backgroundColor: [
+                                    'rgba(54, 162, 235, 0.7)', // 파란색
+                                    'rgba(255, 99, 132, 0.7)', // 빨간색
+                                    'rgba(75, 192, 192, 0.7)'  // 초록색
+                                ],
+                                borderColor: [
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(75, 192, 192, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('평균 스코어 데이터 불러오기 실패:', error);
+                }
+            }
+
+            // 페이지 로딩 후 실행
+            document.addEventListener('DOMContentLoaded', fetchAverageScoresChart);
+
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-03 10:40 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         </script>
+
 
     </div>
 </div>

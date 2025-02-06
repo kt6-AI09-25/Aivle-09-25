@@ -153,6 +153,11 @@ public class AdminController {
         return "admin/report/members";
     }
 
+    @GetMapping("/prView")
+    public String prViewPage(){
+        return "admin/report/presentation";
+    }
+
     @GetMapping("/statistics")
     public ResponseEntity<Map<String, Long>> getUserStats() {
         long totalUsers = customUserDetailsService.getTotalUsers();
@@ -202,8 +207,5 @@ public class AdminController {
         return ResponseEntity.ok("사용자가 삭제되었습니다.");
     }
 
-    @GetMapping("/activity")
-    public String activity() {
-        return "admin/activitytest";
-    }
+
 }

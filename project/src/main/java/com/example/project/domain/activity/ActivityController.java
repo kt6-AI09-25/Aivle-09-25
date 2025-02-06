@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
@@ -15,6 +16,14 @@ public class ActivityController {
 
     @GetMapping("/recent-activities")
     public List<ActivityDTO> getRecentActivities() {
-        return activityRepository.findRecentActivities();
+        return activityRepository.findRecentActivities()
+                .stream()
+                .map(activity -> new ActivityDTO(
+                        activity.getUsername(),
+                        activity.getAction(),
+                        activity.getTargetId(),
+                        activity.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
     }
 }
