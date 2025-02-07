@@ -26,6 +26,12 @@
     <canvas id="expressionScoreChart"></canvas>
     <canvas id="languageScoreChart"></canvas>
 </div>
+<div class="container">
+    <canvas id="totalScoreKDE"></canvas>
+    <canvas id="motionScoreKDE"></canvas>
+    <canvas id="expressionScoreKDE"></canvas>
+    <canvas id="languageScoreKDE"></canvas>
+</div>
 
 <script>
     async function fetchData() {
@@ -39,20 +45,63 @@
 
         const response = await fetch('/scores/all');
         const scores = await response.json();
-
-        // 특정 scoreId의 점수 가져오기
         const specificScore = scores.find(s => s.scoreId == scoreId);
+
         if (!specificScore) {
             alert("Invalid scoreId!");
             return;
         }
 
-        function groupScores(scores, maxScore) {
-            const bins = new Array(Math.floor(maxScore / 5) + 1).fill(0);
-            scores.forEach(score => {
-                bins[Math.floor(score / 5)] += 1;
+        function gaussianKernelDensityEstimation(data, bandwidth) {
+            const kernel = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+            const min = 0; // 0으로 시작하도록 고정
+            const max = Math.max(...data);
+            const points = Array.from({ length: 100 }, (_, i) => min + (max - min) * i / 99);
+            const density = points.map(p => data.reduce((sum, d) => sum + kernel((p - d) / bandwidth), 0) / (data.length * bandwidth));
+            return { points, density };
+        }
+
+        function createHistogram(canvasId, labels, data, highlightedValue, labelName) {
+            new Chart(document.getElementById(canvasId).getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: labelName,
+                        data: labels.map(label => data.filter(score => Math.floor(score / 5) * 5 === label).length),
+                        backgroundColor: labels.map(label => (label === highlightedValue ? 'red' : 'rgba(54, 162, 235, 0.5)')),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { x: { type: 'category' }, y: { beginAtZero: true } }
+                }
             });
-            return bins;
+        }
+
+        function createKDEChart(canvasId, data, labelName) {
+            const kde = gaussianKernelDensityEstimation(data, 5);
+            new Chart(document.getElementById(canvasId).getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: kde.points,
+                    datasets: [{
+                        label: labelName,
+                        data: kde.density,
+                        borderColor: 'blue',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: true,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { x: { type: 'linear' }, y: { beginAtZero: true } }
+                }
+            });
         }
 
         const totalScores = scores.map(s => s.totalScore);
@@ -60,61 +109,15 @@
         const expressionScores = scores.map(s => s.expressionScore);
         const languageScores = scores.map(s => s.languageScore);
 
-        const groupedTotalScores = groupScores(totalScores, 300);
-        const groupedMotionScores = groupScores(motionScores, 100);
-        const groupedExpressionScores = groupScores(expressionScores, 100);
-        const groupedLanguageScores = groupScores(languageScores, 100);
+        createHistogram("totalScoreChart", Array.from({ length: 61 }, (_, i) => i * 5), totalScores, Math.round(specificScore.totalScore / 5) * 5, "Total Score");
+        createHistogram("motionScoreChart", Array.from({ length: 21 }, (_, i) => i * 5), motionScores, Math.round(specificScore.motionScore / 5) * 5, "Motion Score");
+        createHistogram("expressionScoreChart", Array.from({ length: 21 }, (_, i) => i * 5), expressionScores, Math.round(specificScore.expressionScore / 5) * 5, "Expression Score");
+        createHistogram("languageScoreChart", Array.from({ length: 21 }, (_, i) => i * 5), languageScores, Math.round(specificScore.languageScore / 5) * 5, "Language Score");
 
-        const totalLabels = Array.from({ length: 61 }, (_, i) => i * 5);  // 0~300
-        const otherLabels = Array.from({ length: 21 }, (_, i) => i * 5);  // 0~100
-
-        function roundToNearestFive(score) {
-            return Math.round(score / 5) * 5;
-        }
-
-        const highlightedTotal = roundToNearestFive(specificScore.totalScore);
-        const highlightedMotion = roundToNearestFive(specificScore.motionScore);
-        const highlightedExpression = roundToNearestFive(specificScore.expressionScore);
-        const highlightedLanguage = roundToNearestFive(specificScore.languageScore);
-
-        function getBarColors(labels, highlightedValue) {
-            return labels.map(label => (label === highlightedValue ? 'red' : 'rgba(54, 162, 235, 0.5)'));
-        }
-
-        function createHistogram(canvasId, labels, data, highlightedValue, labelName) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: labelName,
-                        data: data,
-                        backgroundColor: getBarColors(labels, highlightedValue), // 특정 점수 바 강조
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            type: 'category',
-                            ticks: { stepSize: 5 }
-                        },
-                        y: { beginAtZero: true }
-                    },
-                    barPercentage: 0.5,
-                    categoryPercentage: 0.5
-                }
-            });
-        }
-
-        createHistogram("totalScoreChart", totalLabels, groupedTotalScores, highlightedTotal, "Total Score");
-        createHistogram("motionScoreChart", otherLabels, groupedMotionScores, highlightedMotion, "Motion Score");
-        createHistogram("expressionScoreChart", otherLabels, groupedExpressionScores, highlightedExpression, "Expression Score");
-        createHistogram("languageScoreChart", otherLabels, groupedLanguageScores, highlightedLanguage, "Language Score");
+        createKDEChart("totalScoreKDE", totalScores, "Total Score KDE");
+        createKDEChart("motionScoreKDE", motionScores, "Motion Score KDE");
+        createKDEChart("expressionScoreKDE", expressionScores, "Expression Score KDE");
+        createKDEChart("languageScoreKDE", languageScores, "Language Score KDE");
     }
 
     fetchData();

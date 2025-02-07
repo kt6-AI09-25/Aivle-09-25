@@ -6,10 +6,7 @@ import com.example.project.domain.comment.CommentService;
 import com.example.project.domain.letter.LetterDTO;
 import com.example.project.domain.letter.LetterService;
 import com.example.project.domain.noticeboard.NoticeBoardDTO;
-import com.example.project.domain.noticeboard.NoticeBoardRepository;
 import com.example.project.domain.noticeboard.NoticeBoardService;
-import com.example.project.domain.score.Score;
-import com.example.project.domain.score.ScoreDTO;
 import com.example.project.domain.score.ScoreService;
 import com.example.project.domain.user.CustomUserDetailsService;
 import com.example.project.domain.user.UpdateUserRole;
@@ -25,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -213,6 +209,6 @@ public class AdminController {
     @GetMapping("/visualization")
     public String showScoreVisualization(@RequestParam(value = "scoreId", required = false) Long scoreId, Model model) {
         model.addAttribute("scoreId", scoreId);
-        return "/admin/temp_graph";
+        return "admin/temp_graph";
     }
 }
