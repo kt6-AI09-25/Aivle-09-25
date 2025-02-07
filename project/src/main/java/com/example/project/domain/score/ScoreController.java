@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -194,5 +195,30 @@ public class ScoreController {
     }
 
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // 재관 현재점수가 전체에서 몇퍼센트에 있는지 반환
+    @GetMapping("/distribution")
+    @ResponseBody
+    public double distribution(@RequestParam("totalscore") double totalscore) {
+        List<Score> scores = scoreService.getAllScores();
+        // 모든 totalscore 값 추출
+        List<Double> totalScores = scores.stream()
+                .map(Score::getTotalScore)
+                .sorted()
+                .collect(Collectors.toList());
+
+        int totalCount = totalScores.size();
+        if (totalCount == 0) {
+            return 0;
+        }
+
+        // 현재 입력받은 totalscore 값의 순위 찾기
+        int rank = Collections.binarySearch(totalScores, totalscore);
+        if (rank < 0) {
+            rank = -rank - 1;
+        }
+
+        double percentile = (double) rank / totalCount * 100;
+        return percentile;
+    }
 
 }
