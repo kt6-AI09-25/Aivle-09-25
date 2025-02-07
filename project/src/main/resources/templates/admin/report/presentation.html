@@ -5,6 +5,9 @@
     <title>관리자 페이지 - 회원 관리</title>
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         /* 기본 스타일 */
 
@@ -93,6 +96,137 @@
             padding: 15px;
           }
         }
+
+        .button-group {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 10px;
+      }
+
+      .score-btn {
+          padding: 10px 15px;
+          margin: 5px;
+          border: none;
+          background-color: #007bff;
+          color: white;
+          border-radius: 5px;
+          cursor: pointer;
+      }
+
+      .score-btn:hover {
+          background-color: #0056b3;
+      }
+
+        /* 모달 기본 스타일 */
+        .stat-modal {
+          display: none;
+          position: fixed;
+          z-index: 1000;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      /* 모달 내부 컨텐츠 */
+      .stat-modal-content {
+          background-color: #fff;
+          margin: 5% auto;
+          padding: 20px;
+          width: 60%;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      /* 모달 내부 Grid 레이아웃 */
+      .modal-grid {
+          display: grid;
+          grid-template-columns: 2fr 1fr; /* 왼쪽(차트) 2비율, 오른쪽(글) 1비율 */
+          gap: 10px;
+          align-items: center;
+      }
+
+      /* 차트 컨테이너 */
+      .chart-container {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+      }
+
+      /* 오른쪽 글 컨테이너 */
+      .text-container {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+      }
+
+      /* 글 박스 스타일 */
+      .text-box {
+          background-color: #f8f8f8;
+          padding: 20px;
+          text-align: center;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+      }
+
+/* 닫기 버튼 */
+.stat-close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.stat-close-btn:hover {
+    color: black;
+}
+
+
+/* 버튼 그룹 스타일 */
+.button-group {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.score-btn {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.score-btn:hover {
+    background-color: #0056b3;
+}
+
+/* 모달 내부 Grid 레이아웃 */
+.modal-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 왼쪽(차트) 2, 오른쪽(텍스트) 1 */
+    gap: 10px;
+    align-items: center;
+}
+
+/* 차트 컨테이너 */
+.chart-container {
+    width: 100%;
+}
+
+/* 모달 내부 텍스트 스타일 */
+.text-box {
+    background-color: #f8f8f8;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+
     </style>
 </head>
 <body>
@@ -170,9 +304,41 @@
                     <td>95</td>
                     <td>285</td>
                 </tr>
-
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- 발표 점수 상세 조회 모달 -->
+    <div id="scoreStatModal" class="stat-modal">
+        <div class="stat-modal-content">
+            <span class="stat-close-btn">&times;</span>
+            <h2 id="modalTitle">발표 점수 상세 정보</h2>
+
+            <!-- 점수 선택 버튼 -->
+            <div class="button-group">
+                <button class="score-btn" data-type="behavior">행동 점수</button>
+                <button class="score-btn" data-type="expression">표정 점수</button>
+                <button class="score-btn" data-type="language">언어 점수</button>
+                <button class="score-btn" data-type="total">총합 점수</button>
+            </div>
+
+            <!-- 그리드 레이아웃 -->
+            <div class="modal-grid">
+                <!-- 차트 영역 -->
+                <div class="chart-container">
+                    <canvas id="scoreChart"></canvas>
+                </div>
+
+                <!-- 점수 상세 정보 -->
+                <div class="text-container">
+                    <div class="text-box">
+                        <p><strong>회원 ID:</strong> <span id="modalUserId"></span></p>
+                        <p><strong>발표 날짜:</strong> <span id="modalDate"></span></p>
+                        <p><strong>현재 점수:</strong> <span id="modalScore"></span>점</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -215,6 +381,125 @@
             }
           });
         }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+          let chartInstance = null;
+          let currentUserId = "";
+          let currentDate = "";
+
+          // 모달 열기 (테이블 행 클릭)
+          $(document).on("click", ".table-wrapper tbody tr", function () {
+              currentUserId = $(this).find("td:eq(0)").text().trim();
+              currentDate = $(this).find("td:eq(1)").text().trim();
+              let behaviorScore = parseFloat($(this).find("td:eq(2)").text().trim());
+              let expressionScore = parseFloat($(this).find("td:eq(3)").text().trim());
+              let languageScore = parseFloat($(this).find("td:eq(4)").text().trim());
+              let totalScore = parseFloat($(this).find("td:eq(5)").text().trim());
+
+              // 모달에 기본 데이터 설정
+              $("#modalUserId").text(currentUserId);
+              $("#modalDate").text(currentDate);
+
+              // 모달 초기값: "총합 점수" 표시
+              updateModalContent("total", totalScore, [behaviorScore, expressionScore, languageScore, totalScore]);
+
+              // 모달 표시
+              $("#scoreStatModal").fadeIn();
+          });
+
+          // 버튼 클릭 시 모달 내용 변경
+          $(document).on("click", ".score-btn", function () {
+              let scoreType = $(this).data("type");
+              let scoreValue;
+
+              // 현재 클릭된 행에서 점수 가져오기
+              let behaviorScore = parseFloat($(".table-wrapper tbody tr.selected td:eq(2)").text().trim());
+              let expressionScore = parseFloat($(".table-wrapper tbody tr.selected td:eq(3)").text().trim());
+              let languageScore = parseFloat($(".table-wrapper tbody tr.selected td:eq(4)").text().trim());
+              let totalScore = parseFloat($(".table-wrapper tbody tr.selected td:eq(5)").text().trim());
+
+              let scoreArray = [behaviorScore, expressionScore, languageScore, totalScore];
+
+              switch (scoreType) {
+                  case "behavior":
+                      scoreValue = behaviorScore;
+                      break;
+                  case "expression":
+                      scoreValue = expressionScore;
+                      break;
+                  case "language":
+                      scoreValue = languageScore;
+                      break;
+                  case "total":
+                      scoreValue = totalScore;
+                      break;
+                  default:
+                      scoreValue = 0;
+              }
+
+              updateModalContent(scoreType, scoreValue, scoreArray);
+          });
+
+          // 모달 닫기
+          $(document).on("click", ".stat-close-btn", function () {
+              $("#scoreStatModal").fadeOut();
+          });
+
+          $(document).on("click", function (event) {
+              if ($(event.target).attr("id") === "scoreStatModal") {
+                  $("#scoreStatModal").fadeOut();
+              }
+          });
+
+          // 점수 변경 시 모달 업데이트
+          function updateModalContent(scoreType, scoreValue, scoreArray) {
+              let titleMap = {
+                  behavior: "행동 점수 상세 조회",
+                  expression: "표정 점수 상세 조회",
+                  language: "언어 점수 상세 조회",
+                  total: "총합 점수 상세 조회"
+              };
+
+              // 제목 변경
+              $("#modalTitle").text(titleMap[scoreType]);
+
+              // 점수 업데이트
+              $("#modalScore").text(scoreValue);
+
+              // 차트 업데이트
+              updateChart(scoreArray);
+          }
+
+          // 차트 업데이트 함수
+          function updateChart(scoreArray) {
+              if (chartInstance) {
+                  chartInstance.destroy();
+              }
+
+              let ctx = document.getElementById("scoreChart").getContext("2d");
+              chartInstance = new Chart(ctx, {
+                  type: "bar",
+                  data: {
+                      labels: ["행동 점수", "표정 점수", "언어 점수", "총합 점수"],
+                      datasets: [{
+                          label: "점수",
+                          data: scoreArray,
+                          backgroundColor: ["blue", "green", "orange", "red"]
+                      }]
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      scales: {
+                          y: { beginAtZero: true }
+                      }
+                  }
+              });
+          }
+      });
+
     </script>
 </div><!-- /.content -->
 </body>
