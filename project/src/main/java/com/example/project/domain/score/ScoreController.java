@@ -184,6 +184,8 @@ public class ScoreController {
         List<Map<String, Object>> response = scores.stream().map(score -> {
             Map<String, Object> data = new HashMap<>();
             data.put("scoreId", score.getScoreId());
+            data.put("userId", score.getUser().getUsername());
+            data.put("date", score.getDate().toString());
             data.put("totalScore", score.getTotalScore());
             data.put("motionScore", score.getMotionScore());
             data.put("expressionScore", score.getExpressionScore());
