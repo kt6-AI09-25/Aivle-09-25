@@ -211,15 +211,4 @@ public class AdminController {
         model.addAttribute("scoreId", scoreId);
         return "admin/temp_graph";
     }
-
-    @GetMapping("/score-details")
-    public String showScoreDetails(@RequestParam(value = "scoreId", required = false) Long scoreId, Model model) {
-        if (scoreId == null) {
-            throw new IllegalArgumentException("scoreId 값이 필요합니다."); // scoreId가 없으면 에러 발생
-        }
-        model.addAttribute("scoreId", scoreId);
-        return "admin/score_details";
-    }
-
-
 }
