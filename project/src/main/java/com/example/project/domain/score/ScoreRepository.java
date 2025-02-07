@@ -41,6 +41,34 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
 
     List<Score> findTop4ByOrderByTotalScoreDesc();
 
+    @Query("SELECT new com.example.project.domain.score.ScoreDetailsDTO( " +
+            "s.scoreId, s.totalScore, s.motionScore, s.expressionScore, s.languageScore, " +
+            "s.motionFrequency, s.expressionFrequency, s.languageFrequency, " +
+            "LEAST(s.motionScore, s.expressionScore, s.languageScore), " +
+            "CASE " +
+            "WHEN s.motionScore <= s.expressionScore AND s.motionScore <= s.languageScore THEN 'motion' " +
+            "WHEN s.expressionScore <= s.motionScore AND s.expressionScore <= s.languageScore THEN 'expression' " +
+            "WHEN s.languageScore <= s.motionScore AND s.languageScore <= s.expressionScore THEN 'language' " +
+            "END, " +
+            "CAST(PERCENT_RANK() OVER (ORDER BY s.motionScore ASC) AS DOUBLE) * 100, " +
+            "CAST(PERCENT_RANK() OVER (ORDER BY s.expressionScore ASC) AS DOUBLE) * 100, " +
+            "CAST(PERCENT_RANK() OVER (ORDER BY s.languageScore ASC) AS DOUBLE) * 100, " +
+            "CAST(PERCENT_RANK() OVER (ORDER BY s.totalScore ASC) AS DOUBLE) * 100) " +
+            "FROM Score s WHERE s.scoreId = :scoreId")
+    Optional<ScoreDetailsDTO> findScoreWithDetailsByScoreId(@Param("scoreId") Long scoreId);
+
+
+
+    @Query("SELECT s.motionFrequency, COUNT(s) FROM Score s GROUP BY s.motionFrequency")
+    List<Object[]> getMotionFrequencyDistribution();
+
+    @Query("SELECT s.expressionFrequency, COUNT(s) FROM Score s GROUP BY s.expressionFrequency")
+    List<Object[]> getExpressionFrequencyDistribution();
+
+    @Query("SELECT s.languageFrequency, COUNT(s) FROM Score s GROUP BY s.languageFrequency")
+    List<Object[]> getLanguageFrequencyDistribution();
+
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 }

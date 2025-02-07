@@ -268,5 +268,54 @@ public class ScoreService {
         return scoreRepository.findAll();
     }
 
+    public ScoreDetailsDTO getScoreDetailPoints(Long scoreId) {
+        ScoreDetailsDTO details = scoreRepository.findScoreWithDetailsByScoreId(scoreId)
+                .orElseThrow(() -> new IllegalArgumentException("Score not found for ID: " + scoreId));
+
+        // ✅ 프리퀀시 비율 계산 추가
+        Map<String, Double> frequencyRatios = calculateFrequencyRatios();
+        details.setMotionFrequencyRatio(frequencyRatios.getOrDefault(details.getMotionFrequency(), 0.0));
+        details.setExpressionFrequencyRatio(frequencyRatios.getOrDefault(details.getExpressionFrequency(), 0.0));
+        details.setLanguageFrequencyRatio(frequencyRatios.getOrDefault(details.getLanguageFrequency(), 0.0));
+
+        return details;
+    }
+
+
+
+    private double castToDouble(Object obj) {
+        if (obj instanceof Number) {
+            return ((Number) obj).doubleValue();
+        }
+        return 0.0;
+    }
+
+    public Map<String, Double> calculateFrequencyRatios() {
+        long totalCount = scoreRepository.count(); // 전체 데이터 개수
+
+        Map<String, Double> motionFrequencyRatios = calculateRatio(scoreRepository.getMotionFrequencyDistribution(), totalCount);
+        Map<String, Double> expressionFrequencyRatios = calculateRatio(scoreRepository.getExpressionFrequencyDistribution(), totalCount);
+        Map<String, Double> languageFrequencyRatios = calculateRatio(scoreRepository.getLanguageFrequencyDistribution(), totalCount);
+
+        Map<String, Double> frequencyRatios = new HashMap<>();
+        frequencyRatios.putAll(motionFrequencyRatios);
+        frequencyRatios.putAll(expressionFrequencyRatios);
+        frequencyRatios.putAll(languageFrequencyRatios);
+
+        return frequencyRatios;
+    }
+
+    private Map<String, Double> calculateRatio(List<Object[]> data, long totalCount) {
+        Map<String, Double> result = new HashMap<>();
+        for (Object[] row : data) {
+            String frequency = (String) row[0];
+            long count = ((Number) row[1]).longValue();
+            result.put(frequency, (count * 100.0) / totalCount);
+        }
+        return result;
+    }
+
+
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-06 09:42 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
