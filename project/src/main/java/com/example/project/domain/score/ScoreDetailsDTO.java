@@ -18,25 +18,24 @@ public class ScoreDetailsDTO {
     private String motionFrequency;
     private String expressionFrequency;
     private String languageFrequency;
-    private Double lowestScore;
-    private String lowestScoreType;
+    private Double totalFrequencyRatio;
+    private String totalFrequency;
 
-    // ✅ 추가: 퍼센타일 (상위 몇 %)
+    //퍼센타일 (상위 몇 %)
     private Double motionPercentile;
     private Double expressionPercentile;
     private Double languagePercentile;
     private Double totalPercentile;
 
-    // ✅ 추가: 전체 데이터에서 프리퀀시 비율
+    //전체 데이터에서 프리퀀시 비율
     private Double motionFrequencyRatio;
     private Double expressionFrequencyRatio;
     private Double languageFrequencyRatio;
 
-    // ✅ 생성자 추가 (Hibernate 오류 방지)
+
     public ScoreDetailsDTO(Long scoreId, Double totalScore, Double motionScore, Double expressionScore, Double languageScore,
                            String motionFrequency, String expressionFrequency, String languageFrequency,
-                           Double lowestScore, String lowestScoreType,
-                           Double motionPercentile, Double expressionPercentile, Double languagePercentile, Double totalPercentile) {
+                           Double totalFrequencyRatio, String totalFrequency) {
         this.scoreId = scoreId;
         this.totalScore = totalScore;
         this.motionScore = motionScore;
@@ -45,12 +44,14 @@ public class ScoreDetailsDTO {
         this.motionFrequency = motionFrequency;
         this.expressionFrequency = expressionFrequency;
         this.languageFrequency = languageFrequency;
-        this.lowestScore = lowestScore;
-        this.lowestScoreType = lowestScoreType;
-        this.motionPercentile = motionPercentile;
-        this.expressionPercentile = expressionPercentile;
-        this.languagePercentile = languagePercentile;
-        this.totalPercentile = totalPercentile;
+        this.totalFrequencyRatio = totalFrequencyRatio;
+        this.totalFrequency = totalFrequency;
+
+        // Percentile은 나중에 ScoreService에서 설정
+        this.motionPercentile = 0.0;
+        this.expressionPercentile = 0.0;
+        this.languagePercentile = 0.0;
+        this.totalPercentile = 0.0;
     }
 }
 

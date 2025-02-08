@@ -144,6 +144,7 @@ public class ScoreController {
         averages.put("motionScore", scoreService.getAverageMotionScore());
         averages.put("expressionScore", scoreService.getAverageExpressionScore());
         averages.put("languageScore", scoreService.getAverageLanguageScore());
+        averages.put("totalScore", scoreService.getAverageTotalScore());
         return ResponseEntity.ok(averages);
     }
 
@@ -197,8 +198,8 @@ public class ScoreController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{scoreId}/details")
-    public ResponseEntity<ScoreDetailsDTO> getScoreDetailPoints(@PathVariable Long scoreId) {
+    @GetMapping("/details2")
+    public ResponseEntity<ScoreDetailsDTO> getScoreDetailPoints(@RequestParam("scoreId") Long scoreId) {
         ScoreDetailsDTO details = scoreService.getScoreDetailPoints(scoreId);
         return ResponseEntity.ok(details);
     }

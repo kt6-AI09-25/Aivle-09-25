@@ -207,6 +207,10 @@ public class ScoreService {
         return scoreRepository.getAverageLanguageScore();
     }
 
+    public Double getAverageTotalScore() {
+        return scoreRepository.getAverageTotalScore();
+    }
+
     public List<Map<String, Object>> getRecentScoresCount() {
         // 최근 7일간의 날짜 계산
         LocalDateTime sevenDaysAgo = LocalDate.now().minusDays(6).atStartOfDay();
@@ -268,21 +272,6 @@ public class ScoreService {
         return scoreRepository.findAll();
     }
 
-    public ScoreDetailsDTO getScoreDetailPoints(Long scoreId) {
-        ScoreDetailsDTO details = scoreRepository.findScoreWithDetailsByScoreId(scoreId)
-                .orElseThrow(() -> new IllegalArgumentException("Score not found for ID: " + scoreId));
-
-        // ✅ 프리퀀시 비율 계산 추가
-        Map<String, Double> frequencyRatios = calculateFrequencyRatios();
-        details.setMotionFrequencyRatio(frequencyRatios.getOrDefault(details.getMotionFrequency(), 0.0));
-        details.setExpressionFrequencyRatio(frequencyRatios.getOrDefault(details.getExpressionFrequency(), 0.0));
-        details.setLanguageFrequencyRatio(frequencyRatios.getOrDefault(details.getLanguageFrequency(), 0.0));
-
-        return details;
-    }
-
-
-
     private double castToDouble(Object obj) {
         if (obj instanceof Number) {
             return ((Number) obj).doubleValue();
@@ -314,6 +303,49 @@ public class ScoreService {
         }
         return result;
     }
+
+    public ScoreDetailsDTO getScoreDetailPoints(Long scoreId) {
+        ScoreDetailsDTO details = scoreRepository.findScoreWithDetailsByScoreId(scoreId)
+                .orElseThrow(() -> new IllegalArgumentException("Score not found for ID: " + scoreId));
+
+        Map<String, Double> frequencyRatios = calculateFrequencyRatios();
+        details.setMotionFrequencyRatio(frequencyRatios.getOrDefault(details.getMotionFrequency(), 0.0));
+        details.setExpressionFrequencyRatio(frequencyRatios.getOrDefault(details.getExpressionFrequency(), 0.0));
+        details.setLanguageFrequencyRatio(frequencyRatios.getOrDefault(details.getLanguageFrequency(), 0.0));
+
+        // 전체 데이터 가져오기
+        List<Score> allScores = scoreRepository.findAll();
+
+        // 모든 점수를 리스트로 변환하여 정렬
+        List<Double> motionScores = allScores.stream().map(Score::getMotionScore).sorted().toList();
+        List<Double> expressionScores = allScores.stream().map(Score::getExpressionScore).sorted().toList();
+        List<Double> languageScores = allScores.stream().map(Score::getLanguageScore).sorted().toList();
+        List<Double> totalScores = allScores.stream().map(Score::getTotalScore).sorted().toList();
+
+        // 현재 점수의 percentile 계산
+        details.setMotionPercentile(calculatePercentile(motionScores, details.getMotionScore()));
+        details.setExpressionPercentile(calculatePercentile(expressionScores, details.getExpressionScore()));
+        details.setLanguagePercentile(calculatePercentile(languageScores, details.getLanguageScore()));
+        details.setTotalPercentile(calculatePercentile(totalScores, details.getTotalScore()));
+
+        return details;
+    }
+
+    private double calculatePercentile(List<Double> sortedScores, double score) {
+        int totalCount = sortedScores.size();
+        if (totalCount == 0) return 0.0;
+
+        int rank = Collections.binarySearch(sortedScores, score);
+        if (rank < 0) rank = -rank - 1; // 삽입 위치 계산
+
+        double percentile = ((double) rank / totalCount) * 100;
+
+        //하위 몇 % → 상위 몇 % 변환
+        return 100.0 - percentile;
+    }
+
+
+
 
 
 
