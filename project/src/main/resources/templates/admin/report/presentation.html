@@ -106,6 +106,8 @@
             border-radius: 5px;
         }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -168,17 +170,19 @@
 
         <!-- 모달 내부 레이아웃 -->
         <div class="modal-grid">
-            <!-- 차트 공간 (비워둠, 나중에 추가 가능) -->
+            <!-- 모달 내부 차트 영역 -->
             <div class="chart-container">
-                차트 영역 (나중에 추가 가능)
+                <canvas id="scoreChart"></canvas>
             </div>
 
             <!-- 점수 상세 정보 -->
             <div class="text-container">
                 <div class="text-box">
-                   
+
                     <p><strong>점수:</strong> <span id="modalScore"></span>점</p>
-                    <p><strong>빈도:</strong> <span id="modalFrequency"></span></p>
+                    <p><strong>위치:</strong> <span id="modalPercentile"></span>%</p>
+                    <p><strong>주요감점요인:</strong> <span id="modalFrequency"></span></p>
+                    <p><strong>전체 중 동일 주요감점요인 비율:</strong> <span id="modalFrequencyRatio"></span>%</p>
                 </div>
             </div>
         </div>
@@ -210,10 +214,10 @@
                             <tr data-scoreid="${score.scoreId}">
                                 <td>${score.userId}</td>
                                 <td>${formatDate(score.date)}</td>
-                                <td>${score.motionScore}</td>
-                                <td>${score.expressionScore}</td>
-                                <td>${score.languageScore}</td>
-                                <td>${score.totalScore}</td>
+                                <td>${Math.round(score.motionScore)}</td>
+                                <td>${Math.round(score.expressionScore)}</td>
+                                <td>${Math.round(score.languageScore)}</td>
+                                <td>${Math.round(score.totalScore)}</td>
                             </tr>
                         `;
                         tbody.append(row);
@@ -253,7 +257,7 @@
         });
 
             $.ajax({
-                url: "/scores/details",
+                url: "/scores/details2",
                 type: "GET",
                 data: { scoreId: scoreId },
                 dataType: "json",
@@ -275,18 +279,174 @@
         });
 
         function updateModalContent(scoreType) {
-            let scoreValue = currentData[`${scoreType}Score`] || "없음";
+            let scoreValue = Math.round(currentData[`${scoreType}Score`]) || "없음";
+            let percentileValue = Math.round(currentData[`${scoreType}Percentile`]) || "없음";
             let frequencyValue = currentData[`${scoreType}Frequency`] || "없음";
+            let frequencyRatioValue = Math.round(currentData[`${scoreType}FrequencyRatio`]) || "없음";
 
             $("#modalTitle").text(scoreType.toUpperCase() + " 점수 상세 조회");
             $("#modalScore").text(scoreValue);
+            $("#modalPercentile").text(percentileValue);
             $("#modalFrequency").text(frequencyValue);
+            $("#modalFrequencyRatio").text(frequencyRatioValue);
         }
 
         // 페이지 로드 시 테이블 데이터 불러오기
         loadScores();
     });
+
+    $(document).ready(function () {
+    let currentData = {};
+    let chartInstance = null;  // 기존 차트 인스턴스 저장
+
+    function loadScores() {
+        $.ajax({
+            url: "/scores/all",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                let tbody = $(".table-wrapper tbody");
+                tbody.empty();
+
+                if (data.length === 0) {
+                    tbody.append("<tr><td colspan='6'>데이터가 없습니다.</td></tr>");
+                    return;
+                }
+
+                data.forEach(function (score) {
+                    let row = `
+                        <tr data-scoreid="${score.scoreId}">
+                            <td>${score.userId}</td>
+                            <td>${formatDate(score.date)}</td>
+                            <td>${Math.round(score.motionScore)}</td>
+                            <td>${Math.round(score.expressionScore)}</td>
+                            <td>${Math.round(score.languageScore)}</td>
+                            <td>${Math.round(score.totalScore)}</td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+            },
+            error: function () {
+                alert("점수 데이터를 불러오는 데 실패했습니다.");
+            }
+        });
+    }
+
+    function formatDate(isoString) {
+        const date = new Date(isoString);
+        return date.toISOString().split("T")[0];
+    }
+
+    $(document).on("click", ".table-wrapper tbody tr", function () {
+        let scoreId = $(this).data("scoreid");
+
+        if (!scoreId) {
+            alert("scoreId가 존재하지 않습니다.");
+            return;
+        }
+
+        $.ajax({
+            url: "/scores/details2",
+            type: "GET",
+            data: { scoreId: scoreId },
+            dataType: "json",
+            success: function (data) {
+                currentData = data;
+                $("#modalUserId").text(data.userId || "없음");
+                updateModalContent("total");
+                $("#scoreStatModal").fadeIn();
+            },
+            error: function () {
+                alert("점수 데이터를 불러오는 데 실패했습니다.");
+            }
+        });
+    });
+
+    $(document).on("click", ".score-btn", function () {
+        let scoreType = $(this).data("type");
+        updateModalContent(scoreType);
+    });
+
+    function updateModalContent(scoreType) {
+        let scoreValue = Math.round(currentData[`${scoreType}Score`]) || "없음";
+        let percentileValue = Math.round(currentData[`${scoreType}Percentile`]) || "없음";
+        let frequencyValue = currentData[`${scoreType}Frequency`] || "없음";
+        let frequencyRatioValue = Math.round(currentData[`${scoreType}FrequencyRatio`]) || "없음";
+
+        $("#modalTitle").text(scoreType.toUpperCase() + " 점수 상세 조회");
+        $("#modalScore").text(scoreValue);
+        $("#modalPercentile").text(percentileValue);
+        $("#modalFrequency").text(frequencyValue);
+        $("#modalFrequencyRatio").text(frequencyRatioValue);
+
+        updateChart(scoreType);
+    }
+
+    function updateChart(scoreType) {
+            if (!currentData || !currentData[`${scoreType}Score`]) return;
+
+            let canvas = document.getElementById("scoreChart").getContext("2d");
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            $.ajax({
+                url: "/scores/all",
+                type: "GET",
+                dataType: "json",
+                success: function (scores) {
+                    let scoreValues = scores.map(s => s[`${scoreType}Score`]);
+
+                    let labels = Array.from({ length: 21 }, (_, i) => i * 5);
+                    if (scoreType === "total") {
+                        labels = Array.from({ length: 61 }, (_, i) => i * 5);
+                    }
+
+                    let highlightedValue = Math.round(currentData[`${scoreType}Score`] / 5) * 5;
+
+                    chartInstance = new Chart(canvas, {
+                        type: "bar",
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: scoreType.toUpperCase() + " Score",
+                                data: labels.map(label => scoreValues.filter(score => Math.floor(score / 5) * 5 === label).length),
+                                backgroundColor: labels.map(label => (label === highlightedValue ? "red" : "rgba(54, 162, 235, 0.5)")),
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { type: "category" },
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        $(document).on("click", ".stat-close-btn", function () {
+            $("#scoreStatModal").fadeOut();
+        });
+
+        $(document).on("click", function (event) {
+            if ($(event.target).attr("id") === "scoreStatModal") {
+                $("#scoreStatModal").fadeOut();
+            }
+        });
+
+        loadScores();
+    });
+
+
 </script>
+
+
 
 </body>
 </html>

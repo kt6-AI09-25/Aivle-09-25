@@ -205,10 +205,4 @@ public class AdminController {
         userRepository.delete(user); // 사용자 삭제
         return ResponseEntity.ok("사용자가 삭제되었습니다.");
     }
-
-    @GetMapping("/visualization")
-    public String showScoreVisualization(@RequestParam(value = "scoreId", required = false) Long scoreId, Model model) {
-        model.addAttribute("scoreId", scoreId);
-        return "admin/temp_graph";
-    }
 }

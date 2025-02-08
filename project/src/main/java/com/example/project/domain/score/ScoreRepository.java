@@ -32,6 +32,9 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
     @Query("SELECT AVG(s.languageScore) FROM Score s")
     Double getAverageLanguageScore();
 
+    @Query("SELECT AVG(s.totalScore) FROM Score s")
+    Double getAverageTotalScore();
+
     @Query("SELECT DATE(s.date), COUNT(s) " +
             "FROM Score s " +
             "WHERE s.date >= :startDate " +
@@ -49,13 +52,10 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "WHEN s.motionScore <= s.expressionScore AND s.motionScore <= s.languageScore THEN 'motion' " +
             "WHEN s.expressionScore <= s.motionScore AND s.expressionScore <= s.languageScore THEN 'expression' " +
             "WHEN s.languageScore <= s.motionScore AND s.languageScore <= s.expressionScore THEN 'language' " +
-            "END, " +
-            "CAST(PERCENT_RANK() OVER (ORDER BY s.motionScore ASC) AS DOUBLE) * 100, " +
-            "CAST(PERCENT_RANK() OVER (ORDER BY s.expressionScore ASC) AS DOUBLE) * 100, " +
-            "CAST(PERCENT_RANK() OVER (ORDER BY s.languageScore ASC) AS DOUBLE) * 100, " +
-            "CAST(PERCENT_RANK() OVER (ORDER BY s.totalScore ASC) AS DOUBLE) * 100) " +
+            "END) " +
             "FROM Score s WHERE s.scoreId = :scoreId")
     Optional<ScoreDetailsDTO> findScoreWithDetailsByScoreId(@Param("scoreId") Long scoreId);
+
 
 
 
