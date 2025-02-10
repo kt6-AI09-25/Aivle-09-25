@@ -293,7 +293,7 @@
                 </div>
 
                 <div class="text-box">
-                    <p><strong>주요 감점 요인은</strong> <span id="modalFrequency"> </span></p>
+                    <p><strong>주요 감점 요인 : </strong> <span id="modalFrequency"> </span></p>
                     <p><strong>전체 중 동일 주요 감점 요인 비율:</strong> <span id="modalFrequencyRatio"></span>%</p>
                     <p>test</span></p>
                     <p>test</span></p>
@@ -505,6 +505,12 @@
         $("#modalPercentile").text(percentileValue);
         $("#modalFrequency").text(frequencyValue);
         $("#modalFrequencyRatio").text(frequencyRatioValue);
+
+        if (scoreType === "total") {
+        $("#modalFrequencyRatio").closest("p").hide();
+    } else {
+        $("#modalFrequencyRatio").closest("p").show();
+    }
 
         updateChart(scoreType);
     }
