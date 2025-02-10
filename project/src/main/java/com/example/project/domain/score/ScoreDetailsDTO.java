@@ -37,10 +37,10 @@ public class ScoreDetailsDTO {
                            String motionFrequency, String expressionFrequency, String languageFrequency,
                            Double totalFrequencyRatio, String totalFrequency) {
         this.scoreId = scoreId;
-        this.totalScore = totalScore;
+        this.totalScore = Math.floor(totalScore);
         this.motionScore = motionScore;
         this.expressionScore = expressionScore;
-        this.languageScore = languageScore;
+        this.languageScore = Math.floor(languageScore);
         this.motionFrequency = motionFrequency;
         this.expressionFrequency = expressionFrequency;
         this.languageFrequency = languageFrequency;
