@@ -33,7 +33,7 @@
     }
 
     /* 타이머 */
-    #timerOverlay {
+    #timer {
       display: none;
       position: absolute;
       top: 10px; right: 10px;

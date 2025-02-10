@@ -28,7 +28,7 @@
       height: 100%;
       pointer-events: none;
       object-fit: contain;
-      opacity:1;
+      opacity:0;
     }
 
     #countdownOverlay {
@@ -44,13 +44,6 @@
     }
 
     .controls {
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    #timer {
-      font-size: 24px;
-      color: red;
       text-align: center;
       margin-top: 10px;
     }
@@ -73,13 +66,12 @@
 
     /* 오디오 레벨 게이지 컨테이너 */
     #audioMeter {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 90%;
-      height: 50px;
-      margin: 20px auto;
-      position: relative;
+      display: none;
+      position: absolute;
+      z-index: 10;
+      left : 50%;
+      bottom: 20px;
+      transform: translate(-50%, -50%);
     }
 
     .bar {
@@ -135,6 +127,7 @@
 
   document.addEventListener("DOMContentLoaded", async function () {
       await startdoc();
+      document.getElementById('overlayCanvas').style.opacity = '1';
   });
 
   // 발표 시작
@@ -207,6 +200,7 @@
         video.srcObject = stream;
 
         document.getElementById('overlayCanvas').style.opacity = '1';
+        document.getElementById('timer').style.display = 'none';
       }
 
       // 카운트다운
@@ -252,6 +246,8 @@
 
           // 사람형상 투명하게
           document.getElementById('overlayCanvas').style.opacity = '0';
+          document.getElementById('audioMeter').style.display = 'block';
+          document.getElementById('timer').style.display = 'block';
         }
       }, 1000);
 
@@ -282,6 +278,7 @@
 
     document.getElementById('startBtn').disabled = false;
     document.getElementById('stopBtn').disabled = true;
+    document.getElementById('audioMeter').style.display = 'none';
   }
 
   // 녹화본 업로드 및 결과 페이지 이동
