@@ -185,71 +185,61 @@
 
 let isAscending = true; // 정렬 방향 (true: 오름차순, false: 내림차순)
 
-    $(document).ready(function () {
-        loadUsers();
+   $(document).ready(function () {
+    let sortOrder = {};
 
-        // "마지막 접속일" 클릭 이벤트 추가
-        $("#sortLastLogin").on("click", function () {
-            sortUsersByLastLogin();
-        });
+    // 모든 테이블 헤더에 정렬 아이콘 추가
+    $("th").each(function () {
+        $(this).append(' <span class="sort-arrow" style="display: inline-block; width: 15px;"></span>');
     });
 
-    function loadUsers() {
-        $.ajax({
-            url: "/admin/member/list",
-            type: "GET",
-            success: function (users) {
-                renderUserTable(users);
-            },
-            error: function () {
-                alert("회원 목록을 불러오는 데 실패했습니다.");
+    $("th").css("cursor", "pointer");
+
+    $("th").on("click", function () {
+        let columnIndex = $(this).index();
+        let columnKey = $(this).data("sort") || $(this).text().trim();
+        let tbody = $(".table-wrapper tbody");
+        let rows = tbody.find("tr").toArray();
+
+        // 현재 정렬 상태 확인
+        sortOrder[columnKey] = sortOrder[columnKey] === "asc" ? "desc" : "asc";
+        let order = sortOrder[columnKey];
+
+        rows.sort(function (rowA, rowB) {
+            let cellA = $(rowA).find("td").eq(columnIndex).text().trim();
+            let cellB = $(rowB).find("td").eq(columnIndex).text().trim();
+
+            // 날짜 변환
+            if (Date.parse(cellA) && Date.parse(cellB)) {
+                valA = new Date(cellA);
+                valB = new Date(cellB);
             }
-        });
-    }
+            // 숫자 변환
+            else if (!isNaN(cellA) && !isNaN(cellB)) {
+                valA = parseFloat(cellA);
+                valB = parseFloat(cellB);
+            }
+            // 일반 문자열 비교
+            else {
+                valA = cellA.toLowerCase();
+                valB = cellB.toLowerCase();
+            }
 
-    function renderUserTable(users) {
-        let tbody = $("#userTableBody");
-        tbody.empty();
-
-        users.forEach(user => {
-            let safeUsername = user.username.replace(/[@.]/g, "_"); // 특수 문자 변환
-            let row = `<tr data-last-login="${user.lastLogin}">
-                <td>${user.username}</td>
-                <td>${user.nickname}</td>
-                <td>${new Date(user.dateJoin).toLocaleDateString()}</td>
-                <td>${user.postCount}</td>
-                <td>${new Date(user.lastLogin).toLocaleDateString()}</td>
-                <td>
-                    <select id="roleSelect_${safeUsername}">
-                        <option value="USER" ${user.role === 'USER' ? 'selected' : ''}>일반 회원</option>
-                        <option value="ADMIN" ${user.role === 'ADMIN' ? 'selected' : ''}>관리자 회원</option>
-                    </select>
-                    <button class="block-btn" onclick="updateUserRole('${user.username}')">변경</button>
-                </td>
-                <td>
-                    <button class="delete-btn" onclick="deleteUser('${user.username}')">탈퇴</button>
-                </td>
-            </tr>`;
-            tbody.append(row);
-        });
-    }
-
-    function sortUsersByLastLogin() {
-        let rows = $("#userTableBody tr").get();
-
-        rows.sort((a, b) => {
-            let dateA = new Date($(a).data("last-login"));
-            let dateB = new Date($(b).data("last-login"));
-            return isAscending ? dateA - dateB : dateB - dateA;
+            if (valA < valB) return order === "asc" ? -1 : 1;
+            if (valA > valB) return order === "asc" ? 1 : -1;
+            return 0;
         });
 
-        isAscending = !isAscending; // 정렬 방향 변경
+        tbody.html(rows);
 
-        $("#userTableBody").empty().append(rows);
+        // 모든 화살표 초기화
+        $(".sort-arrow").text(" ");
 
-        // 정렬 아이콘 변경 (⬍ = 기본 / ⬆ = 내림차순 / ⬇ = 오름차순)
-        $("#sortLastLogin").html(`마지막 접속일 ${isAscending ? '⬇' : '⬆'}`);
-    }
+        // 클릭한 컬럼에 화살표 추가
+        $(this).find(".sort-arrow").text(order === "asc" ? " ▲" : " ▼");
+    });
+});
+
 
 
     function updateUserRole(username) {
