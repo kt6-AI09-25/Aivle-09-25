@@ -173,14 +173,28 @@
                 <div id="summaryContent" class="summary-content">
                     <!-- 점수 관련 내용 영역 -->
                     <div id="scoreSummary"></div>
-                    <!-- 진행률 영역: 하드코딩된 기본값 대신 빈 상태로 두고 함수에서 업데이트 -->
-                    <div class="progress-container">
-                        <p class="rank-text"><strong id="rank-label"></strong> <span id="percent-value"></span>%</p>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progress-fill"></div>
-                            <div class="progress-marker"></div>
+
+                    <!-- 차트들을 나란히 배치하기 위한 래퍼 -->
+                    <div class="chart-wrapper" style="display: flex; justify-content: space-around; align-items: flex-start; flex-wrap: wrap;">
+
+                        <!-- 기존 진행률 차트 영역 (하위/상위 차트) -->
+                        <div class="progress-container" style="flex: 1; min-width: 300px; margin: 10px;">
+                            <p class="rank-text"><strong id="rank-label"></strong> <span id="percent-value"></span>%</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                                <div class="progress-marker"></div>
+                            </div>
+                            <p class="progress-description">전체 면접 영상 중 내 면접 영상의 순위</p>
                         </div>
-                        <p class="progress-description">전체 면접 영상 중 내 면접 영상의 순위</p>
+
+                        <!-- 추가한 레이더 차트 영역 -->
+                        <div class="score-radar-chart" style="flex: 1; min-width: 300px; margin: 10px;">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+
+                        <div class="chart-container">
+                            <canvas id="scoreChart"></canvas>
+                        </div>
                     </div>
                 </div>
                 <!-- 세부분석 -->
@@ -338,20 +352,22 @@
       resetToSummary();
       analysisModal.querySelector('.modal-content').focus();
     }
-    // updateSummaryContent() 함수: 점수 정보를 출력한 후 updateProgress()를 호출하여 진행률을 업데이트합니다.
+    // updateSummaryContent() 함수: 점수 정보를 출력한 후 진행률 및 레이더 차트를 업데이트합니다.
     function updateSummaryContent(totalScore, motionScore, expressionScore, languageScore, percentile) {
         let summaryText =
-            '<h2>총 점수: ' + totalScore + '</h2>' +
-            '<h2>모션 점수: ' + motionScore + '</h2>' +
-            '<h2>표정 점수: ' + expressionScore + '</h2>' +
-            '<h2>언어 점수: ' + languageScore + '</h2>';
-        if (percentile >= 50) {
-            summaryText += `<p>상위 ${100 - percentile}% 입니다.</p>`;
-        } else {
-            summaryText += `<p>하위 ${percentile}% 입니다.</p>`;
-        }
+            '<h2>총 점수 ' + totalScore + '</h2>'
+<!--            '<h2>모션 점수: ' + motionScore + '</h2>' +-->
+<!--            '<h2>표정 점수: ' + expressionScore + '</h2>' +-->
+<!--            '<h2>언어 점수: ' + languageScore + '</h2>';-->
+<!--        if (percentile >= 50) {-->
+<!--            summaryText += `<p>상위 ${(100 - percentile).toFixed(1)}% 입니다.</p>`;-->
+<!--        } else {-->
+<!--            summaryText += `<p>하위 ${percentile.toFixed(1)}% 입니다.</p>`;-->
+<!--        }-->
         document.getElementById("scoreSummary").innerHTML = summaryText;
         updateProgress(percentile);
+        // 레이더 차트 업데이트: 점수값을 숫자로 변환하여 전달
+        renderRadarChart(Number(motionScore), Number(expressionScore), Number(languageScore));
     }
     detailAnalysis.addEventListener('click', function(event) {
       event.preventDefault();
@@ -551,8 +567,7 @@
       commonModal.classList.remove('active');
       document.getElementById('modalVideo').src = '';
     }
-
-    // updateProgress() 함수: 전달받은 percentile 값에 따라 진행률과 순위 텍스트를 업데이트합니다.
+<!--상위, 하위 바그래프-->
     function updateProgress(percentile) {
       const progressFill = document.getElementById("progress-fill");
       const progressMarker = document.querySelector(".progress-marker");
@@ -560,7 +575,11 @@
       const percentValue = document.getElementById("percent-value");
 
       // 퍼센트 값을 설정
-      percentValue.textContent = percentile;
+      if (percentile >= 50) {
+          percentValue.textContent = `${(100 - percentile).toFixed(1)}`;  // 상위 퍼센트
+      } else {
+          percentValue.textContent = `${percentile.toFixed(1)}`;  // 하위 퍼센트
+      }
 
       // 막대의 위치 업데이트 (왼쪽->오른쪽 진행)
       let position = percentile + "%";
@@ -573,6 +592,41 @@
       } else {
           rankLabel.textContent = "하위";
       }
+    }
+
+    /***** 추가: 레이더 차트 렌더링 함수 *****/
+    function renderRadarChart(motionScore, expressionScore, languageScore) {
+      const ctx = document.getElementById('radarChart').getContext('2d');
+      // 기존 인스턴스가 있다면 제거하여 중복 방지
+      if (window.radarChartInstance) {
+        window.radarChartInstance.destroy();
+      }
+      window.radarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['모션 점수', '표정 점수', '언어 점수'],
+          datasets: [{
+            label: '점수',
+            data: [motionScore, expressionScore, languageScore],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          scale: {
+            ticks: {
+              beginAtZero: true,
+          min: 0,          // 최소값 0
+          max: 100,        // 최대값 100
+          stepSize: 10
+            }
+          },
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
     }
 </script>
 
@@ -589,6 +643,7 @@
       }
     });
 </script>
+
 
 </body>
 </html>

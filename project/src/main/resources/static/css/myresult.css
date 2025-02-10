@@ -140,11 +140,11 @@ html, body {
     transform: translate(-50%, -50%);
     width: 90%;
     max-width: 1100px;
-    height: 92%;
+    height: 98%;
     display: flex;
     flex-direction: column;
     border-radius: 10px; /* 모서리 둥글게 */
-    background-color: #fff;
+    background-color: #ffffff;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* 그림자 강화 */
     animation: slideDown 0.3s ease-out; /* 슬라이드 애니메이션 */
 }
@@ -163,12 +163,12 @@ html, body {
 
 /* 모달 헤더 영역 개선 */
 .module-titleArea {
-    background: linear-gradient(135deg, #ffffff, #f2f2f2); /* 그라데이션 배경 */
+    background: #ffffff;
     color: #333;
     height: 72px;
     line-height: 72px;
     padding: 0 15px; /* 좌우 공백 제거 */
-    border-bottom: 1px solid #ccc;
+    border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: left;
     display: flex;
@@ -178,30 +178,27 @@ html, body {
 
 /* 모달 내부 메뉴바 (탭 버튼) 스타일 개선 */
 .menu-bar {
-    background-color: #f8f8f8;
+    background-color: #ffffff;
     height: 44px;
     line-height: 44px;
     display: flex;
-    gap: 10px;
+    gap: 5px;
     padding: 0 10px;
     user-select: none; /* 드래그 방지 */
 }
 .menu-bar a {
     text-decoration: none;
-    color: #888; /* 약간 어두운 회색 */
-    background-color: #f0f0f0; /* 버튼 느낌을 주기 위한 배경색 */
     padding: 8px 12px;
     border-radius: 6px; /* 모서리 둥글게 */
     transition: background-color 0.3s ease, color 0.3s ease;
     user-select: none; /* 드래그 방지 */
+    text-color: #a5aaa3;
 }
 .menu-bar a:hover {
-    background-color: #d0e8ff; /* 호버 시 부드러운 파란색 배경 */
-    color: #0056b3; /* 텍스트 색상 변경 */
+    color: #000000; /* 텍스트 색상 변경 */
 }
 .menu-bar a.active {
-    background-color: #007bff; /* 활성화 시 진한 파란색 */
-    color: #fff;
+    color: #000000;
 }
 .menu-bar.hidden {
     display: none;
