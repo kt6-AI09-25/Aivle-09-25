@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8"/>
     <title>관리자 페이지 - 발표 점수 조회</title>
@@ -14,6 +14,12 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             padding: 20px;
+        }
+
+        .members-section h3 {
+          margin-bottom: 16px;
+          font-size: 1.2rem;
+          font-weight: bold;
         }
 
         .table-wrapper {
@@ -63,25 +69,60 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .button-group {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-
-        .score-btn {
-            padding: 10px 15px;
-            margin: 5px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            border-radius: 5px;
+        .stat-close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 24px;
             cursor: pointer;
         }
 
-        .score-btn:hover {
-            background-color: #0056b3;
+        .stat-close-btn:hover {
+            color: black;
         }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .score-btn {
+            flex: 1;
+            padding: 12px 18px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            background-color: transparent;
+            color: #555;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .score-btn.active {
+            color: #007bff;
+            font-weight: bold;
+            border-bottom: 3px solid #007bff;
+        }
+
+        /* 선택된 탭 강조 */
+        .score-btn.active::after {
+            content: "";
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #007bff;
+        }
+
+/* 버튼 호버 효과 */
+.score-btn:hover {
+    color: #007bff;
+}
 
         .modal-grid {
             display: grid;
@@ -91,20 +132,67 @@
         }
 
         .chart-container {
-            height: 200px;
-            background-color: #f1f1f1;
+            background: #f9f9f9; /* 배경 흰색 */
+            padding: 15px; /* 내부 여백 추가 */
+            border-radius: 8px; /* 둥근 모서리 적용 */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 효과 */
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 100%; /* 부모 요소에 맞춤 */
+            height: auto; /* 높이를 자동 조정 */
+            min-height: 300px; /* 최소 높이 설정 */
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
-        .text-box {
-            background-color: #f8f8f8;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        .text-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
+
+/*개별 점수 정보 박스 */
+.text-box {
+    background: #f9f9f9;
+    padding: 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    border-left: none;
+}
+
+/* 텍스트 스타일 개선 */
+.text-box p {
+    font-size: 1rem;
+    margin: 6px 0;
+    color: #444;
+}
+
+.text-box strong {
+    font-weight: bold;
+    color: #333;
+}
+
+/* 점수 강조 */
+.text-box span {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* 주요 감점 요인 스타일 */
+#modalFrequency {
+    color: #dc3545;  /* 붉은색 강조 */
+    font-weight: bold;
+}
+
+#modalFrequencyRatio {
+    color: #28a745; /* 초록색 강조 */
+    font-weight: bold;
+}
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -119,7 +207,6 @@
         <li><a href="/admin/members">회원 관리</a></li>
         <li><a href="/admin/report">게시판 신고 관리</a></li>
         <li><a href="/admin/prView" class="active">발표 내용 조회</a></li>
-        <li><a href="statistics.html">통계 페이지</a></li>
     </ul>
 
     <footer class="sidebar-footer">
@@ -130,7 +217,8 @@
 
 <!-- 발표 점수 목록 -->
 <div class="content">
-    <h1 class="page-title">발표 점수 조회</h1>
+    <h2 class="page-title">발표 점수 조회</h2>
+    <div class="title-line"></div>
 
     <div class="members-section">
         <h3>발표 점수 목록</h3>
@@ -181,12 +269,22 @@
 
                     <p><strong>점수:</strong> <span id="modalScore"></span>점</p>
                     <p><strong>위치:</strong> <span id="modalPercentile"></span>%</p>
-                    <p><strong>주요감점요인:</strong> <span id="modalFrequency"></span></p>
-                    <p><strong>전체 중 동일 주요감점요인 비율:</strong> <span id="modalFrequencyRatio"></span>%</p>
+                    <!--                    <p><strong>주요감점요인:</strong> <span id="modalFrequency"></span></p>-->
+                    <!--                    <p><strong>전체 중 동일 주요감점요인 비율:</strong> <span id="modalFrequencyRatio"></span>%</p>-->
+                </div>
+
+                <div class="text-box">
+                    <p><strong>주요 감점 요인:</strong> <span id="modalFrequency"></span></p>
+                    <p><strong>전체 중 동일 주요 감점 요인 비율:</strong> <span id="modalFrequencyRatio"></span>%</p>
+                    <p>test</span></p>
+                    <p>test</span></p>
+                    <p>test</span></p>
+
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <!-- JavaScript -->
@@ -262,10 +360,15 @@
                 data: { scoreId: scoreId },
                 dataType: "json",
                 success: function (data) {
-                    currentData = data;
-                    $("#modalUserId").text(data.userId || "없음");
-                    updateModalContent("total");
-                    $("#scoreStatModal").fadeIn();
+                currentData = data;
+                $("#modalUserId").text(data.userId || "없음");
+                updateModalContent("total");
+
+                // 모든 버튼의 active 클래스 제거 후, 총합 점수 버튼에 active 추가
+                $(".score-btn").removeClass("active");
+                $(".score-btn[data-type='total']").addClass("active");
+
+                $("#scoreStatModal").fadeIn();
                 },
                 error: function () {
                     alert("점수 데이터를 불러오는 데 실패했습니다.");
@@ -388,6 +491,8 @@
 
             let canvas = document.getElementById("scoreChart").getContext("2d");
 
+
+
             if (chartInstance) {
                 chartInstance.destroy();
             }
@@ -439,6 +544,16 @@
                 $("#scoreStatModal").fadeOut();
             }
         });
+        //
+        $(document).on("click", ".score-btn", function () {
+        $(".score-btn").removeClass("active"); // 모든 버튼에서 active 제거
+        $(this).addClass("active"); // 현재 클릭된 버튼만 active 추가
+        let scoreType = $(this).data("type");
+        updateModalContent(scoreType);
+        });
+        //
+
+
 
         loadScores();
     });
