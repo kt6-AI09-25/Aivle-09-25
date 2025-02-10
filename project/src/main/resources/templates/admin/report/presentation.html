@@ -98,7 +98,6 @@
             color: #555;
             border-radius: 8px 8px 0 0;
             cursor: pointer;
-            transition: all 0.3s ease;
             position: relative;
         }
 
@@ -199,6 +198,7 @@
 </head>
 <body>
 
+
 <div th:replace="navbar.html"></div>
 <div class="sidebar">
     <h2>Admin</h2>
@@ -217,6 +217,25 @@
 
 <!-- 발표 점수 목록 -->
 <div class="content">
+    <div class="dashboard-cards">
+        <!-- <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-03 10:40 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
+        <div class="card">
+            <h3>평균 행동 점수</h3>
+            <p id="avg-motion-score">로딩 중...</p>
+        </div>
+        <div class="card">
+            <h3>평균 표정 점수</h3>
+            <p id="avg-expression-score">로딩 중...</p>
+        </div>
+        <div class="card">
+            <h3>평균 언어 점수</h3>
+            <p id="avg-language-score">로딩 중...</p>
+        </div>
+        <div class="card">
+            <h3>평균 총합 점수</h3>
+            <p id="avg-total-score">로딩 중...</p>
+        </div>
+    </div>
     <h2 class="page-title">발표 점수 조회</h2>
     <div class="title-line"></div>
 
@@ -274,11 +293,12 @@
                 </div>
 
                 <div class="text-box">
-                    <p><strong>주요 감점 요인:</strong> <span id="modalFrequency"></span></p>
+                    <p><strong>주요 감점 요인은</strong> <span id="modalFrequency"> </span></p>
                     <p><strong>전체 중 동일 주요 감점 요인 비율:</strong> <span id="modalFrequencyRatio"></span>%</p>
                     <p>test</span></p>
                     <p>test</span></p>
                     <p>test</span></p>
+
 
                 </div>
             </div>
@@ -467,6 +487,9 @@
     });
 
     $(document).on("click", ".score-btn", function () {
+        $(".score-btn").removeClass("active"); // 모든 버튼에서 active 제거
+        $(this).addClass("active"); // 현재 클릭된 버튼에 active 추가
+
         let scoreType = $(this).data("type");
         updateModalContent(scoreType);
     });
@@ -558,6 +581,76 @@
     });
 
 
+</script>
+
+//정렬기능
+<script>
+    $(document).ready(function () {
+        let sortOrder = {};
+
+        $("th").each(function () {
+            $(this).append(' <span class="sort-arrow" style="display: inline-block; width: 15px;"></span>');
+        });
+
+        $("th").css("cursor", "pointer");
+
+        $("th").on("click", function () {
+            let columnIndex = $(this).index();
+            let columnKey = $(this).text().trim();
+            let tbody = $(".table-wrapper tbody");
+            let rows = tbody.find("tr").toArray();
+
+            // 현재 정렬 상태 확인
+            sortOrder[columnKey] = sortOrder[columnKey] === "asc" ? "desc" : "asc";
+            let order = sortOrder[columnKey];
+
+            rows.sort(function (rowA, rowB) {
+                let cellA = $(rowA).find("td").eq(columnIndex).text().trim();
+                let cellB = $(rowB).find("td").eq(columnIndex).text().trim();
+
+                let valA = isNaN(cellA) ? cellA : parseFloat(cellA);
+                let valB = isNaN(cellB) ? cellB : parseFloat(cellB);
+
+                if (valA < valB) return order === "asc" ? -1 : 1;
+                if (valA > valB) return order === "asc" ? 1 : -1;
+                return 0;
+            });
+
+            tbody.html(rows);
+
+            // 모든 화살표 초기화
+            $(".sort-arrow").text(" ");
+
+            // 클릭한 컬럼에 화살표 추가
+            $(this).find(".sort-arrow").text(order === "asc" ? " ▲" : " ▼");
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', fetchAverageScores);
+
+async function fetchAverageScores() {
+    try {
+        const response = await fetch('/scores/averages'); // 평균 점수 데이터를 가져오는 API
+        if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
+
+        const data = await response.json();
+
+        // 받아온 데이터를 화면에 반영
+        document.getElementById('avg-motion-score').textContent = `${data.motionScore.toFixed(2)}점`;
+        document.getElementById('avg-expression-score').textContent = `${data.expressionScore.toFixed(2)}점`;
+        document.getElementById('avg-language-score').textContent = `${data.languageScore.toFixed(2)}점`;
+        document.getElementById('avg-total-score').textContent = `${data.totalScore.toFixed(2)}점`;
+
+    } catch (error) {
+        console.error('평균 점수 데이터를 가져오는 중 오류 발생:', error);
+        document.getElementById('avg-motion-score').textContent = '불러오기 실패';
+        document.getElementById('avg-expression-score').textContent = '불러오기 실패';
+        document.getElementById('avg-language-score').textContent = '불러오기 실패';
+        document.getElementById('avg-total-score').textContent = '불러오기 실패';
+    }
+}
 </script>
 
 
