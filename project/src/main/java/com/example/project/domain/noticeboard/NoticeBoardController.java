@@ -156,7 +156,7 @@ public class NoticeBoardController {
 
     @GetMapping
     public String list(@RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "13") int size,
+                       @RequestParam(defaultValue = "10") int size,
                        Model model) {
         Page<Response> posts = noticeBoardService.getPagedPosts(page, size);
 
