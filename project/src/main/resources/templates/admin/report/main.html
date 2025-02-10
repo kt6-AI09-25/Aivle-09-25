@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/style.css">
     <style>
-        /* 대시보드용 간단한 카드 스타일 */
+        /* 대시보드용
 
         .online-users {
           background-color: #fff;
@@ -19,6 +19,21 @@
           font-size: 1.2rem;
           color: #333;
         }
+
+        #rankingList {
+
+            flex-wrap: nowrap; /* 줄바꿈 방지 */
+            gap: 20px; /* 항목 간 간격 */
+        }
+
+        #rankingList li {
+
+            align-items: center; /* 세로 정렬 */
+            white-space: nowrap; /* 줄바꿈 방지 */
+        }
+
+
+
 
         /* 최근 활동 섹션 예시 */
         .recent-activities {
@@ -52,6 +67,45 @@
           color: #999;
           font-size: 0.9rem;
         }
+
+        #activeUsersList {
+            max-height: 300px; /* 최대 높이 설정 */
+            overflow-y: auto; /* 세로 스크롤 활성화 */
+            padding: 10px;
+            border-radius: 5px;
+
+        }
+
+
+
+<!--        .users-list {-->
+<!--            max-height: 300px; /* 최대 높이 설정 (필요에 따라 조정 가능) */-->
+<!--            overflow-y: auto; /* 세로 스크롤 활성화 */-->
+<!--            padding: 10px;-->
+<!--            border-radius: 5px;-->
+<!--            background-color: #f8f9fa; /* 배경색 */-->
+<!--        }-->
+
+<!--        .users-list li {-->
+<!--            padding: 8px 12px;-->
+<!--            border-bottom: 1px solid #eee; /* 항목 구분선 */-->
+<!--            font-size: 14px;-->
+<!--        }-->
+
+<!--        .users-list li:last-child {-->
+<!--            border-bottom: none; /* 마지막 항목의 구분선 제거 */-->
+<!--        }-->
+
+       
+
+        .scrollable-container {
+            max-height: 300px; /* 최대 높이 설정 */
+            overflow-y: auto; /* 세로 스크롤 추가 */
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa; /* 배경색 */
+            position: relative; /* 부모 요소 위치 기준 */
+        }
     </style>
 </head>
 <body>
@@ -65,7 +119,6 @@
             <li><a href="/admin/members">회원 관리</a></li>
             <li><a href="/admin/report">게시판 신고 관리</a></li>
             <li><a href="/admin/prView">발표 내용 조회</a></li>
-            <li><a href="statistics.html">통계 페이지</a></li>
         </ul>
 
         <footer class="sidebar-footer">
@@ -76,7 +129,7 @@
 
     <!-- 메인 컨텐츠 영역 -->
     <div class="content">
-        <h1 class="page-title">관리자 메인 페이지</h1>
+        <h2 class="page-title">관리자 메인 페이지</h2>
         <div class="title-line"></div>
 
         <!-- 카드 형태의 주요 지표 -->
@@ -149,19 +202,20 @@
 
             <div class="chart-card">
                 <h3>접속중인 회원</h3>
-                <ul id="activeUsersList" class="users-list">
+                <ul id="activeUsersList" class="activities-list">
                     <li>로딩 중...</li>
-                </ul>
+
             </div>
         </div>
 
         <div class="recent-activities">
                     <h3>최근 활동</h3>
-                    <ul id="activityList" class="activities-list">
-                        <li>로딩 중...</li>
+<!--                    <ul id="activityList" class="activities-list">-->
+<!--                        <li>로딩 중...</li>-->
+
                     </ul>
         </div>
-      
+
         <script>
             //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-03 10:40 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
