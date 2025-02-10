@@ -8,14 +8,39 @@
   <link rel="stylesheet" href="/css/pr_test.css">
 
   <style>
-    #myVideo {
-      display: block;
+    #tempvideo{
       margin: 20px auto;
-      border: 2px solid black;
       position: relative;
       width: 900px;
       height: 500px;
+    }
+    #myVideo{
+      display: block;
+      width: 100%;
+      height: 100%;
       border: 2px solid black;
+    }
+    #overlayCanvas{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      object-fit: contain;
+      opacity:1;
+    }
+
+    #countdownOverlay {
+      display: none;
+      position: absolute;
+      top: 50px; right: 0px;
+      transform: translate(-50%, -50%);
+      font-size: 100px;
+      font-weight: bold;
+      color: #ccc;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      z-index: 10;
     }
 
     .controls {
@@ -73,13 +98,20 @@
 <div id="loadingModal">로딩 중입니다...</div>
 
 <!-- 비디오 화면 -->
-<video id="myVideo" autoplay playsinline></video>
-
+<div id="tempvideo">
+  <video id="myVideo" autoplay playsinline></video>
+  <img src="images/human.png" id="overlayCanvas"></img>
+  <div id="countdownOverlay">3</div>
+  <!-- 마이크 게이지 -->
+  <div id="audioMeter"></div>
+  <!-- 타이머 -->
+  <div id="timer">00:00</div>
+</div>
 <!-- 마이크 게이지 -->
-<div id="audioMeter"></div>
+<!--<div id="audioMeter"></div>-->
 
 <!-- 타이머 -->
-<div id="timer">00:00</div>
+<!--<div id="timer">00:00</div>-->
 
 <!-- 버튼 컨트롤 -->
 <div class="controls">
@@ -100,6 +132,28 @@
   let analyser;
   let microphone;
   const bars = [];
+
+  document.addEventListener("DOMContentLoaded", async function () {
+      await startdoc();
+  });
+
+  // 발표 시작
+  async function startdoc() {
+      try {
+          // 1) 스트림 가져오기 (비디오 900x500, 오디오 true)
+          stream = await navigator.mediaDevices.getUserMedia({
+              video: { width: 900, height: 500 },
+              audio: true
+          });
+
+          const video = document.getElementById('myVideo');
+          video.width = 900;
+          video.height = 500;
+          video.srcObject = stream;
+      } catch (error) {
+          console.error("스트리밍 오류:", error);
+      }
+  }
 
   // 타이머 업데이트 함수
   function updateTimer() {
@@ -140,46 +194,68 @@
   // 발표 시작
   async function startPresentation() {
     try {
-      // 1) 스트림 가져오기 (비디오 900x500, 오디오 true)
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 900, height: 500 },
-        audio: true
-      });
+      if(!stream){
+        // 1) 스트림 가져오기 (비디오 900x500, 오디오 true)
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 900, height: 500 },
+          audio: true
+        });
 
-      const video = document.getElementById('myVideo');
-      video.width = 900;
-      video.height = 500;
-      video.srcObject = stream;
+        const video = document.getElementById('myVideo');
+        video.width = 900;
+        video.height = 500;
+        video.srcObject = stream;
 
-      // 2) MediaRecorder
-      mediaRecorder = new MediaRecorder(stream);
-      recordedChunks = [];
-      mediaRecorder.ondataavailable = function(event) {
-        if (event.data.size > 0) {
-          recordedChunks.push(event.data);
+        document.getElementById('overlayCanvas').style.opacity = '1';
+      }
+
+      // 카운트다운
+      countdownOverlay.style.display = 'block';
+      let countdown = 3;
+      countdownOverlay.textContent = countdown;
+      let countdownInterval = setInterval(() => {
+        countdown--;
+        countdownOverlay.textContent = countdown;
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          countdownOverlay.style.display = 'none';
+
+          // 2) MediaRecorder
+          mediaRecorder = new MediaRecorder(stream);
+          recordedChunks = [];
+          mediaRecorder.ondataavailable = function(event) {
+            if (event.data.size > 0) {
+              recordedChunks.push(event.data);
+            }
+          };
+          mediaRecorder.start();
+
+          // 3) 타이머
+          seconds = 0;
+          document.getElementById('timer').textContent = "00:00";
+          timerInterval = setInterval(updateTimer, 1000);
+
+          // 4) 오디오 분석
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioContext.createAnalyser();
+          microphone = audioContext.createMediaStreamSource(stream);
+          microphone.connect(analyser);
+
+          createAudioBars();
+          monitorAudioLevel();
+
+          console.log("발표 녹화가 시작되었습니다.");
+
+          // 버튼 상태
+          document.getElementById('startBtn').disabled = true;
+          document.getElementById('stopBtn').disabled = false;
+
+          // 사람형상 투명하게
+          document.getElementById('overlayCanvas').style.opacity = '0';
         }
-      };
-      mediaRecorder.start();
+      }, 1000);
 
-      // 3) 타이머
-      seconds = 0;
-      document.getElementById('timer').textContent = "00:00";
-      timerInterval = setInterval(updateTimer, 1000);
 
-      // 4) 오디오 분석
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioContext.createAnalyser();
-      microphone = audioContext.createMediaStreamSource(stream);
-      microphone.connect(analyser);
-
-      createAudioBars();
-      monitorAudioLevel();
-
-      console.log("발표 녹화가 시작되었습니다.");
-
-      // 버튼 상태
-      document.getElementById('startBtn').disabled = true;
-      document.getElementById('stopBtn').disabled = false;
 
     } catch (error) {
       console.error("발표 시작 중 오류:", error);
