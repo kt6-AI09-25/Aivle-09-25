@@ -491,8 +491,6 @@
 
             let canvas = document.getElementById("scoreChart").getContext("2d");
 
-
-
             if (chartInstance) {
                 chartInstance.destroy();
             }
@@ -502,12 +500,23 @@
                 type: "GET",
                 dataType: "json",
                 success: function (scores) {
-                    let scoreValues = scores.map(s => s[`${scoreType}Score`]);
+                    let scoreValues = scores.map(s => Math.round(s[`${scoreType}Score`]));
 
-                    let labels = Array.from({ length: 21 }, (_, i) => i * 5);
-                    if (scoreType === "total") {
-                        labels = Array.from({ length: 61 }, (_, i) => i * 5);
-                    }
+                    let maxScore = scoreType === "total" ? 300 : 100;
+                    let labels = Array.from({ length: (maxScore / 5) + 1 }, (_, i) => i * 5);
+                    if (!labels.includes(maxScore)) labels.push(maxScore);
+
+                    let binnedScores = labels.reduce((acc, label) => {
+                        acc[label] = 0;
+                        return acc;
+                    }, {});
+
+                    scoreValues.forEach(score => {
+                        let bin = Math.round(score / 5) * 5;
+                        if (bin > maxScore) bin = maxScore;
+                        binnedScores[bin]++;
+                    });
+
 
                     let highlightedValue = Math.round(currentData[`${scoreType}Score`] / 5) * 5;
 
@@ -517,7 +526,7 @@
                             labels: labels,
                             datasets: [{
                                 label: scoreType.toUpperCase() + " Score",
-                                data: labels.map(label => scoreValues.filter(score => Math.floor(score / 5) * 5 === label).length),
+                                data: labels.map(label => binnedScores[label] || 0),
                                 backgroundColor: labels.map(label => (label === highlightedValue ? "red" : "rgba(54, 162, 235, 0.5)")),
                                 borderWidth: 0
                             }]
@@ -544,16 +553,6 @@
                 $("#scoreStatModal").fadeOut();
             }
         });
-        //
-        $(document).on("click", ".score-btn", function () {
-        $(".score-btn").removeClass("active"); // 모든 버튼에서 active 제거
-        $(this).addClass("active"); // 현재 클릭된 버튼만 active 추가
-        let scoreType = $(this).data("type");
-        updateModalContent(scoreType);
-        });
-        //
-
-
 
         loadScores();
     });
