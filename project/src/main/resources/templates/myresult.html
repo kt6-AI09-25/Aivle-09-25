@@ -5,66 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>분석 결과 및 평가 기록</title>
     <link rel="stylesheet" href="/css/myresult.css">
+    <link rel="stylesheet" href="/css/style.css">
     <style>
+        /* “저장된 발표영상이 없습니다” 메시지 스타일 */
         .no-videos-message {
-            text-align: center;
-            color: #666666;
-            margin: 20px 0;
-            font-size: 1.2em;
+          text-align: center;
+          color: #666666;
+          margin: 20px 0;
+          font-size: 1.2em;
         }
-        /*------------------------------- 이유찬 수정 ------------------------------ */
-        /* "현재 평가 중" 섹션을 숨기거나 표시할 때 사용할 클래스 */
-        .hidden {
-            display: none !important;
+        /* 썸네일 컨테이너 – Flex 레이아웃으로 썸네일 개수와 상관없이 균일하게 보이도록 함 */
+        .thumbnail-container {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px;
+          position: relative; /* 내부에 오버레이(로딩, 완료 영상)를 배치하기 위함 */
         }
-
-        /* 간단한 로딩 모달 예시 */
+        /* 개별 썸네일 스타일 */
+        .video-thumbnail {
+          max-width: 300px;
+          cursor: pointer;
+        }
+        /* 로딩 오버레이 – “분석 중입니다...” 메시지 (썸네일 내부에 오버레이) */
         #loadingModal {
-            display: none;
-            position: fixed;
-            z-index: 999;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            color: #fff;
-            text-align: center;
-            padding-top: 200px;
-            font-size: 24px;
+          display: none;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0,0,0,0.5);
+          color: #fff;
+          text-align: center;
+          padding-top: 50px;
+          font-size: 24px;
+          z-index: 10;
         }
         #loadingModal.active {
-            display: block !important;
+          display: block;
         }
-
-        /* 완료된 동영상을 표시할 컨테이너 예시 */
+        /* 평가 완료 영상 오버레이 */
         #completedVideoContainer {
-            margin: 20px;
-            border: 2px dashed #aaa;
-            padding: 10px;
+          display: none;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          background-color: rgba(0,0,0,0.5);
+          color: #fff;
+          text-align: center;
+          padding: 20px;
+          z-index: 10;
         }
-        #completedVideoContainer.hidden {
-            display: none;
+        #completedVideoContainer.active {
+          display: block;
         }
-        /*------------------------------- 이유찬 수정 ------------------------------*/
     </style>
 </head>
 <body>
-
 <!-- 네비게이션 (Thymeleaf include) -->
 <div th:replace="navbar.html"></div>
 
-<!----------------이유찬 로딩 모달 (평가중 표시)  수정 요망 ---------------->
-<div id="loadingModal" class="hidden">
-    <p>분석 중입니다... 잠시만 기다려주세요.</p>
-</div>
-
-<!--  완료된 동영상을 표시할 컨테이너 -->
-<div id="completedVideoContainer" class="hidden">
-    <h2>평가가 완료된 영상</h2>
-    <video id="completedVideo" width="400" height="240" controls></video>
-</div>
-<!------------------------------- 이유찬 수정 ------------------------------>
-
-<!-- 분석 결과 영역 (프론트엔드 담당 코드) -->
 <main>
     <section class="content">
         <div class="centered-content analysis-section">
@@ -77,8 +79,19 @@
             </div>
         </div>
 
-        <!-- 썸네일 컨테이너 -->
+        <!-- 썸네일 컨테이너 (내부에 로딩/완료 오버레이 포함) -->
         <div class="thumbnail-container">
+            <!-- 로딩 오버레이 (분석중 메시지) -->
+
+            <!-- 평가 완료 영상 오버레이 -->
+            <div id="completedVideoContainer">
+                <h2>평가가 완료된 영상</h2>
+                <video id="completedVideo" width="400" height="240" controls></video>
+                <div id="loadingModal">
+                    <p>분석 중입니다... 잠시만 기다려주세요.</p>
+                </div>
+            </div>
+
             <!-- 발표영상 섹션 -->
             <div id="presentationVideos">
                 <div th:if="${presentationVideos != null and !#lists.isEmpty(presentationVideos)}">
@@ -88,16 +101,28 @@
                              alt="발표영상 썸네일"
                              th:attr="data-videoUrl=${video.videoUrl}"
                              class="video-thumbnail" />
-                        <div th:if="${iterStat.index % 3 == 2}" style="clear: both;"></div>
                     </div>
                 </div>
                 <div th:if="${presentationVideos == null or #lists.isEmpty(presentationVideos)}">
                     <h1 class="no-videos-message">저장된 발표영상이 없습니다.</h1>
-                    <div style="text-align: center; margin: 20px 0;">
-                        <button type="button" class="mui-button" onclick="openAnalysisModal()">결과모달 열기 (임시)</button>
+                    <div class="video-flex" style="text-align: center; margin: 20px 0;">
+                        <div th:each="score : ${previousScores}" class="video-container">
+                            <div th:if="${score.status != 'IN_PROGRESS'}" class="video-container">
+                                <div class="video-thumbnail"
+                                     th:attr="totalscore=${score.totalScore}, motionscore=${score.motionScore}, expressionscore=${score.expressionScore}, languagescore=${score.languageScore}, fileId=${score.fileId}"
+                                     onclick="openScoreModal(this)">
+                                    <video width="300" height="180"
+                                           th:src="@{/myresults/upload/results/{fileId}(fileId=${score.fileId})}">
+                                    </video>
+                                </div>
+                                <p><strong>날짜:</strong> <span th:text="${#temporals.format(score.date, 'yyyy-MM-dd HH:mm')}"></span></p>
+                                <p><strong>작성자:</strong> <span th:text="${score.userId}"></span></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
             <!-- 면접영상 섹션 -->
             <div id="interviewVideos" style="display: none;">
                 <div th:if="${interviewVideos != null and !#lists.isEmpty(interviewVideos)}">
@@ -113,12 +138,26 @@
                 <div th:if="${interviewVideos == null or #lists.isEmpty(interviewVideos)}">
                     <h1 class="no-videos-message">저장된 면접영상이 없습니다.</h1>
                     <div style="text-align: center; margin: 20px 0;">
-                        <button type="button" class="mui-button" onclick="openAnalysisModal()">결과모달 열기 (임시)</button>
+                        <div th:each="score : ${previousScores}" class="video-container">
+                            <div th:if="${score.status != 'IN_PROGRESS'}" class="video-container">
+                                <div class="video-thumbnail"
+                                     th:attr="totalscore=${score.totalScore}, motionscore=${score.motionScore}, fileId=${score.fileId}"
+                                     onclick="openScoreModal(this)">
+                                    <video width="350" height="230"
+                                           th:src="@{/myresults/upload/results/{fileId}(fileId=${score.fileId})}">
+                                    </video>
+                                </div>
+                                <p><strong>날짜:</strong> <span th:text="${#temporals.format(score.date, 'yyyy-MM-dd HH:mm')}"></span></p>
+                                <p><strong>작성자:</strong> <span th:text="${score.userId}"></span></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="spacer"></div>
+
         <!-- 분석 결과 모달 -->
         <div id="videoModal" class="modal" role="dialog" aria-modal="true">
             <div class="modala" tabindex="-1">
@@ -132,7 +171,17 @@
                 </div>
                 <!-- 종합결과 -->
                 <div id="summaryContent" class="summary-content">
-                    <p>이곳은 종합결과를 보여주는 영역입니다.</p>
+                    <!-- 점수 관련 내용 영역 -->
+                    <div id="scoreSummary"></div>
+                    <!-- 진행률 영역: 하드코딩된 기본값 대신 빈 상태로 두고 함수에서 업데이트 -->
+                    <div class="progress-container">
+                        <p class="rank-text"><strong id="rank-label"></strong> <span id="percent-value"></span>%</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                            <div class="progress-marker"></div>
+                        </div>
+                        <p class="progress-description">전체 면접 영상 중 내 면접 영상의 순위</p>
+                    </div>
                 </div>
                 <!-- 세부분석 -->
                 <div id="detailContent" class="detail-content">
@@ -150,7 +199,7 @@
                         <div class="modal-right">
                             <div class="frame-card">
                                 <div id="motionContent" class="motion-content active">
-                                    <p>모션 평가 내용이 여기에 표시됩니다.</p>
+                                    <p id="motionScoreText">모션 평가 내용이 여기에 표시됩니다.</p>
                                     <div class="chart-container">
                                         <canvas id="motionChart"></canvas>
                                     </div>
@@ -177,39 +226,9 @@
     </section>
 
     <!-- 평가 기록 영역 (백엔드 담당 코드) -->
-    <section>
-        <h1>이전 평가 기록</h1>
-        <div th:each="score : ${previousScores}" class="video-container">
-            <div th:if="${score.status != 'IN_PROGRESS'}" class="video-container">
-            <div class="video-thumbnail" th:attr="data-scoreid=${score.scoreId}" onclick="openScoreModal(this)">
-                <video width="300" height="180"
-                       th:src="@{/myresults/upload/results/{fileId}(fileId=${score.fileId})}"
-                       controls>
-                </video>
-            </div>
-            <p><strong>날짜:</strong> <span th:text="${#temporals.format(score.date, 'yyyy-MM-dd HH:mm')}"></span></p>
-            <p><strong>작성자:</strong> <span th:text="${score.userId}"></span></p>
-        </div>
-        </div>
-        <h1>현재 평가 중</h1>
-        <!------------------------------- 이유찬 수정 ------------------------------>
-        <div id="inProgressContainer"
-             th:if="${evaluatingScore != null and evaluatingScore['scoreId'] != null}"
-             class="video-container">
-            <!-- 평가 데이터가 있는 경우에만 이 영역이 렌더링됨 -->
-            <div class="video-thumbnail" th:attr="data-scoreid=${evaluatingScore['scoreId']}"
-                 onclick="openScoreModal(this)">
-                <video width="300" height="180"
-                       th:src="@{/myresults/upload/results/{fileId}(fileId=${evaluatingScore['fileId']})}"
-                       controls>
-                </video>
-            </div>
-            <p><strong>날짜:</strong> <span th:text="${#temporals.format(evaluatingScore['date'], 'yyyy-MM-dd HH:mm')}"></span></p>
-            <p><strong>작성자:</strong> <span th:text="${evaluatingScore['userId']}"></span></p>
-        </div>
-        <!------------------------------- 이유찬 수정 ------------------------------>
-    </section>
+    <!-- 기존 평가 기록 영역은 주석 처리되어 있음 -->
 </main>
+
 <!-- 평가 상세 모달 (Score Modal) -->
 <div id="commonModal" class="modal" role="dialog" aria-modal="true">
     <div class="modal-content" tabindex="-1">
@@ -236,7 +255,9 @@
         </div>
     </div>
 </div>
+
 <div th:replace="footer.html"></div>
+
 <!-- 외부 Chart.js 라이브러리 -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- 스크립트 (분석 결과 및 평가 기록 영역 기능 포함) -->
@@ -264,13 +285,9 @@
     let expressionChartInstance = null;
     const presentationVideoButton = document.getElementById('presentationVideoButton');
     const interviewVideoButton = document.getElementById('interviewVideoButton');
-    const presentationThumbnail = document.getElementById('presentationThumbnail');
-    const interviewThumbnail = document.getElementById('interviewThumbnail');
-    const presentationVideoSrc = "/video/recorded_presentation.mp4";
-    const interviewVideoSrc = "/video/recorded_interview.mp4";
     presentationVideoButton.classList.add('active-button');
-    presentationVideos.style.display = 'block'; // 이유찬 수정
-    interviewVideos.style.display = 'none';       // 이유찬 수정
+    presentationVideos.style.display = 'block';
+    interviewVideos.style.display = 'none';
     presentationVideoButton.addEventListener('click', () => {
       presentationVideos.style.display = 'block';
       interviewVideos.style.display = 'none';
@@ -283,60 +300,58 @@
       interviewVideoButton.classList.add('active-button');
       presentationVideoButton.classList.remove('active-button');
     });
-    /******************** 이유찬 수정 ********************/
-    /***** (1) 폴링 & 로딩 모달 전환 로직 *****/
+
+    /***** 폴링 및 로딩/완료 오버레이 업데이트 *****/
     function pollEvaluatingScore() {
       fetch('/scores/results/api')
         .then(res => res.json())
         .then(data => {
-          // /scores/results/api -> { previousScores: [...], evaluatingScore: {...} }
           const evalScore = data.evaluatingScore;
           const loadingModal = document.getElementById('loadingModal');
-          const inProgressElem = document.getElementById('inProgressContainer');
           const completedVideoContainer = document.getElementById('completedVideoContainer');
           const completedVideo = document.getElementById('completedVideo');
 
           if (!evalScore || !evalScore.scoreId) {
-            // "IN_PROGRESS" 자체가 없으면 => 로딩창 X, 현재평가중 X, 완료동영상 X
             loadingModal.classList.remove('active');
-            inProgressElem?.classList.add('hidden');
-            completedVideoContainer.classList.add('hidden');
+            completedVideoContainer.classList.remove('active');
             return;
           }
 
           if (evalScore.status === 'IN_PROGRESS') {
-            // 평가중 => 로딩창 표시, 현재평가중 영역 표시, 완료동영상 숨김
             loadingModal.classList.add('active');
-            inProgressElem?.classList.remove('hidden');
-            completedVideoContainer.classList.add('hidden');
-
+            completedVideoContainer.classList.remove('active');
           } else if (evalScore.status === 'COMPLETED') {
-            // 평가 완료 => 로딩창 숨기고, IN_PROGRESS 숨기고, 완료된 영상 보여주기
             loadingModal.classList.remove('active');
-            inProgressElem?.classList.add('hidden');
-            completedVideoContainer.classList.remove('hidden');
-
-            // 새 동영상 주소 세팅
+            completedVideoContainer.classList.add('active');
             completedVideo.src = '/myresults/upload/results/' + evalScore.fileId;
           }
         })
-        .catch(err => console.error('IN_PROGRESS 체크 중 오류:', err));
+        .catch(err => console.error('Error in polling:', err));
     }
-
-    // 페이지 로드 후 3초마다 폴링
     document.addEventListener('DOMContentLoaded', () => {
       setInterval(pollEvaluatingScore, 3000);
     });
-    /******************** 이유찬 수정 ********************/
+
     /***** 기존 모달/차트 로직 *****/
     function openAnalysisModal() {
       analysisModal.style.display = 'block';
-      updateSummaryContent(259);
       resetToSummary();
       analysisModal.querySelector('.modal-content').focus();
     }
-    function updateSummaryContent(totalScore) {
-      summaryContent.innerHTML = '<h2>총 점수: ' + totalScore + '</h2>';
+    // updateSummaryContent() 함수: 점수 정보를 출력한 후 updateProgress()를 호출하여 진행률을 업데이트합니다.
+    function updateSummaryContent(totalScore, motionScore, expressionScore, languageScore, percentile) {
+        let summaryText =
+            '<h2>총 점수: ' + totalScore + '</h2>' +
+            '<h2>모션 점수: ' + motionScore + '</h2>' +
+            '<h2>표정 점수: ' + expressionScore + '</h2>' +
+            '<h2>언어 점수: ' + languageScore + '</h2>';
+        if (percentile >= 50) {
+            summaryText += `<p>상위 ${100 - percentile}% 입니다.</p>`;
+        } else {
+            summaryText += `<p>하위 ${percentile}% 입니다.</p>`;
+        }
+        document.getElementById("scoreSummary").innerHTML = summaryText;
+        updateProgress(percentile);
     }
     detailAnalysis.addEventListener('click', function(event) {
       event.preventDefault();
@@ -474,34 +489,39 @@
       analysisVideo.src = '';
     }
 
-     /***** 평가 기록 영역 (백엔드) *****/
+    /***** 평가 기록 영역 (백엔드) *****/
     function openScoreModal(element) {
-      const scoreId = element.getAttribute('data-scoreid');
-      fetch(`/scores/details?scoreId=${scoreId}`)
+      const totalscore = element.getAttribute('totalscore');
+      const motionscore = element.getAttribute('motionscore');
+      const expressionscore = element.getAttribute('expressionscore');
+      const languagescore = element.getAttribute('languagescore');
+      const fileId = element.getAttribute('fileId');
+
+      const videoElement = document.getElementById('analysisVideo');
+      if (videoElement) {
+        videoElement.src = `/myresults/upload/results/${fileId}`;
+        videoElement.load();
+      }
+      fetch(`/scores/distribution?totalscore=${totalscore}`)
         .then(response => response.json())
-        .then(data => {
-          document.getElementById('modalTotalScore').textContent = data.totalScore;
-          document.getElementById('modalMotionScore').textContent = data.motionScore;
-          document.getElementById('modalExpressionScore').textContent = data.expressionScore;
-          document.getElementById('modalLanguageScore').textContent = data.languageScore;
-          document.getElementById('modalTempo').textContent = data.tempo;
-          document.getElementById('modalDate').textContent = data.date;
-          document.getElementById('modalUserId').textContent = data.userId;
-          // 이유찬 수정
-          document.getElementById('modalVideo').src = `/myresults/upload/results/${data.fileId}`;
-
-          displayTimes('motionTimesList', data.motionTimes);
-          displayTimes('expressionTimesList', data.expressionTimes);
-          displayTimes('languageTimesList', data.languageTimes);
-
-          document.getElementById('commonModal').classList.add('active');
+        .then(percentile => {
+            updateSummaryContent(totalscore, motionscore, expressionscore, languagescore, percentile);
         })
         .catch(error => {
-          console.error('데이터 로드 실패:', error);
-          alert('평가 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
+            console.error('데이터 로드 실패:', error);
+            alert('평가 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
         });
+
+      analysisModal.style.display = 'block';
+      resetToSummary();
+      analysisModal.querySelector('.modal-content').focus();
     }
-    // 이유찬 수정
+    function updateMotionScore(motionScore) {
+      const motionScoreText = document.getElementById('motionScoreText');
+      if (motionScoreText) {
+        motionScoreText.innerText = `모션점수 = ${motionScore}`;
+      }
+    }
     function displayTimes(elementId, timesMap) {
       const listElement = document.getElementById(elementId);
       listElement.innerHTML = '';
@@ -531,6 +551,44 @@
       commonModal.classList.remove('active');
       document.getElementById('modalVideo').src = '';
     }
+
+    // updateProgress() 함수: 전달받은 percentile 값에 따라 진행률과 순위 텍스트를 업데이트합니다.
+    function updateProgress(percentile) {
+      const progressFill = document.getElementById("progress-fill");
+      const progressMarker = document.querySelector(".progress-marker");
+      const rankLabel = document.getElementById("rank-label");
+      const percentValue = document.getElementById("percent-value");
+
+      // 퍼센트 값을 설정
+      percentValue.textContent = percentile;
+
+      // 막대의 위치 업데이트 (왼쪽->오른쪽 진행)
+      let position = percentile + "%";
+      progressFill.style.width = position;
+      progressMarker.style.left = position;
+
+      // 상위 / 하위 텍스트 변경
+      if (percentile >= 50) {
+          rankLabel.textContent = "상위";
+      } else {
+          rankLabel.textContent = "하위";
+      }
+    }
 </script>
+
+<!-- 추가 스크립트: 썸네일이 있으면 '저장된 발표영상이 없습니다' 메시지 숨기기 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+      const presentationSection = document.getElementById("presentationVideos");
+      const thumbnails = presentationSection.querySelectorAll(".video-thumbnail");
+      if(thumbnails.length > 0){
+        const noVideosMsg = presentationSection.querySelector(".no-videos-message");
+        if(noVideosMsg){
+          noVideosMsg.style.display = "none";
+        }
+      }
+    });
+</script>
+
 </body>
 </html>
