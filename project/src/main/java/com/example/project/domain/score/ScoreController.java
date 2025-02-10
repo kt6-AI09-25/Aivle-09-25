@@ -188,10 +188,10 @@ public class ScoreController {
             data.put("scoreId", score.getScoreId());
             data.put("userId", score.getUser().getUsername());
             data.put("date", score.getDate().toString());
-            data.put("totalScore", score.getTotalScore());
+            data.put("totalScore", Math.floor(score.getTotalScore()));
             data.put("motionScore", score.getMotionScore());
             data.put("expressionScore", score.getExpressionScore());
-            data.put("languageScore", score.getLanguageScore());
+            data.put("languageScore", Math.floor(score.getLanguageScore()));
             return data;
         }).toList();
 
