@@ -27,6 +27,7 @@
         .video-thumbnail {
           max-width: 300px;
           cursor: pointer;
+          position: relative;
         }
         /* 로딩 오버레이 – “분석 중입니다...” 메시지 (썸네일 내부에 오버레이) */
         #loadingModal {
@@ -50,13 +51,8 @@
         #completedVideoContainer {
           display: none;
           position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
           background-color: rgba(0,0,0,0.5);
-          color: #fff;
           text-align: center;
-          padding: 20px;
           z-index: 10;
         }
         #completedVideoContainer.active {
@@ -143,31 +139,28 @@
 
         <!-- 썸네일 컨테이너 (내부에 로딩/완료 오버레이 포함) -->
         <div class="thumbnail-container">
-            <!-- 로딩 오버레이 (분석중 메시지) -->
-
-            <!-- 평가 완료 영상 오버레이 -->
-            <div id="completedVideoContainer">
-                <h2>평가가 완료된 영상</h2>
-                <video id="completedVideo" width="400" height="240" controls></video>
-                <div id="loadingModal">
-                    <p>분석 중입니다... 잠시만 기다려주세요.</p>
-                </div>
-            </div>
-
             <!-- 발표영상 섹션 -->
             <div id="presentationVideos">
-                <div th:if="${presentationVideos != null and !#lists.isEmpty(presentationVideos)}">
-                    <div th:each="video, iterStat : ${presentationVideos}">
-                        <img th:if="${video.thumbnailUrl != null}"
-                             th:src="@{${video.thumbnailUrl}}"
-                             alt="발표영상 썸네일"
-                             th:attr="data-videoUrl=${video.videoUrl}"
-                             class="video-thumbnail" />
-                    </div>
-                </div>
                 <div th:if="${presentationVideos == null or #lists.isEmpty(presentationVideos)}">
                     <h1 class="no-videos-message">저장된 발표영상이 없습니다.</h1>
                     <div class="video-flex" style="text-align: center; margin: 20px 0;">
+                        <!--평가중-->
+                        <div class="video-container"
+                             id="completedVideoContainer"
+                             th:if="${evaluatingScore != null and evaluatingScore['scoreId'] != null}">
+                            <div class="video-container" >
+                                <div class="video-thumbnail">
+                                    <video id="completedVideo" width="300" height="180">
+                                    </video>
+                                    <div id="loadingModal">
+                                        <p>분석 중입니다... 잠시만 기다려주세요.</p>
+                                    </div>
+                                </div>
+                                <p><strong>날짜:</strong> <span th:text="${#temporals.format(evaluatingScore['date'], 'yyyy-MM-dd HH:mm')}"></span></p>
+                                <p><strong>작성자:</strong> <span th:text="${evaluatingScore['userId']}"></span></p>
+                            </div>
+                        </div>
+
                         <div th:each="score : ${previousScores}" class="video-container">
                             <div th:if="${score.status != 'IN_PROGRESS'}" class="video-container">
                                 <div class="video-thumbnail"
@@ -280,6 +273,9 @@
                             <video controls id="analysisVideo">
                                 Your browser does not support the video tag.
                             </video>
+                            <div id="timeLinks"></div>
+
+
                         </div>
                         <div class="modal-right">
                             <div class="frame-card">
@@ -382,7 +378,7 @@
     });
 
     /***** 폴링 및 로딩/완료 오버레이 업데이트 *****/
-    let pollingInterval;
+    let pollingInterval = null;
 
     function pollEvaluatingScore() {
       fetch('/scores/results/api')
@@ -396,28 +392,60 @@
           if (!evalScore || Object.keys(evalScore).length === 0) {
             loadingModal.classList.remove('active');
             completedVideoContainer.classList.remove('active');
+
+            const container = document.getElementById('completedVideoContainer');
+            container.remove();
+            updatePreviousScores(data.previousScores);
+
             clearInterval(pollingInterval);
             pollingInterval = null;
             return;
-          }
-
-          if (evalScore.status === 'IN_PROGRESS') {
+          }else{
             loadingModal.classList.add('active');
-            completedVideoContainer.classList.remove('active');
-          } else if (evalScore.status === 'COMPLETED') {
-            loadingModal.classList.remove('active');
             completedVideoContainer.classList.add('active');
             completedVideo.src = '/myresults/upload/results/' + evalScore.fileId;
-
-            clearInterval(pollingInterval);
-            pollingInterval = null;
           }
         })
         .catch(err => console.error('Error in polling:', err));
     }
     document.addEventListener('DOMContentLoaded', () => {
-      pollingInterval = setInterval(pollEvaluatingScore, 3000);
+      if (pollingInterval === null) {
+        pollingInterval = setInterval(pollEvaluatingScore, 3000);
+      }
     });
+
+    function updatePreviousScores(scores) {
+        const container = document.querySelector('.video-flex');
+        const previousScoresDivs = container.querySelectorAll('.video-container:not(#completedVideoContainer)');
+
+        // 기존 previousScores 비우기
+        previousScoresDivs.forEach(div => div.remove());
+
+        scores.forEach(score => {
+            if (score.status !== 'IN_PROGRESS') {
+                const videoContainer = document.createElement('div');
+                videoContainer.classList.add('video-container');
+
+                videoContainer.innerHTML = `
+                    <div class="video-container">
+                        <div class="video-thumbnail"
+                             scoreId="${score.scoreId}"
+                             totalscore="${score.totalScore}"
+                             motionscore="${score.motionScore}"
+                             expressionscore="${score.expressionScore}"
+                             languagescore="${score.languageScore}"
+                             fileId="${score.fileId}"
+                             onclick="openScoreModal(this)">
+                            <video width="300" height="180" src="/myresults/upload/results/${score.fileId}"></video>
+                        </div>
+                        <p><strong>날짜:</strong> ${new Date(score.date).toLocaleString()}</p>
+                        <p><strong>작성자:</strong> ${score.userId}</p>
+                    </div>
+                `;
+                container.appendChild(videoContainer);
+            }
+        });
+    }
 
     /***** 기존 모달/차트 로직 *****/
     function openAnalysisModal() {
@@ -539,8 +567,8 @@
       document.getElementById("summaryResult").setAttribute("data-score", totalscore);
       document.getElementById("detailAnalysis").setAttribute("data-score", motionscore);
       document.getElementById("motion").setAttribute("data-score", motionscore);
-      document.getElementById("voice").setAttribute("data-score", expressionscore);
-      document.getElementById("gaze").setAttribute("data-score", languagescore);
+      document.getElementById("voice").setAttribute("data-score", languagescore);
+      document.getElementById("gaze").setAttribute("data-score", expressionscore);
 
       const videoElement = document.getElementById('analysisVideo');
       if (videoElement) {
@@ -670,13 +698,20 @@
 
     function updateModalContent(scoreType) {
         let scoreValue = Math.round(currentData[`${scoreType}Score`]) || "없음";
-        let percentileValue = Math.round(currentData[`${scoreType}Percentile`]) || "없음";
         let frequencyValue = currentData[`${scoreType}Frequency`] || "없음";
         let frequencyRatioValue = Math.round(currentData[`${scoreType}FrequencyRatio`]) || "없음";
 
         $(".modalScore").text(scoreValue);
         $(".modalFrequency").text(frequencyValue);
         $(".modalFrequencyRatio").text(frequencyRatioValue);
+
+        if (scoreType != 'total'){
+            if(scoreValue <=80){
+
+
+
+            }
+        }
     }
 
     function updateChart(scoreType, score) {
