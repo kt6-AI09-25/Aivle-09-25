@@ -146,16 +146,25 @@
 
       <!-- Action (처리) -->
       <td>
-        <form th:action="@{/admin/report/{id}/update(id=${report.report_id})}" method="post">
-          <select name="reportProcessType">
-            <option th:each="type : ${T(com.example.project.domain.report.ReportProcessTypes).values()}"
-                    th:value="${type}" th:text="${type}"
-                    th:selected="${type} == ${report.report_process_type}">
-            </option>
-          </select>
-          <button type="submit">확인</button>
-        </form>
+        <div style="display: flex; gap: 5px;">
+          <!-- 신고 처리 버튼 -->
+          <form th:action="@{/admin/report/{id}/update(id=${report.report_id})}" method="post">
+            <select name="reportProcessType">
+              <option th:each="type : ${T(com.example.project.domain.report.ReportProcessTypes).values()}"
+                      th:value="${type}" th:text="${type}"
+                      th:selected="${type} == ${report.report_process_type}">
+              </option>
+            </select>
+            <button type="submit">확인</button>
+          </form>
+
+          <!-- 삭제 (반려) 버튼 -->
+          <form th:action="@{/admin/report/{id}/delete(id=${report.report_id})}" method="get">
+            <button type="submit" style="background-color: red; color: white;">반려</button>
+          </form>
+        </div>
       </td>
+
 
     </tr>
     </tbody>

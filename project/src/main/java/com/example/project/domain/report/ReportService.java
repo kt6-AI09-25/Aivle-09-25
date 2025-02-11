@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReportService {
 
     private final ReportRepository reportRepository;
@@ -43,7 +44,7 @@ public class ReportService {
 
 
         Report newReport = new Report();
-        newReport.setReported_id(request.getReported_id());
+        newReport.setReportedId(request.getReported_id());
         newReport.setReport_details(request.getReport_details());
         newReport.setReporter(reporter);
         newReport.setReport_type(request.getReport_type());
@@ -102,11 +103,11 @@ public class ReportService {
 
     private ReportDto.Response convertToResponseDTO(Report report) {
         return ReportDto.Response.builder()
-                .report_id(report.getReport_id())
+                .report_id(report.getReportId())
                 .reporter_id(report.getReporter().getId())
                 .reporter_name(report.getReporter().getUsername())
                 .report_type(report.getReport_type())
-                .reported_id(report.getReported_id())
+                .reported_id(report.getReportedId())
                 .processing_state(report.getProcessing_state())
                 .date_processing(report.getDate_processing())
                 .report_details(report.getReport_details())
@@ -117,5 +118,11 @@ public class ReportService {
 
     public long getUnprocessedReports() {
         return reportRepository.countUnprocessedReports();
+    }
+
+    @Transactional
+    public void deleteReport(Long reportId) {
+        Report report = reportRepository.findByReportId(reportId);
+        reportRepository.delete(report);
     }
 }
