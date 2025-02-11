@@ -2,6 +2,10 @@ package com.example.project.domain.testpage;
 
 import com.example.project.domain.score.ScoreDTO;
 import com.example.project.domain.score.ScoreRepository;
+import com.example.project.domain.score.ScoreService;
+import com.example.project.domain.score2.Score2DTO;
+import com.example.project.domain.score2.Score2Repository;
+import com.example.project.domain.score2.Score2Service;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,16 +17,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
 @Slf4j
 public class IndexController {
 
-
     private final UserRepository userRepository;
-    private final ScoreRepository scoreRepository;
+    private final ScoreService scoreService;
+    private final Score2Service score2Service;
 
     @GetMapping("/")
     public String index() {
@@ -38,7 +44,6 @@ public class IndexController {
     public String result() {
         return "result"; // result.html 반환
     }
-
 
     @GetMapping("/board")
     public String board() {
@@ -68,22 +73,24 @@ public class IndexController {
                     .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         }
 
-
-        List<ScoreDTO> previousScores = scoreRepository.findByUserIdWithDetails(userId)
+        List<ScoreDTO> previousScores = scoreService.getPreviousScores(userId)
                 .stream()
                 .map(ScoreDTO::fromEntity)
                 .toList();
 
-        System.out.println("=== 사용자 ID: " + userId + " ===");
-        System.out.println("=== previousScores 조회 결과 ===");
-        previousScores.forEach(score -> System.out.println("점수 ID: " + score.getScoreId() + " | 총 점수: " + score.getTotalScore()));
+        List<Score2DTO> previousScores2 = score2Service.getPreviousScores(userId)
+                .stream()
+                .map(Score2DTO::fromEntity)
+                .toList();
+
+        Map<String, Object> evaluatingScore = scoreService.getEvaluatingScore(userId);
+        Map<String, Object> evaluatingScore2 = score2Service.getEvaluatingScore(userId);
 
         model.addAttribute("previousScores", previousScores);
+        model.addAttribute("previousScores2", previousScores2);
+        model.addAttribute("evaluatingScore", evaluatingScore);
+        model.addAttribute("evaluatingScore2", evaluatingScore2);
 
         return "myresult";
     }
-
-
 }
-
-
