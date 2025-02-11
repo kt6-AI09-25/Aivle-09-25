@@ -3,6 +3,7 @@ package com.example.project.domain.score2;
 import com.example.project.domain.file.File;
 import com.example.project.domain.score.Score;
 import com.example.project.domain.score.ScoreDTO;
+import com.example.project.domain.score.ScoreDetailsDTO;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -282,19 +283,25 @@ public class Score2Service {
         return result;
     }
 
-    //  점수 상세 정보 및 퍼센타일 조회
-    public Score2DetailsDTO getScore2DetailPoints(Long score2Id) {
-        Score2DetailsDTO details = score2Repository.findScore2WithDetailsByScore2Id(score2Id)
-                .orElseThrow(() -> new IllegalArgumentException("Score2 not found for ID: " + score2Id));
+    public Score2DetailsDTO getScore2DetailPoints(Long scoreId) {
+        Score2DetailsDTO details = score2Repository.findScore2WithDetailsByScore2Id(scoreId)
+                .orElseThrow(() -> new IllegalArgumentException("Score not found for ID: " + scoreId));
 
-        List<Score2> allScore2s = score2Repository.findAll();
+        Map<String, Double> frequencyRatios = calculateFrequencyRatios();
+        details.setExpressionFrequencyRatio(frequencyRatios.getOrDefault(details.getExpressionFrequency(), 0.0));
+        details.setLanguageFrequencyRatio(frequencyRatios.getOrDefault(details.getLanguageFrequency(), 0.0));
 
-        List<Double> eyeheadScores = allScore2s.stream().map(Score2::getEyeheadScore).sorted().toList();
-        List<Double> expressionScores = allScore2s.stream().map(Score2::getExpressionScore).sorted().toList();
-        List<Double> languageScores = allScore2s.stream().map(Score2::getLanguageScore).sorted().toList();
-        List<Double> totalScores = allScore2s.stream().map(Score2::getTotalScore).sorted().toList();
+        // 전체 데이터 가져오기
+        List<Score2> allScores = score2Repository.findAll();
 
-        details.setEyeheadPercentile(calculatePercentile(eyeheadScores, details.getEyeheadScore()));
+        // 모든 점수를 리스트로 변환하여 정렬
+        List<Double> motionScores = allScores.stream().map(Score2::getEyeheadScore).sorted().toList();
+        List<Double> expressionScores = allScores.stream().map(Score2::getExpressionScore).sorted().toList();
+        List<Double> languageScores = allScores.stream().map(Score2::getLanguageScore).sorted().toList();
+        List<Double> totalScores = allScores.stream().map(Score2::getTotalScore).sorted().toList();
+
+        // 현재 점수의 percentile 계산
+        details.setEyeheadPercentile(calculatePercentile(motionScores, details.getEyeheadScore()));
         details.setExpressionPercentile(calculatePercentile(expressionScores, details.getExpressionScore()));
         details.setLanguagePercentile(calculatePercentile(languageScores, details.getLanguageScore()));
         details.setTotalPercentile(calculatePercentile(totalScores, details.getTotalScore()));

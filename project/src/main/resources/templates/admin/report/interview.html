@@ -2,7 +2,7 @@
 <html lang="ko" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8"/>
-    <title>관리자 페이지 - 발표 점수 조회</title>
+    <title>관리자 페이지 - 면접 점수 조회</title>
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -88,7 +88,7 @@
             padding-bottom: 10px;
         }
 
-        .score-btn {
+        .score2-btn {
             flex: 1;
             padding: 12px 18px;
             border: none;
@@ -101,14 +101,14 @@
             position: relative;
         }
 
-        .score-btn.active {
+        .score2-btn.active {
             color: #007bff;
             font-weight: bold;
             border-bottom: 3px solid #007bff;
         }
 
         /* 선택된 탭 강조 */
-        .score-btn.active::after {
+        .score2-btn.active::after {
             content: "";
             position: absolute;
             bottom: -3px;
@@ -119,7 +119,7 @@
         }
 
 /* 버튼 호버 효과 */
-.score-btn:hover {
+.score2-btn:hover {
     color: #007bff;
 }
 
@@ -206,8 +206,8 @@
         <li><a href="/admin">메인</a></li>
         <li><a href="/admin/members">회원 관리</a></li>
         <li><a href="/admin/report">게시판 신고 관리</a></li>
-        <li><a href="/admin/prView" class="active">발표 내용 조회</a></li>
-        <li><a href="/admin/interview">면접 내용 조회</a></li>
+        <li><a href="/admin/prView">면접 내용 조회</a></li>
+        <li><a href="/admin/interview" class="active">면접 내용 조회</a></li>
     </ul>
 
     <footer class="sidebar-footer">
@@ -216,13 +216,13 @@
     </footer>
 </div>
 
-<!-- 발표 점수 목록 -->
+<!-- 면접 점수 목록 -->
 <div class="content">
     <div class="dashboard-cards">
         <!-- <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-03 10:40 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
         <div class="card">
-            <h3>평균 행동 점수</h3>
-            <p id="avg-motion-score">로딩 중...</p>
+            <h3>평균 시선 점수</h3>
+            <p id="avg-eyehead-score">로딩 중...</p>
         </div>
         <div class="card">
             <h3>평균 표정 점수</h3>
@@ -237,18 +237,18 @@
             <p id="avg-total-score">로딩 중...</p>
         </div>
     </div>
-    <h2 class="page-title">발표 점수 조회</h2>
+    <h2 class="page-title">면접 점수 조회</h2>
     <div class="title-line"></div>
 
     <div class="members-section">
-        <h3>발표 점수 목록</h3>
+        <h3>면접 점수 목록</h3>
         <div class="table-wrapper">
             <table>
                 <thead>
                 <tr>
                     <th>회원 ID</th>
-                    <th>발표 날짜</th>
-                    <th>행동 점수</th>
+                    <th>면접 날짜</th>
+                    <th>시선 점수</th>
                     <th>표정 점수</th>
                     <th>언어 점수</th>
                     <th>점수 총합</th>
@@ -262,25 +262,25 @@
     </div>
 </div>
 
-<!-- 발표 점수 상세 조회 모달 -->
-<div id="scoreStatModal" class="stat-modal">
+<!-- 면접 점수 상세 조회 모달 -->
+<div id="score2StatModal" class="stat-modal">
     <div class="stat-modal-content">
         <span class="stat-close-btn">&times;</span>
-        <h2 id="modalTitle">발표 점수 상세 정보</h2>
+        <h2 id="modalTitle">면접 점수 상세 정보</h2>
 
         <!-- 점수 선택 버튼 -->
         <div class="button-group">
-            <button class="score-btn" data-type="total">총합 점수</button>
-            <button class="score-btn" data-type="motion">행동 점수</button>
-            <button class="score-btn" data-type="expression">표정 점수</button>
-            <button class="score-btn" data-type="language">언어 점수</button>
+            <button class="score2-btn" data-type="total">총합 점수</button>
+            <button class="score2-btn" data-type="eyehead">시선 점수</button>
+            <button class="score2-btn" data-type="expression">표정 점수</button>
+            <button class="score2-btn" data-type="language">언어 점수</button>
         </div>
 
         <!-- 모달 내부 레이아웃 -->
         <div class="modal-grid">
             <!-- 모달 내부 차트 영역 -->
             <div class="chart-container">
-                <canvas id="scoreChart"></canvas>
+                <canvas id="score2Chart"></canvas>
             </div>
 
             <!-- 점수 상세 정보 -->
@@ -289,8 +289,8 @@
 
                     <p>
                         <strong>점수:</strong>
-                        <span id="modalScore" style="font-size: 1.5rem; font-weight: bold; color: #007bff;"></span>
-                        <span id="modalMaxScore" style="font-size: 0.9rem; color: #666;"></span>
+                        <span id="modalScore2" style="font-size: 1.5rem; font-weight: bold; color: #007bff;"></span>
+                        <span id="modalMaxScore2" style="font-size: 0.9rem; color: #666;"></span>
                     </p>
                     <p><strong>위치:</strong> <span id="modalPercentile"></span>%</p>
                     <!--                    <p><strong>주요감점요인:</strong> <span id="modalFrequency"></span></p>-->
@@ -318,9 +318,9 @@
         let currentData = {};
 
         // 테이블 데이터 로드
-        function loadScores() {
+        function loadScore2s() {
             $.ajax({
-                url: "/scores/all",
+                url: "/scores2/all",
                 type: "GET",
                 dataType: "json",
                 success: function (data) {
@@ -332,15 +332,15 @@
                         return;
                     }
 
-                    data.forEach(function (score) {
+                    data.forEach(function (score2) {
                         let row = `
-                            <tr data-scoreid="${score.scoreId}">
-                                <td>${score.userId}</td>
-                                <td>${formatDate(score.date)}</td>
-                                <td>${Math.round(score.motionScore)}</td>
-                                <td>${Math.round(score.expressionScore)}</td>
-                                <td>${Math.round(score.languageScore)}</td>
-                                <td>${Math.round(score.totalScore)}</td>
+                            <tr data-score2id="${score2.score2Id}">
+                                <td>${score2.userId}</td>
+                                <td>${formatDate(score2.date)}</td>
+                                <td>${Math.round(score2.eyeheadScore)}</td>
+                                <td>${Math.round(score2.expressionScore)}</td>
+                                <td>${Math.round(score2.languageScore)}</td>
+                                <td>${Math.round(score2.totalScore)}</td>
                             </tr>
                         `;
                         tbody.append(row);
@@ -360,29 +360,29 @@
 
         // 테이블 행 클릭 시 모달 열기
         $(document).on("click", ".table-wrapper tbody tr", function () {
-            let scoreId = $(this).data("scoreid");
+            let score2Id = $(this).data("score2id");
 
-            if (!scoreId) {
-                alert("scoreId가 존재하지 않습니다.");
+            if (!score2Id) {
+                alert("score2Id가 존재하지 않습니다.");
                 return;
             }
 
 
         // 모달 닫기
         $(document).on("click", ".stat-close-btn", function () {
-            $("#scoreStatModal").fadeOut();
+            $("#score2StatModal").fadeOut();
         });
 
         $(document).on("click", function (event) {
-            if ($(event.target).attr("id") === "scoreStatModal") {
-                $("#scoreStatModal").fadeOut();
+            if ($(event.target).attr("id") === "score2StatModal") {
+                $("#score2StatModal").fadeOut();
             }
         });
 
             $.ajax({
-                url: "/scores/details2",
+                url: "/scores2/details2",
                 type: "GET",
-                data: { scoreId: scoreId },
+                data: { score2Id: score2Id },
                 dataType: "json",
                 success: function (data) {
                 currentData = data;
@@ -390,10 +390,10 @@
                 updateModalContent("total");
 
                 // 모든 버튼의 active 클래스 제거 후, 총합 점수 버튼에 active 추가
-                $(".score-btn").removeClass("active");
-                $(".score-btn[data-type='total']").addClass("active");
+                $(".score2-btn").removeClass("active");
+                $(".score2-btn[data-type='total']").addClass("active");
 
-                $("#scoreStatModal").fadeIn();
+                $("#score2StatModal").fadeIn();
                 },
                 error: function () {
                     alert("점수 데이터를 불러오는 데 실패했습니다.");
@@ -402,34 +402,34 @@
         });
 
         // 버튼 클릭 시 모달 데이터 변경
-        $(document).on("click", ".score-btn", function () {
+        $(document).on("click", ".score2-btn", function () {
             updateModalContent($(this).data("type"));
         });
 
-        function updateModalContent(scoreType) {
-            let scoreValue = Math.round(currentData[`${scoreType}Score`]) || "없음";
-            let percentileValue = Math.round(currentData[`${scoreType}Percentile`]) || "없음";
-            let frequencyValue = currentData[`${scoreType}Frequency`] || "없음";
-            let frequencyRatioValue = Math.round(currentData[`${scoreType}FrequencyRatio`]) || "없음";
+        function updateModalContent(score2Type) {
+            let score2Value = Math.round(currentData[`${score2Type}Score`]) || "없음";
+            let percentileValue = Math.round(currentData[`${score2Type}Percentile`]) || "없음";
+            let frequencyValue = currentData[`${score2Type}Frequency`] || "없음";
+            let frequencyRatioValue = Math.round(currentData[`${score2Type}FrequencyRatio`]) || "없음";
 
-            $("#modalTitle").text(scoreType.toUpperCase() + " 점수 상세 조회");
-            $("#modalScore").text(scoreValue);
+            $("#modalTitle").text(score2Type.toUpperCase() + " 점수 상세 조회");
+            $("#modalScore2").text(score2Value);
             $("#modalPercentile").text(percentileValue);
             $("#modalFrequency").text(frequencyValue);
             $("#modalFrequencyRatio").text(frequencyRatioValue);
         }
 
         // 페이지 로드 시 테이블 데이터 불러오기
-        loadScores();
+        loadScore2s();
     });
 
     $(document).ready(function () {
     let currentData = {};
     let chartInstance = null;  // 기존 차트 인스턴스 저장
 
-    function loadScores() {
+    function loadScore2s() {
         $.ajax({
-            url: "/scores/all",
+            url: "/scores2/all",
             type: "GET",
             dataType: "json",
             success: function (data) {
@@ -441,15 +441,15 @@
                     return;
                 }
 
-                data.forEach(function (score) {
+                data.forEach(function (score2) {
                     let row = `
-                        <tr data-scoreid="${score.scoreId}">
-                            <td>${score.userId}</td>
-                            <td>${formatDate(score.date)}</td>
-                            <td>${Math.round(score.motionScore)}</td>
-                            <td>${Math.round(score.expressionScore)}</td>
-                            <td>${Math.round(score.languageScore)}</td>
-                            <td>${Math.round(score.totalScore)}</td>
+                        <tr data-score2id="${score2.score2Id}">
+                            <td>${score2.userId}</td>
+                            <td>${formatDate(score2.date)}</td>
+                            <td>${Math.round(score2.eyeheadScore)}</td>
+                            <td>${Math.round(score2.expressionScore)}</td>
+                            <td>${Math.round(score2.languageScore)}</td>
+                            <td>${Math.round(score2.totalScore)}</td>
                         </tr>
                     `;
                     tbody.append(row);
@@ -467,23 +467,23 @@
     }
 
     $(document).on("click", ".table-wrapper tbody tr", function () {
-        let scoreId = $(this).data("scoreid");
+        let score2Id = $(this).data("score2id");
 
-        if (!scoreId) {
-            alert("scoreId가 존재하지 않습니다.");
+        if (!score2Id) {
+            alert("score2Id가 존재하지 않습니다.");
             return;
         }
 
         $.ajax({
-            url: "/scores/details2",
+            url: "/scores2/details2",
             type: "GET",
-            data: { scoreId: scoreId },
+            data: { score2Id: score2Id },
             dataType: "json",
             success: function (data) {
                 currentData = data;
                 $("#modalUserId").text(data.userId || "없음");
                 updateModalContent("total");
-                $("#scoreStatModal").fadeIn();
+                $("#score2StatModal").fadeIn();
             },
             error: function () {
                 alert("점수 데이터를 불러오는 데 실패했습니다.");
@@ -491,81 +491,81 @@
         });
     });
 
-    $(document).on("click", ".score-btn", function () {
-        $(".score-btn").removeClass("active"); // 모든 버튼에서 active 제거
+    $(document).on("click", ".score2-btn", function () {
+        $(".score2-btn").removeClass("active"); // 모든 버튼에서 active 제거
         $(this).addClass("active"); // 현재 클릭된 버튼에 active 추가
 
-        let scoreType = $(this).data("type");
-        updateModalContent(scoreType);
+        let score2Type = $(this).data("type");
+        updateModalContent(score2Type);
     });
 
-    function updateModalContent(scoreType) {
-        let scoreValue = Math.round(currentData[`${scoreType}Score`]) || "없음";
-        let percentileValue = Math.round(currentData[`${scoreType}Percentile`]) || "없음";
-        let frequencyValue = currentData[`${scoreType}Frequency`] || "없음";
-        let frequencyRatioValue = Math.round(currentData[`${scoreType}FrequencyRatio`]) || "없음";
+    function updateModalContent(score2Type) {
+        let score2Value = Math.round(currentData[`${score2Type}Score`]) || "없음";
+        let percentileValue = Math.round(currentData[`${score2Type}Percentile`]) || "없음";
+        let frequencyValue = currentData[`${score2Type}Frequency`] || "없음";
+        let frequencyRatioValue = Math.round(currentData[`${score2Type}FrequencyRatio`]) || "없음";
 
         // 점수에 맞는 최대값 추가
-        let maxScore = scoreType === "total" ? 300 : 100;
+        let maxScore2 = score2Type === "total" ? 300 : 100;
 
 
-        $("#modalTitle").text(scoreType.toUpperCase() + " 점수 상세 조회");
-        $("#modalScore").html(`${scoreValue}`); // 점수는 크게, 파란색 유지
-        $("#modalMaxScore").html(` / ${maxScore}점`); // 단위는 작고 회색으로
+        $("#modalTitle").text(score2Type.toUpperCase() + " 점수 상세 조회");
+        $("#modalScore2").html(`${score2Value}`); // 점수는 크게, 파란색 유지
+        $("#modalMaxScore2").html(` / ${maxScore2}점`); // 단위는 작고 회색으로
         $("#modalPercentile").text(percentileValue);
         $("#modalFrequency").text(frequencyValue);
         $("#modalFrequencyRatio").text(frequencyRatioValue);
 
-        if (scoreType === "total") {
+        if (score2Type === "total") {
         $("#modalFrequencyRatio").closest("p").hide();
     } else {
         $("#modalFrequencyRatio").closest("p").show();
     }
 
-        updateChart(scoreType);
+        updateChart(score2Type);
     }
 
-    function updateChart(scoreType) {
-            if (!currentData || !currentData[`${scoreType}Score`]) return;
+    function updateChart(score2Type) {
+            if (!currentData || !currentData[`${score2Type}Score`]) return;
 
-            let canvas = document.getElementById("scoreChart").getContext("2d");
+            let canvas = document.getElementById("score2Chart").getContext("2d");
 
             if (chartInstance) {
                 chartInstance.destroy();
             }
 
             $.ajax({
-                url: "/scores/all",
+                url: "/scores2/all",
                 type: "GET",
                 dataType: "json",
-                success: function (scores) {
-                    let scoreValues = scores.map(s => Math.round(s[`${scoreType}Score`]));
+                success: function (score2s) {
+                    let score2Values = score2s.map(s => Math.round(s[`${score2Type}Score`]));
 
-                    let maxScore = scoreType === "total" ? 300 : 100;
-                    let labels = Array.from({ length: (maxScore / 5) + 1 }, (_, i) => i * 5);
-                    if (!labels.includes(maxScore)) labels.push(maxScore);
+                    let maxScore2 = score2Type === "total" ? 300 : 100;
+                    let labels = Array.from({ length: (maxScore2 / 5) + 1 }, (_, i) => i * 5);
+                    if (!labels.includes(maxScore2)) labels.push(maxScore2);
 
-                    let binnedScores = labels.reduce((acc, label) => {
+                    let binnedScore2s = labels.reduce((acc, label) => {
                         acc[label] = 0;
                         return acc;
                     }, {});
 
-                    scoreValues.forEach(score => {
-                        let bin = Math.round(score / 5) * 5;
-                        if (bin > maxScore) bin = maxScore;
-                        binnedScores[bin]++;
+                    score2Values.forEach(score2 => {
+                        let bin = Math.round(score2 / 5) * 5;
+                        if (bin > maxScore2) bin = maxScore2;
+                        binnedScore2s[bin]++;
                     });
 
 
-                    let highlightedValue = Math.round(currentData[`${scoreType}Score`] / 5) * 5;
+                    let highlightedValue = Math.round(currentData[`${score2Type}Score`] / 5) * 5;
 
                     chartInstance = new Chart(canvas, {
                         type: "bar",
                         data: {
                             labels: labels,
                             datasets: [{
-                                label: scoreType.toUpperCase() + " Score",
-                                data: labels.map(label => binnedScores[label] || 0),
+                                label: score2Type.toUpperCase() + " Score2",
+                                data: labels.map(label => binnedScore2s[label] || 0),
                                 backgroundColor: labels.map(label => (label === highlightedValue ? "red" : "rgba(54, 162, 235, 0.5)")),
                                 borderWidth: 0
                             }]
@@ -584,16 +584,16 @@
         }
 
         $(document).on("click", ".stat-close-btn", function () {
-            $("#scoreStatModal").fadeOut();
+            $("#score2StatModal").fadeOut();
         });
 
         $(document).on("click", function (event) {
-            if ($(event.target).attr("id") === "scoreStatModal") {
-                $("#scoreStatModal").fadeOut();
+            if ($(event.target).attr("id") === "score2StatModal") {
+                $("#score2StatModal").fadeOut();
             }
         });
 
-        loadScores();
+        loadScore2s();
     });
 
 
@@ -648,20 +648,20 @@
 
 async function fetchAverageScores() {
     try {
-        const response = await fetch('/scores/averages'); // 평균 점수 데이터를 가져오는 API
+        const response = await fetch('/scores2/averages'); // 평균 점수 데이터를 가져오는 API
         if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
 
         const data = await response.json();
 
         // 받아온 데이터를 화면에 반영
-        document.getElementById('avg-motion-score').textContent = `${data.motionScore.toFixed(2)}점`;
+        document.getElementById('avg-eyehead-score').textContent = `${data.eyeheadScore.toFixed(2)}점`;
         document.getElementById('avg-expression-score').textContent = `${data.expressionScore.toFixed(2)}점`;
         document.getElementById('avg-language-score').textContent = `${data.languageScore.toFixed(2)}점`;
         document.getElementById('avg-total-score').textContent = `${data.totalScore.toFixed(2)}점`;
 
     } catch (error) {
         console.error('평균 점수 데이터를 가져오는 중 오류 발생:', error);
-        document.getElementById('avg-motion-score').textContent = '불러오기 실패';
+        document.getElementById('avg-eyehead-score').textContent = '불러오기 실패';
         document.getElementById('avg-expression-score').textContent = '불러오기 실패';
         document.getElementById('avg-language-score').textContent = '불러오기 실패';
         document.getElementById('avg-total-score').textContent = '불러오기 실패';
