@@ -576,7 +576,6 @@ textarea {
                                        style="display: block; padding: 8px 12px; color: #333; background-color: transparent; border: none; text-decoration: none;">
                                         삭제
                                     </a>
-                                    </form>
                                     <a href="#"
                                        class="dropdown-item report-comment-btn"
                                        th:data-comment-id="${comment.commentId}"
@@ -780,70 +779,80 @@ textarea {
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // 📌 댓글 편집 버튼 처리 (권한 체크)
-        document.querySelectorAll('.edit-comment-btn').forEach(button => {
-            button.addEventListener('click', async (event) => {
-                event.preventDefault(); // 기본 동작 방지
-                const editUrl = button.getAttribute('data-edit-url');
+    // 📌 댓글 편집 버튼을 눌렀을 때 수정 폼만 표시
+    document.querySelectorAll('.edit-comment-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault(); // 기본 동작 방지
+            const row = button.closest('.comment-card');
+            const commentText = row.querySelector('.comment-text');
+            const editForm = row.querySelector('.edit-comment-form');
 
-                try {
-                    const response = await fetch(editUrl, { method: 'GET' });
+            commentText.style.display = 'none'; // 기존 댓글 숨김
+            editForm.classList.remove('hidden'); // 수정 폼 표시
+            editForm.style.display = 'block';
 
-                    if (!response.ok) {
-                        const data = await response.json().catch(() => null);
-                        alert(data?.message || "댓글 편집 권한이 없습니다.");
-                    } else {
-                        // 편집 폼 보이기
-                        const row = button.closest('.comment-card');
-                        const commentText = row.querySelector('.comment-text');
-                        const editForm = row.querySelector('.edit-comment-form');
-
-                        commentText.style.display = 'none';
-                        editForm.classList.remove('hidden');
-                        editForm.style.display = 'block';
-
-                        // 취소 버튼 클릭 시 편집 폼 숨기기
-                        const cancelBtn = editForm.querySelector('.cancel-edit-btn');
-                        cancelBtn.addEventListener('click', () => {
-                            editForm.style.display = 'none';
-                            editForm.classList.add('hidden');
-                            commentText.style.display = 'inline';
-                        });
-                    }
-                } catch (error) {
-                    console.error("편집 중 오류 발생:", error);
-                    alert("서버 오류가 발생했습니다.");
-                }
-            });
-        });
-
-        // 📌 댓글 삭제 버튼 처리 (권한 체크)
-        document.querySelectorAll('.delete-comment-btn').forEach(button => {
-            button.addEventListener('click', async (event) => {
-                event.preventDefault(); // 기본 동작 방지
-                const deleteUrl = button.getAttribute('data-delete-url');
-
-                const confirmed = confirm("댓글을 삭제하시겠습니까?");
-                if (!confirmed) return;
-
-                try {
-                    const response = await fetch(deleteUrl, { method: 'POST' });
-
-                    if (!response.ok) {
-                        const data = await response.json().catch(() => null);
-                        alert(data?.message || "댓글 삭제 권한이 없습니다.");
-                    } else {
-                        alert("댓글이 삭제되었습니다.");
-                        location.reload(); // 페이지 새로고침
-                    }
-                } catch (error) {
-                    console.error("삭제 중 오류 발생:", error);
-                    alert("서버 오류가 발생했습니다.");
-                }
+            // 취소 버튼 클릭 시 수정 폼 숨기기
+            const cancelBtn = editForm.querySelector('.cancel-edit-btn');
+            cancelBtn.addEventListener('click', () => {
+                editForm.style.display = 'none';
+                editForm.classList.add('hidden');
+                commentText.style.display = 'inline';
             });
         });
     });
-</script>
 
+    // 📌 수정 폼의 "수정" 버튼을 눌렀을 때만 fetch 요청 실행
+    document.querySelectorAll('.edit-comment-form').forEach(form => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // 기본 동작 방지
+            const formData = new FormData(form);
+            const actionUrl = form.getAttribute('action');
+
+            try {
+                const response = await fetch(actionUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    alert("댓글을 수정할 권한이 없습니다.");
+                } else {
+                    alert("댓글이 성공적으로 수정되었습니다.");
+                    location.reload(); // 페이지 새로고침
+                }
+            } catch (error) {
+                console.error("댓글 수정 중 오류 발생:", error);
+                alert("서버 오류가 발생했습니다.");
+            }
+        });
+    });
+
+
+    // 📌 댓글 삭제 버튼 처리
+    document.querySelectorAll('.delete-comment-btn').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault(); // 기본 동작 방지
+            const deleteUrl = button.getAttribute('data-delete-url');
+
+            const confirmed = confirm("댓글을 삭제하시겠습니까?");
+            if (!confirmed) return;
+
+            try {
+                const response = await fetch(deleteUrl, { method: 'POST' });
+
+                if (!response.ok) {
+                    alert("댓글을 삭제할 권한이 없습니다.");
+                } else {
+                    alert("댓글이 삭제되었습니다.");
+                    location.reload(); // 페이지 새로고침
+                }
+            } catch (error) {
+                console.error("댓글 삭제 중 오류 발생:", error);
+                alert("서버 오류가 발생했습니다.");
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>
