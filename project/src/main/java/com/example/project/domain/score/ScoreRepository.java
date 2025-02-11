@@ -18,7 +18,8 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "LEFT JOIN FETCH s.motionTimes " +
             "LEFT JOIN FETCH s.expressionTimes " +
             "LEFT JOIN FETCH s.languageTimes " +
-            "WHERE s.user.id = :userId")
+            "WHERE s.user.id = :userId "+
+            "ORDER BY s.date DESC")
     List<Score> findByUserIdWithDetails(@Param("userId") Long userId);
 
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<2025-02-06 09:42 박청하<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

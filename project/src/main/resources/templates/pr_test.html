@@ -297,7 +297,7 @@
 
     try {
 
-      const response = await fetch('/myresults/upload/results', {
+      const response = await fetch('/myresults/upload/presentation', {
         method: 'POST',
         body: formData
       });
@@ -305,7 +305,7 @@
         const result = await response.json();
         console.log("녹화본 업로드 성공:", result.filePath);
         // result.fileId를 사용해서 /scores/results?uploadedFileId=... 로 이동
-        window.location.href = `/scores/results?uploadedFileId=${result.fileId}`;
+        window.location.href = `/myresult`;
       } else {
         console.error("서버 응답 오류:", response.statusText);
         alert("녹화본 업로드에 실패했습니다.");
