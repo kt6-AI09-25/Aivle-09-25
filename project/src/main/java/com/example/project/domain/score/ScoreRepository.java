@@ -42,7 +42,11 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
             "ORDER BY DATE(s.date) ASC")
     List<Object[]> getRecentScoresCount(@Param("startDate") LocalDateTime startDate);
 
+    @Query("SELECT s FROM Score s " +
+            "WHERE s.totalScore = (SELECT MAX(sub.totalScore) FROM Score sub WHERE sub.user.id = s.user.id) " +
+            "ORDER BY s.totalScore DESC")
     List<Score> findTop4ByOrderByTotalScoreDesc();
+
 
     @Query("SELECT new com.example.project.domain.score.ScoreDetailsDTO( " +
             "s.scoreId, s.totalScore, s.motionScore, s.expressionScore, s.languageScore, " +

@@ -243,14 +243,19 @@ public class ScoreService {
     }
 
     public List<ScoreDTO> getTop4Scores() {
-        return scoreRepository.findTop4ByOrderByTotalScoreDesc()
-                .stream()
-                .map(score -> {
-                    ScoreDTO dto = ScoreDTO.fromEntity(score);
-                    return dto;
-                })
-                .toList();
+        List<Score> topScores = scoreRepository.findTop4ByOrderByTotalScoreDesc();
+
+        Map<Long, ScoreDTO> uniqueUserScores = new LinkedHashMap<>();
+        for (Score score : topScores) {
+            if (!uniqueUserScores.containsKey(score.getUser().getId())) {
+                uniqueUserScores.put(score.getUser().getId(), ScoreDTO.fromEntity(score));
+            }
+            if (uniqueUserScores.size() == 4) break;
+        }
+
+        return new ArrayList<>(uniqueUserScores.values());
     }
+
 
     public ScoreDTO getScoreWithTop4(Long scoreId) {
         Score score = scoreRepository.findById(scoreId)
