@@ -20,13 +20,25 @@
           color: #333;
         }
 
-        #rankingList {
+        #PRrankingList {
 
             flex-wrap: nowrap; /* 줄바꿈 방지 */
             gap: 20px; /* 항목 간 간격 */
         }
 
-        #rankingList li {
+        #PRrankingList li {
+
+            align-items: center; /* 세로 정렬 */
+            white-space: nowrap; /* 줄바꿈 방지 */
+        }
+
+        #ITrankingList {
+
+            flex-wrap: nowrap; /* 줄바꿈 방지 */
+            gap: 20px; /* 항목 간 간격 */
+        }
+
+        #ITrankingList li {
 
             align-items: center; /* 세로 정렬 */
             white-space: nowrap; /* 줄바꿈 방지 */
@@ -106,6 +118,33 @@
             background-color: #f8f9fa; /* 배경색 */
             position: relative; /* 부모 요소 위치 기준 */
         }
+
+        .charts-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .chart-wrapper {
+            display: flex;
+            flex-direction: row; /* 가로 정렬 */
+            justify-content: space-between;
+            width: 100%;
+            gap: 20px; /* 그래프 간격 */
+        }
+
+        .chart-container {
+            flex: 1; /* 두 개의 그래프가 균등한 너비를 차지하도록 설정 */
+            max-width: 50%; /* 한 개가 최대 50% 차지하도록 설정 */
+        }
+        .chart-title {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -166,38 +205,36 @@
             </div>
 
             <div class="chart-card">
-                <h3>등수</h3>
-                <ul id="rankingList" class="activities-list">
+                <h3> 발표 등수</h3>
+                <ul id="PRrankingList" class="activities-list">
                     <li>로딩 중...</li>
                 </ul>
             </div>
 
 
             <div class="chart-card">
-                <h3>등수</h3>
-                <ul class="activities-list">
+                <h3>면접 등수</h3>
+                <ul id="ITrankingList" class="activities-list">
+                    <li>로딩 중...</li>
                 <li>
-                    <span>길동</span>
-                </li>
-                <li>
-                    <span>길동</span>
-                </li>
-                <li>
-                    <span>길동</span>
-                </li>
-                <li>
-                    <span>길동</span>
-                </li>
                 </ul>
             </div>
         </div>
 
         <div class="dashboard-cards">
 
-            <div class="chart-card">
-                <h3>최근 7일 서비스이용</h3>
-                <div class="chart-container">
-                    <canvas id="myChartRecent"></canvas>
+            <div class="chart-card charts-container">
+                <h3 style="width: 100%; text-align: center;">최근 7일 서비스이용</h3>
+
+                <div class="chart-wrapper">
+                    <div class="chart-container">
+                        <h4 class="chart-title">발표</h4>
+                        <canvas id="myChartRecentPR"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h4 class="chart-title">면접</h4>
+                        <canvas id="myChartRecentIT"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -275,36 +312,35 @@
 
             async function fetchRecentScoresChart() {
                 try {
-                    const response = await fetch('/scores/recent-counts'); // 최근 7일간 Score 개수 가져오는 API
+                    const response = await fetch('/scores/recent-counts');
                     if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
 
                     const data = await response.json();
 
-                    const labels = data.map(item => item.date); // 날짜 리스트
-                    const counts = data.map(item => item.count); // 점수 개수 리스트
+                    const labels = data.map(item => item.date);
+                    const counts = data.map(item => item.count);
 
-                    // 차트 그리기
-                    const ctx2 = document.getElementById('myChartRecent').getContext('2d');
+                    const ctx2 = document.getElementById('myChartRecentPR').getContext('2d');
                     new Chart(ctx2, {
-                        type: 'line', // 꺾은선 그래프
+                        type: 'line',
                         data: {
                             labels: labels,
                             datasets: [{
-                                label: '최근 7일간 Score 등록 수',
+                                label: '최근 7일간 발표 등록 수',
                                 data: counts,
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgba(54, 162, 235, 0.7)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.7)',
                                 borderWidth: 2,
-                                tension: 0.3, // 곡선 정도 (0 = 직선)
-                                pointRadius: 5, // 포인트 크기
-                                pointBackgroundColor: 'rgba(255, 99, 132, 1)' // 포인트 색상
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointBackgroundColor: 'rgba(54, 162, 235, 0.7)' // 포인트 색상
                             }]
                         },
                         options: {
                             responsive: true,
                             plugins: {
                                         legend: {
-                                            display: false // 범례 숨기기
+                                            display: false
                                         }
                                     },
                             scales: {
@@ -313,61 +349,134 @@
                         }
                     });
                 } catch (error) {
-                    console.error('최근 7일간 Score 데이터 불러오기 실패:', error);
+                    console.error('최근 7일간 발표 등록 데이터 불러오기 실패:', error);
                 }
             }
 
             // 페이지 로딩 후 실행
             document.addEventListener('DOMContentLoaded', fetchRecentScoresChart);
 
-            let myChartInstance = null;
-
-            async function fetchAverageScoresChart() {
+            async function fetchRecentScore2sChart() {
                 try {
-                    const response = await fetch('/scores/averages'); // 3종류의 평균 스코어 가져오는 API
+                    const response = await fetch('/scores2/recent-counts');
                     if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
 
                     const data = await response.json();
 
-                    const labels = ['Motion Score', 'Expression Score', 'Language Score']; // 카테고리 라벨
-                    const scores = [data.motionScore, data.expressionScore, data.languageScore]; // 평균 스코어
-
-                    // 기존 차트가 있다면 삭제 (destroy)
-                    if (myChartInstance) {
-                        myChartInstance.destroy();
-                    }
+                    const labels = data.map(item => item.date);
+                    const counts = data.map(item => item.count);
 
                     // 차트 그리기
-                    const ctx1 = document.getElementById('myChartAvg').getContext('2d');
-                    new Chart(ctx1, {
-                        type: 'bar', // 히스토그램(막대 그래프)
+                    const ctx2 = document.getElementById('myChartRecentIT').getContext('2d');
+                    new Chart(ctx2, {
+                        type: 'line',
                         data: {
                             labels: labels,
                             datasets: [{
-                                label: '평균 스코어',
-                                data: scores,
-                                backgroundColor: [
-                                    'rgba(54, 162, 235, 0.7)', // 파란색
-                                    'rgba(255, 99, 132, 0.7)', // 빨간색
-                                    'rgba(75, 192, 192, 0.7)'  // 초록색
-                                ],
-                                borderColor: [
-                                    'rgba(54, 162, 235, 1)',
-                                    'rgba(255, 99, 132, 1)',
-                                    'rgba(75, 192, 192, 1)'
-                                ],
-                                borderWidth: 1
+                                label: '최근 7일간 면접 등록 수',
+                                data: counts,
+                                borderColor: 'rgba(255, 99, 132, 0.7)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointBackgroundColor: 'rgba(255, 99, 132, 0.7)'
                             }]
                         },
                         options: {
                             responsive: true,
                             plugins: {
                                         legend: {
-                                            display: false // 범례 숨기기
+                                            display: false
                                         }
                                     },
                             scales: {
                                 y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('최근 7일간 면접 등록 데이터 불러오기 실패:', error);
+                }
+            }
+
+            // 페이지 로딩 후 실행
+            document.addEventListener('DOMContentLoaded', fetchRecentScore2sChart);
+
+
+
+            let myChartInstance = null;
+
+            async function fetchAverageScoresChart() {
+                try {
+                    // 두 개의 API 요청을 병렬적으로 수행
+                    const [scoreResponse, score2Response] = await Promise.all([
+                        fetch('/scores/averages'),
+                        fetch('/scores2/averages')
+                    ]);
+
+                    if (!scoreResponse.ok || !score2Response.ok) {
+                        throw new Error('데이터를 불러오는 데 실패했습니다.');
+                    }
+
+                    // JSON 데이터 변환
+                    const scoreData = await scoreResponse.json();
+                    const score2Data = await score2Response.json();
+
+                    const labels = ['행동/시선 점수', '표정 점수', '언어 점수', '총합 점수'];
+
+                    const scoreValues = [
+                        scoreData.motionScore,
+                        scoreData.expressionScore,
+                        scoreData.languageScore,
+                        scoreData.totalScore
+                    ];
+
+                    const score2Values = [
+                        score2Data.eyeheadScore,
+                        score2Data.expressionScore,
+                        score2Data.languageScore,
+                        score2Data.totalScore
+                    ];
+
+                    if (myChartInstance) {
+                        myChartInstance.destroy();
+                    }
+
+                    const ctx = document.getElementById('myChartAvg').getContext('2d');
+                    myChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: '발표',
+                                    data: scoreValues,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.7)', // 파란색
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: '면접',
+                                    data: score2Values,
+                                    backgroundColor: 'rgba(255, 99, 132, 0.7)', // 빨간색
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    borderWidth: 1
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
                             }
                         }
                     });
@@ -385,22 +494,45 @@
                     if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
 
                     const data = await response.json();
-                    const rankingList = document.getElementById("rankingList");
-                    rankingList.innerHTML = ""; // 기존 목록 초기화
+                    const PRrankingList = document.getElementById("PRrankingList");
+                    PRrankingList.innerHTML = ""; // 기존 목록 초기화
 
                     data.forEach((item, index) => {
                         const listItem = document.createElement("li");
                         listItem.innerHTML = `<strong>${index + 1}위:</strong> ${item.username || '알 수 없음'} - ${Math.floor(item.totalScore)}점`;
-                        rankingList.appendChild(listItem);
+                        PRrankingList.appendChild(listItem);
                     });
 
                 } catch (error) {
                     console.error("TOP 4 불러오기 실패:", error);
-                    document.getElementById("rankingList").innerHTML = "<li>데이터를 불러오는 데 실패했습니다.</li>";
+                    document.getElementById("PRrankingList").innerHTML = "<li>데이터를 불러오는 데 실패했습니다.</li>";
                 }
             }
 
             document.addEventListener('DOMContentLoaded', fetchTop4Scores);
+
+            async function fetchTop4Score2s() {
+                try {
+                    const response = await fetch('/scores2/top4');
+                    if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
+
+                    const data = await response.json();
+                    const ITrankingList = document.getElementById("ITrankingList");
+                    ITrankingList.innerHTML = ""; // 기존 목록 초기화
+
+                    data.forEach((item, index) => {
+                        const listItem = document.createElement("li");
+                        listItem.innerHTML = `<strong>${index + 1}위:</strong> ${item.username || '알 수 없음'} - ${Math.floor(item.totalScore)}점`;
+                        ITrankingList.appendChild(listItem);
+                    });
+
+                } catch (error) {
+                    console.error("TOP 4 불러오기 실패:", error);
+                    document.getElementById("PRrankingList").innerHTML = "<li>데이터를 불러오는 데 실패했습니다.</li>";
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', fetchTop4Score2s);
 
 
 

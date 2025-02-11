@@ -1,5 +1,6 @@
 package com.example.project.domain.score2;
 
+import com.example.project.domain.score.Score;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -53,6 +54,7 @@ public interface Score2Repository extends JpaRepository<Score2, Long> {
             "WHERE s.totalScore = (SELECT MAX(sub.totalScore) FROM Score2 sub WHERE sub.user.id = s.user.id) " +
             "ORDER BY s.totalScore DESC")
     List<Score2> findTop4ByOrderByTotalScore2Desc();
+
 
     // 점수 상세 정보 조회
     @Query("SELECT new com.example.project.domain.score2.Score2DetailsDTO( " +
