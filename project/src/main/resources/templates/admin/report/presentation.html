@@ -286,7 +286,11 @@
             <div class="text-container">
                 <div class="text-box">
 
-                    <p><strong>점수:</strong> <span id="modalScore"></span>점</p>
+                    <p>
+                        <strong>점수:</strong>
+                        <span id="modalScore" style="font-size: 1.5rem; font-weight: bold; color: #007bff;"></span>
+                        <span id="modalMaxScore" style="font-size: 0.9rem; color: #666;"></span>
+                    </p>
                     <p><strong>위치:</strong> <span id="modalPercentile"></span>%</p>
                     <!--                    <p><strong>주요감점요인:</strong> <span id="modalFrequency"></span></p>-->
                     <!--                    <p><strong>전체 중 동일 주요감점요인 비율:</strong> <span id="modalFrequencyRatio"></span>%</p>-->
@@ -500,8 +504,13 @@
         let frequencyValue = currentData[`${scoreType}Frequency`] || "없음";
         let frequencyRatioValue = Math.round(currentData[`${scoreType}FrequencyRatio`]) || "없음";
 
+        // 점수에 맞는 최대값 추가
+        let maxScore = scoreType === "total" ? 300 : 100;
+
+
         $("#modalTitle").text(scoreType.toUpperCase() + " 점수 상세 조회");
-        $("#modalScore").text(scoreValue);
+        $("#modalScore").html(`${scoreValue}`); // 점수는 크게, 파란색 유지
+        $("#modalMaxScore").html(` / ${maxScore}점`); // 단위는 작고 회색으로
         $("#modalPercentile").text(percentileValue);
         $("#modalFrequency").text(frequencyValue);
         $("#modalFrequencyRatio").text(frequencyRatioValue);
