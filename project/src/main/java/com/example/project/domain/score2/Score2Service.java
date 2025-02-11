@@ -1,6 +1,8 @@
 package com.example.project.domain.score2;
 
 import com.example.project.domain.file.File;
+import com.example.project.domain.score.Score;
+import com.example.project.domain.score.ScoreDTO;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -193,7 +195,7 @@ public class Score2Service {
     }
 
     //  최근 7일간의 점수 등록 개수 조회
-    public List<Map<String, Object>> getRecentScoresCount() {
+    public List<Map<String, Object>> getRecentScore2sCount() {
         LocalDateTime sevenDaysAgo = LocalDate.now().minusDays(6).atStartOfDay();
         LocalDate today = LocalDate.now();
 
@@ -202,7 +204,7 @@ public class Score2Service {
             dateCountMap.put(today.minusDays(i), 0);
         }
 
-        List<Object[]> results = score2Repository.getRecentScoresCount(sevenDaysAgo);
+        List<Object[]> results = score2Repository.getRecentScore2sCount(sevenDaysAgo);
         for (Object[] result : results) {
             LocalDate date = ((java.sql.Date) result[0]).toLocalDate();
             int count = ((Number) result[1]).intValue();
@@ -220,20 +222,27 @@ public class Score2Service {
         return response;
     }
 
-    //  상위 4개 점수 조회
-    public List<Score2DTO> getTop4Scores() {
-        return score2Repository.findTop4ByOrderByTotalScoreDesc()
-                .stream()
-                .map(Score2DTO::fromEntity)
-                .toList();
+
+    public List<Score2DTO> getTop4Score2s() {
+        List<Score2> topScores2 = score2Repository.findTop4ByOrderByTotalScore2Desc();
+
+        Map<Long, Score2DTO> uniqueUserScore2s = new LinkedHashMap<>();
+        for (Score2 score2 : topScores2) {
+            if (!uniqueUserScore2s.containsKey(score2.getUser().getId())) {
+                uniqueUserScore2s.put(score2.getUser().getId(), Score2DTO.fromEntity(score2));
+            }
+            if (uniqueUserScore2s.size() == 4) break;
+        }
+
+        return new ArrayList<>(uniqueUserScore2s.values());
     }
 
-    public Score2DTO getScoreWithTop4(Long score2Id) {
+    public Score2DTO getScore2WithTop4(Long score2Id) {
         Score2 score2 = score2Repository.findById(score2Id)
                 .orElseThrow(() -> new RuntimeException("Score2 not found"));
 
         Score2DTO score2DTO = Score2DTO.fromEntity(score2);
-        score2DTO.setTop4Scores(getTop4Scores());
+        score2DTO.setTop4Scores(getTop4Score2s());
 
         return score2DTO;
     }
@@ -245,7 +254,7 @@ public class Score2Service {
                 .orElse("알 수 없음");
     }
 
-    public List<Score2> getAllScores() {
+    public List<Score2> getAllScore2s() {
         return score2Repository.findAll();
     }
 
@@ -274,16 +283,16 @@ public class Score2Service {
     }
 
     //  점수 상세 정보 및 퍼센타일 조회
-    public Score2DetailsDTO getScoreDetailPoints(Long score2Id) {
-        Score2DetailsDTO details = score2Repository.findScoreWithDetailsByScore2Id(score2Id)
+    public Score2DetailsDTO getScore2DetailPoints(Long score2Id) {
+        Score2DetailsDTO details = score2Repository.findScore2WithDetailsByScore2Id(score2Id)
                 .orElseThrow(() -> new IllegalArgumentException("Score2 not found for ID: " + score2Id));
 
-        List<Score2> allScores = score2Repository.findAll();
+        List<Score2> allScore2s = score2Repository.findAll();
 
-        List<Double> eyeheadScores = allScores.stream().map(Score2::getEyeheadScore).sorted().toList();
-        List<Double> expressionScores = allScores.stream().map(Score2::getExpressionScore).sorted().toList();
-        List<Double> languageScores = allScores.stream().map(Score2::getLanguageScore).sorted().toList();
-        List<Double> totalScores = allScores.stream().map(Score2::getTotalScore).sorted().toList();
+        List<Double> eyeheadScores = allScore2s.stream().map(Score2::getEyeheadScore).sorted().toList();
+        List<Double> expressionScores = allScore2s.stream().map(Score2::getExpressionScore).sorted().toList();
+        List<Double> languageScores = allScore2s.stream().map(Score2::getLanguageScore).sorted().toList();
+        List<Double> totalScores = allScore2s.stream().map(Score2::getTotalScore).sorted().toList();
 
         details.setEyeheadPercentile(calculatePercentile(eyeheadScores, details.getEyeheadScore()));
         details.setExpressionPercentile(calculatePercentile(expressionScores, details.getExpressionScore()));
@@ -294,11 +303,11 @@ public class Score2Service {
     }
 
     //  퍼센타일 계산 메서드
-    private double calculatePercentile(List<Double> sortedScores, double score) {
-        int totalCount = sortedScores.size();
+    private double calculatePercentile(List<Double> sortedScore2s, double score2) {
+        int totalCount = sortedScore2s.size();
         if (totalCount == 0) return 0.0;
 
-        int rank = Collections.binarySearch(sortedScores, score);
+        int rank = Collections.binarySearch(sortedScore2s, score2);
         if (rank < 0) rank = -rank - 1;
 
         double percentile = ((double) rank / totalCount) * 100;

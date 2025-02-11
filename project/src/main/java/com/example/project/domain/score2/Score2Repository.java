@@ -1,5 +1,6 @@
 package com.example.project.domain.score2;
 
+import com.example.project.domain.score.Score;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -46,10 +47,13 @@ public interface Score2Repository extends JpaRepository<Score2, Long> {
             "WHERE s.date >= :startDate " +
             "GROUP BY DATE(s.date) " +
             "ORDER BY DATE(s.date) ASC")
-    List<Object[]> getRecentScoresCount(@Param("startDate") LocalDateTime startDate);
+    List<Object[]> getRecentScore2sCount(@Param("startDate") LocalDateTime startDate);
 
     // 상위 4개 점수 조회
-    List<Score2> findTop4ByOrderByTotalScoreDesc();
+    @Query("SELECT s FROM Score2 s " +
+            "WHERE s.totalScore = (SELECT MAX(sub.totalScore) FROM Score2 sub WHERE sub.user.id = s.user.id) " +
+            "ORDER BY s.totalScore DESC")
+    List<Score2> findTop4ByOrderByTotalScore2Desc();
 
     // 점수 상세 정보 조회
     @Query("SELECT new com.example.project.domain.score2.Score2DetailsDTO( " +
@@ -62,7 +66,7 @@ public interface Score2Repository extends JpaRepository<Score2, Long> {
             "WHEN s.languageScore <= s.eyeheadScore AND s.languageScore <= s.expressionScore THEN 'language' " +
             "END) " +
             "FROM Score2 s WHERE s.score2Id = :score2Id")
-    Optional<Score2DetailsDTO> findScoreWithDetailsByScore2Id(@Param("score2Id") Long score2Id);
+    Optional<Score2DetailsDTO> findScore2WithDetailsByScore2Id(@Param("score2Id") Long score2Id);
 
     // 빈도수 분포 조회
     @Query("SELECT s.expressionFrequency, COUNT(s) FROM Score2 s GROUP BY s.expressionFrequency")
