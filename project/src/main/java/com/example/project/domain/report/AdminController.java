@@ -60,16 +60,12 @@ public class AdminController {
         return "redirect:/admin/report";
     }
 
-    @GetMapping("/report/test/{id}")
-    public String reportTest(@PathVariable Long id, Model model) {
-        NoticeBoardDTO.Response post = noticeBoardService.getPostById(id);
-        model.addAttribute("post", post);
-
-        List<CommentDTO.Response> comments = commentService.getCommentsByPostId(id);
-        model.addAttribute("comments", comments);
-
-        return "admin/report/test";
+    @GetMapping("report/{id}/delete")
+    public String deleteReport(@PathVariable Long id) {
+        reportService.deleteReport(id);
+        return "redirect:/admin/report";
     }
+
 
     @GetMapping("/report/{report_type}/{reported_id}")
     public String commentDetail(@PathVariable Integer report_type, @PathVariable Long reported_id, Model model) {
@@ -103,7 +99,6 @@ public class AdminController {
             return "admin/report/list";
         }
     }
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>어드민 신고관리 02-04 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     @GetMapping("/report/check/{report_type}/{reported_id}")
     @ResponseBody // (또는 return 타입을 ResponseEntity로)
     public ResponseEntity<Void> checkReportedItem(@PathVariable Integer report_type,

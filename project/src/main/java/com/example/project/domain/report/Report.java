@@ -17,7 +17,8 @@ import java.time.LocalDateTime;
 public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long report_id;
+    @Column(name = "report_id")
+    private Long reportId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id", nullable = false)
@@ -26,8 +27,8 @@ public class Report {
     @Column(nullable = false, columnDefinition = "TINYINT")
     private Integer report_type;
 
-    @Column(nullable = false)
-    private Long reported_id;
+    @Column(nullable = false, name = "reported_id")
+    private Long reportedId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_user", nullable = false)
