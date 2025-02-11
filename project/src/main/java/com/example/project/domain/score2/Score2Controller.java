@@ -85,21 +85,21 @@ public class Score2Controller {
 
     @GetMapping("/recent-counts")
     @ResponseBody
-    public ResponseEntity<List<Map<String, Object>>> getRecentScoresCount() {
-        return ResponseEntity.ok(score2Service.getRecentScoresCount());
+    public ResponseEntity<List<Map<String, Object>>> getRecentScore2sCount() {
+        return ResponseEntity.ok(score2Service.getRecentScore2sCount());
     }
 
     @GetMapping("/{score2Id}/with-top4")
-    public ResponseEntity<Score2DTO> getScoreWithTop4(@PathVariable Long score2Id) {
-        return ResponseEntity.ok(score2Service.getScoreWithTop4(score2Id));
+    public ResponseEntity<Score2DTO> getScore2WithTop4(@PathVariable Long score2Id) {
+        return ResponseEntity.ok(score2Service.getScore2WithTop4(score2Id));
     }
 
     @GetMapping("/top4")
     @ResponseBody
-    public ResponseEntity<List<Map<String, Object>>> getTop4Scores() {
-        List<Score2DTO> top4Scores = score2Service.getTop4Scores();
+    public ResponseEntity<List<Map<String, Object>>> getTop4Score2s() {
+        List<Score2DTO> top4Score2s = score2Service.getTop4Score2s();
 
-        List<Map<String, Object>> response = top4Scores.stream().map(dto -> {
+        List<Map<String, Object>> response = top4Score2s.stream().map(dto -> {
             Map<String, Object> map = new HashMap<>();
             map.put("score2Id", dto.getScore2Id());
             map.put("totalScore", dto.getTotalScore());
@@ -114,17 +114,17 @@ public class Score2Controller {
     @GetMapping("/all")
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> getAllScores() {
-        List<Score2> scores = score2Service.getAllScores();
+        List<Score2> score2s = score2Service.getAllScore2s();
 
-        List<Map<String, Object>> response = scores.stream().map(score -> {
+        List<Map<String, Object>> response = score2s.stream().map(score2 -> {
             Map<String, Object> data = new HashMap<>();
-            data.put("score2Id", score.getScore2Id());
-            data.put("userId", score.getUser().getUsername());
-            data.put("date", score.getDate().toString());
-            data.put("totalScore", score.getTotalScore());
-            data.put("eyeheadScore", score.getEyeheadScore());
-            data.put("expressionScore", score.getExpressionScore());
-            data.put("languageScore", score.getLanguageScore());
+            data.put("score2Id", score2.getScore2Id());
+            data.put("userId", score2.getUser().getUsername());
+            data.put("date", score2.getDate().toString());
+            data.put("totalScore", score2.getTotalScore());
+            data.put("eyeheadScore", score2.getEyeheadScore());
+            data.put("expressionScore", score2.getExpressionScore());
+            data.put("languageScore", score2.getLanguageScore());
             return data;
         }).toList();
 
@@ -133,8 +133,8 @@ public class Score2Controller {
 
     @GetMapping("/details2")
     @ResponseBody
-    public ResponseEntity<Score2DetailsDTO> getScoreDetails(@RequestParam("score2Id") Long score2Id) {
-        Score2DetailsDTO details = score2Service.getScoreDetailPoints(score2Id);
+    public ResponseEntity<Score2DetailsDTO> getScore2Details(@RequestParam("score2Id") Long score2Id) {
+        Score2DetailsDTO details = score2Service.getScore2DetailPoints(score2Id);
         return ResponseEntity.ok(details);
     }
 
@@ -142,7 +142,7 @@ public class Score2Controller {
     @GetMapping("/distribution")
     @ResponseBody
     public double distribution(@RequestParam("totalscore") double totalscore) {
-        List<Score2> scores = score2Service.getAllScores();
+        List<Score2> scores = score2Service.getAllScore2s();
         List<Double> totalScores = scores.stream()
                 .map(Score2::getTotalScore)
                 .sorted()

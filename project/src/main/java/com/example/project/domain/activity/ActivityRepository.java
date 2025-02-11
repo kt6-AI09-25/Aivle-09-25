@@ -33,6 +33,12 @@ public interface ActivityRepository extends JpaRepository<NoticeBoard, Long> {
          JOIN `user` u ON s.user_id = u.id
          ORDER BY s.date DESC 
          LIMIT 5)
+          UNION ALL
+        (SELECT u.username AS username, '면접평가를 등록했습니다' AS action, s2.score2id AS targetId, s2.date AS createdAt
+         FROM score2 s2 
+         JOIN `user` u ON s2.user_id = u.id
+         ORDER BY s2.date DESC 
+         LIMIT 5)
         ORDER BY createdAt DESC
         LIMIT 5
         """, nativeQuery = true)
