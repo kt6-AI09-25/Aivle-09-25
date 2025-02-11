@@ -445,10 +445,18 @@ textarea {
                 <!-- 드롭다운 메뉴 (유튜브 스타일로 항목들 나열) -->
                 <div id="dropdownMenu" class="dropdown-menu" aria-labelledby="moreOptionsButton">
                     <!-- 각 항목은 a 태그로 구현되어 클릭 시 URL로 이동 -->
-                    <a class="dropdown-item" th:href="@{/noticeboard/{id}/edit(id=${post.postId})}" style="display: block; background-color: transparent; padding: 8px 12px; color: #333; text-decoration: none;">편집</a>
-                    <form th:action="@{/noticeboard/{id}/delete(id=${post.postId})}" method="post" style="display:inline;">
-                        <a href="#" class="dropdown-item" style="display: block; padding: 8px 12px; color: #333; background-color: transparent; border: none; text-decoration: none;" onclick="this.closest('form').submit();">삭제</a>
-                    </form>
+                    <a href="#" class="dropdown-item edit-post-btn"
+                       th:data-edit-url="@{/noticeboard/{id}/edit(id=${post.postId})}"
+                       style="display: block; background-color: transparent; padding: 8px 12px; color: #333; text-decoration: none;">
+                        편집
+                    </a>
+
+                    <a href="#" class="dropdown-item delete-post-btn"
+                       th:data-delete-url="@{/noticeboard/{id}/delete(id=${post.postId})}"
+                       style="display: block; padding: 8px 12px; color: #333; background-color: transparent; border: none; text-decoration: none;">
+                        삭제
+                    </a>
+
                     <!-- 신고 -->
                     <a href="#" class="dropdown-item" id="reportButton" style="display: block; padding: 8px 12px; color: #333; background-color: transparent; border: none; text-decoration: none;">신고</a>
                 </div>
@@ -556,19 +564,18 @@ textarea {
                                      class="dropdown-menu"
                                      th:attr="aria-labelledby=|moreOptionsButton${comment.commentId}|"
                                      style="display: none; position: absolute; background-color: white; border: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,0.2); border-radius: 4px; padding: 10px;">
-                                    <a class="edit-comment-btn"
+                                    <a href="#" class="edit-comment-btn"
+                                       th:data-edit-url="@{/noticeboard/{postId}/comments/{commentId}/edit(postId=${post.postId}, commentId=${comment.commentId})}"
                                        style="display: block; padding: 8px 12px; color: #333; background-color: transparent; border: none; text-decoration: none;">
                                         편집
                                     </a>
-                                    <form th:action="@{/noticeboard/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}"
-                                          method="post"
-                                          style="display:inline;">
-                                        <a href="#"
-                                           class="dropdown-item"
-                                           style="display: block; padding: 8px 12px; color: #333; background-color: transparent; border: none; text-decoration: none;"
-                                           onclick="this.closest('form').submit();">
-                                            삭제
-                                        </a>
+
+                                    <!-- 삭제 버튼 -->
+                                    <a href="#" class="delete-comment-btn"
+                                       th:data-delete-url="@{/noticeboard/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}"
+                                       style="display: block; padding: 8px 12px; color: #333; background-color: transparent; border: none; text-decoration: none;">
+                                        삭제
+                                    </a>
                                     </form>
                                     <a href="#"
                                        class="dropdown-item report-comment-btn"
@@ -718,5 +725,125 @@ textarea {
         });
     });
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    // 📌 게시글 수정 버튼 처리
+    document.querySelectorAll('.edit-post-btn').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault(); // 기본 동작 방지
+            const editUrl = button.getAttribute('data-edit-url');
+
+            try {
+                const response = await fetch(editUrl, { method: 'GET' });
+
+                if (!response.ok) {
+                    alert("게시글을 수정할 권한이 없습니다.");
+                } else {
+                    window.location.href = editUrl; // 편집 페이지로 이동
+                }
+            } catch (error) {
+                console.error("게시글 수정 중 오류 발생:", error);
+                alert("서버 오류가 발생했습니다.");
+            }
+        });
+    });
+
+    // 📌 게시글 삭제 버튼 처리
+    document.querySelectorAll('.delete-post-btn').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault(); // 기본 동작 방지
+            const deleteUrl = button.getAttribute('data-delete-url');
+
+            const confirmed = confirm("정말 삭제하시겠습니까?");
+            if (!confirmed) return;
+
+            try {
+                const response = await fetch(deleteUrl, { method: 'POST' });
+
+                if (!response.ok) {
+                    alert("게시글을 삭제할 권한이 없습니다.");
+                } else {
+                    alert("게시글이 삭제되었습니다.");
+                    window.location.href = "/noticeboard";  // 게시글 목록으로 이동
+                }
+            } catch (error) {
+                console.error("게시글 삭제 중 오류 발생:", error);
+                alert("서버 오류가 발생했습니다.");
+            }
+        });
+    });
+});
+
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 📌 댓글 편집 버튼 처리 (권한 체크)
+        document.querySelectorAll('.edit-comment-btn').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                event.preventDefault(); // 기본 동작 방지
+                const editUrl = button.getAttribute('data-edit-url');
+
+                try {
+                    const response = await fetch(editUrl, { method: 'GET' });
+
+                    if (!response.ok) {
+                        const data = await response.json().catch(() => null);
+                        alert(data?.message || "댓글 편집 권한이 없습니다.");
+                    } else {
+                        // 편집 폼 보이기
+                        const row = button.closest('.comment-card');
+                        const commentText = row.querySelector('.comment-text');
+                        const editForm = row.querySelector('.edit-comment-form');
+
+                        commentText.style.display = 'none';
+                        editForm.classList.remove('hidden');
+                        editForm.style.display = 'block';
+
+                        // 취소 버튼 클릭 시 편집 폼 숨기기
+                        const cancelBtn = editForm.querySelector('.cancel-edit-btn');
+                        cancelBtn.addEventListener('click', () => {
+                            editForm.style.display = 'none';
+                            editForm.classList.add('hidden');
+                            commentText.style.display = 'inline';
+                        });
+                    }
+                } catch (error) {
+                    console.error("편집 중 오류 발생:", error);
+                    alert("서버 오류가 발생했습니다.");
+                }
+            });
+        });
+
+        // 📌 댓글 삭제 버튼 처리 (권한 체크)
+        document.querySelectorAll('.delete-comment-btn').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                event.preventDefault(); // 기본 동작 방지
+                const deleteUrl = button.getAttribute('data-delete-url');
+
+                const confirmed = confirm("댓글을 삭제하시겠습니까?");
+                if (!confirmed) return;
+
+                try {
+                    const response = await fetch(deleteUrl, { method: 'POST' });
+
+                    if (!response.ok) {
+                        const data = await response.json().catch(() => null);
+                        alert(data?.message || "댓글 삭제 권한이 없습니다.");
+                    } else {
+                        alert("댓글이 삭제되었습니다.");
+                        location.reload(); // 페이지 새로고침
+                    }
+                } catch (error) {
+                    console.error("삭제 중 오류 발생:", error);
+                    alert("서버 오류가 발생했습니다.");
+                }
+            });
+        });
+    });
+</script>
+
 </body>
 </html>
