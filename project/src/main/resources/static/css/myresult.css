@@ -147,6 +147,7 @@ html, body {
     background-color: #ffffff;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* 그림자 강화 */
     animation: slideDown 0.3s ease-out; /* 슬라이드 애니메이션 */
+    overflow: hidden; /* 모달 내에서 내용이 넘지 않도록 설정 */
 }
 
 /* 모달 콘텐츠 애니메이션 keyframes */
@@ -177,6 +178,7 @@ html, body {
 }
 
 /* 모달 내부 메뉴바 (탭 버튼) 스타일 개선 */
+/* 기본 메뉴바 스타일 */
 .menu-bar {
     background-color: #ffffff;
     height: 44px;
@@ -185,24 +187,75 @@ html, body {
     gap: 5px;
     padding: 0 10px;
     user-select: none; /* 드래그 방지 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+/* #detailContent가 활성화될 때 #menuBar2 스타일 변경 */
+.detail-content:not(.hidden) #menuBar2 {
+    background-color: #4c80f1 !important; /* 배경색 유지 */
+    color: #a4bff8;
+}
+
+/* 기본 메뉴 아이템 스타일 */
 .menu-bar a {
     text-decoration: none;
     padding: 8px 12px;
-    border-radius: 6px; /* 모서리 둥글게 */
     transition: background-color 0.3s ease, color 0.3s ease;
     user-select: none; /* 드래그 방지 */
-    text-color: #a5aaa3;
+    color: #5c5c5c;
+    position: relative; /* before 요소 적용을 위해 필요 */
 }
-.menu-bar a:hover {
-    color: #000000; /* 텍스트 색상 변경 */
-}
+
+/* 활성화된 메뉴 아이템 */
 .menu-bar a.active {
     color: #000000;
 }
+
+/* detail-content가 활성화되었을 때, 활성화된 메뉴 아이템 글자색 변경 */
+.detail-content:not(.hidden) .menu-bar a.active {
+    color: #ffffff !important; /* 활성화 시 글자를 흰색으로 */
+}
+
+/* hover 상태와 active 상태에서 언더바 효과 */
+.menu-bar a:before {
+    content: '';
+    margin-bottom: -1px;
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 6px;
+    opacity: 0;
+    background-color: #4c80f1;
+    border-radius: 6px 6px 0 0;
+    transition: .3s;
+}
+
+/* hover 상태에서 언더바 보이기 */
+.menu-bar a:hover:before {
+    bottom: 0;
+    opacity: 1;
+}
+
+/* active 상태에서 언더바 항상 보이기 */
+.menu-bar a.active:before {
+    bottom: 0;
+    opacity: 1;
+}
+
+/* #menuBar2 내부의 언더바 제거 */
+#menuBar2 a:before {
+    content: none !important; /* 언더바 요소 제거 */
+}
+
+/* 숨김 처리 */
 .menu-bar.hidden {
     display: none;
 }
+
+
+
+
 
 .modal-body {
     display: none; /* 기본적으로 숨김 */
@@ -230,10 +283,10 @@ html, body {
 /* 모달 우측 영역 */
 .modal-right {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* 세로 스크롤을 활성화 */
     padding: 20px;
-    scrollbar-width: none; /* 스크롤바 숨김 */
-    -ms-overflow-style: none;
+    box-sizing: border-box; /* 패딩을 포함한 크기 계산 */
+    height: 100%; /* 높이를 100%로 설정하여 모달 내부에서 꽉 차게 */
     user-select: none; /* 드래그 방지 */
 }
 .modal-right::-webkit-scrollbar {
@@ -254,6 +307,8 @@ html, body {
     padding: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     user-select: none; /* 드래그 방지 */
+    width: 300px
+    height: 450px
 }
 
 /* 모달 닫기 버튼 스타일 개선 */
@@ -296,9 +351,20 @@ html, body {
 }
 
 /* 차트 영역 */
+.score-radar-chart{
+
+}
 .chart-container {
-    margin-top: 20px;
-    height: 300px;
+    margin-top: 5px;
+    height: 250px;
+    width: 100%; /* 차트 컨테이너의 너비를 100%로 설정 */
+    overflow: auto; /* 스크롤이 필요하면 생기도록 설정 */
+    box-sizing: border-box; /* padding을 포함한 크기 계산 */
+}
+
+/* 스크롤바 숨기기 */
+.chart-container::-webkit-scrollbar {
+    display: none; /* 스크롤바 숨기기 */
 }
 
 .progress-container {
