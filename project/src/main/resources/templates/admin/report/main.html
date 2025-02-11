@@ -260,8 +260,7 @@
 
                     activities.forEach(activity => {
                         const listItem = document.createElement("li");
-                        let link = activity.targetId ? `<a href="/posts/${activity.targetId}">게시글 보기</a>` : "";
-                        listItem.innerHTML = `<strong>${activity.username}</strong>님이 ${activity.action} ${link} - <span class="activity-time">${activity.formattedCreatedAt}</span>`;
+                        listItem.innerHTML = `<strong>${activity.username}</strong>님이 ${activity.action} - <span class="activity-time">${activity.formattedCreatedAt}</span>`;
                         activityList.appendChild(listItem);
                     });
                 } catch (error) {
