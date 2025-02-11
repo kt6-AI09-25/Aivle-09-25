@@ -216,18 +216,35 @@
 <!-- 푸터 (Thymeleaf include) -->
 <div th:replace="footer.html"></div>
 
+<!--애니메이션 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(".text1"); // 모든 text1 요소 가져오기
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("show"); // 보이면 show 클래스 추가
+                }
+            });
+        }, { threshold: 0.2 }); // 20% 이상 보이면 실행
+
+        sections.forEach((section) => observer.observe(section));
+    });
+</script>
+
 <!-- 단계별 사용법 및 토글 스크립트 -->
 <script>
     // 면접준비 및 발표준비 단계별 데이터
     var interviewSteps = [
-      { top: "Step 1", title: "면접 준비", description: "면접 전 해당 회사의 필수 사항을 확인합니다." },
-      { top: "Step 2", title: "연습 진행", description: "면접 시 예상 질문에 대한 답변 연습을 진행합니다." },
-      { top: "Step 3", title: "결과 분석", description: "면접 후 피드백을 통해 개선점을 파악합니다." }
+      { top: "Step 1", title: "면접 준비", description: "면접 전 해당 회사의 필수 사항을 확인합니다.", image:"images/inter1.png" },
+      { top: "Step 2", title: "연습 진행", description: "면접 시 예상 질문에 대한 답변 연습을 진행합니다.", image: "images/inter1.png" },
+      { top: "Step 3", title: "결과 분석", description: "면접 후 피드백을 통해 개선점을 파악합니다.", image:" images/inter1.png" }
     ];
     var presentationSteps = [
-      { top: "Step 1", title: "발표 준비", description: "발표에 필요한 자료나 스크립트를 준비합니다." },
-      { top: "Step 2", title: "연습 진행", description: "음성, 움직임, 표정을 고려하며 발표 합니다." },
-      { top: "Step 3", title: "결과 분석", description: "발표 후 녹화본을 분석하여 개선점을 파악합니다." }
+      { top: "Step 1", title: "발표 준비", description: "발표에 필요한 자료나 스크립트를 준비합니다.", image: "images/pre1.png" },
+      { top: "Step 2", title: "연습 진행", description: "음성, 움직임, 표정을 고려하며 발표 합니다.", image: "images/pre2.png"},
+      { top: "Step 3", title: "결과 분석", description: "발표 후 녹화본을 분석하여 개선점을 파악합니다.", image:"images/pre2.png"}
     ];
     var currentCategory = "interview"; // 기본은 면접준비
     var currentStep = 0;
@@ -240,7 +257,7 @@ container.innerHTML =
     "<div style='display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;'>"+
          "<button id='prevStep'>&#60;</button>" +
          "<button id='nextStep'>&#62;</button>" +
-         "<div style='display: flex; align-items: center; gap: 10px;'>"+
+         "<div style='display: flex; align-items: center; gap: 10px; margin-top: 35px;'>"+
              "<span style='background: #0056b3; color: white; padding: 6px 15px; border-radius: 15px; font-size: 0.9rem; font-weight: bold;'>"+
              steps[currentStep].top+
              "</span>"+
@@ -249,7 +266,8 @@ container.innerHTML =
              "</h3>"+
          "</div>"+
      "</div>"+
-     "<p style='font-size: 1.15rem; color: #333; text-align: left; line-height: 1.6;'>"+
+     "<img src='"+steps[currentStep].image+"' alt='단계 이미지' style='width: 350px; max-width: 50%; height: auto; margin: 10px auto 15px auto; display: block; '>"+
+     "<p style='font-size: 1.2rem; color: #222; text-align: center; line-height: 1.5; font-weight: bold; margin-top: 15px;'>"+
      steps[currentStep].description+
      "</p>";
 
