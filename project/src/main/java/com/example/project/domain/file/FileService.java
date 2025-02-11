@@ -2,6 +2,8 @@ package com.example.project.domain.file;
 
 import com.example.project.domain.score.Score;
 import com.example.project.domain.score.ScoreService;
+import com.example.project.domain.score2.Score2;
+import com.example.project.domain.score2.Score2Service;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,9 @@ import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
@@ -30,45 +35,53 @@ public class FileService {
     private final UserRepository userRepository;
     private final FileRepository fileRepository;
     private final ScoreService scoreService;
+    private final Score2Service score2Service;
 
-    // 파일 저장 경로를 application.yml 등에서 주입
     @Value("${file.storage.directory}")
-    private String storageDirectory;
+    private String presentationDirectory;
 
-    // FastAPI 서버용 WebClient
+    @Value("${file.storage.directory2}")
+    private String interviewDirectory;
+
     private final WebClient webClient = WebClient.builder()
             .baseUrl("http://127.0.0.1:8000")
             .build();
 
-
+    // 프레젠테이션 업로드 처리
     @Transactional
-    public FileDTO.Response uploadFile(MultipartFile file) {
-        // 1) 로그인된 사용자 정보 가져오기
+    public FileDTO.Response uploadFileForPresentation(MultipartFile file) {
+        return processFileUpload(file, presentationDirectory, "/upload", true);
+    }
+
+    // 인터뷰 업로드 처리
+    @Transactional
+    public FileDTO.Response uploadFileForInterview(MultipartFile file) {
+        return processFileUpload(file, interviewDirectory, "/interview", false);
+    }
+
+    private FileDTO.Response processFileUpload(MultipartFile file, String directory, String apiEndpoint, boolean isPresentation) {
         String username = getLoggedInUsername();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // 2) 파일 물리적 저장
-        String storedFilePath = saveFile(file);
+        String storedFilePath = saveFile(file, directory);
 
-        // 3) DB에 File 엔티티 생성
         com.example.project.domain.file.File fileEntity = new com.example.project.domain.file.File();
         fileEntity.setFilePath(storedFilePath);
         fileEntity.setUploadedAt(LocalDateTime.now());
         fileEntity.setUser(user);
         fileRepository.save(fileEntity);
 
-        // 4) ScoreService를 통해 "IN_PROGRESS" 상태 Score 미리 생성
-        Score inProgressScore = scoreService.createInProgressScore(user, fileEntity);
+        if (isPresentation) {
+            Score inProgressScore = scoreService.createInProgressScore(user, fileEntity);
+            sendFileToFastAPI(storedFilePath, inProgressScore.getScoreId(), apiEndpoint)
+                    .subscribe(response -> scoreService.completeScoreData(inProgressScore.getScoreId(), response));
+        } else {
+            Score2 inProgressScore2 = score2Service.createInProgressScore2(user, fileEntity);
+            sendFileToFastAPI(storedFilePath, inProgressScore2.getScore2Id(), apiEndpoint)
+                    .subscribe(response -> score2Service.completeScore2Data(inProgressScore2.getScore2Id(), response));
+        }
 
-        // 5) FastAPI 서버로 비동기 파일 전송 (scoreId도 함께 보내고 싶으면 sendFileToFastAPI(storedFilePath, inProgressScore.getScoreId()) 형태로 구현)
-        sendFileToFastAPI(storedFilePath, inProgressScore.getScoreId())
-                .subscribe(response -> {
-                    // 6) FastAPI 응답이 오면, 해당 scoreId로 DB조회하여 "COMPLETED" 및 점수데이터 저장
-                    scoreService.completeScoreData(inProgressScore.getScoreId(), response);
-                });
-
-        // 업로드 후 프론트에 돌려줄 응답(파일 정보)
         return FileDTO.Response.builder()
                 .fileId(fileEntity.getFileId())
                 .filePath(fileEntity.getFilePath())
@@ -76,29 +89,22 @@ public class FileService {
                 .build();
     }
 
-
     private String getLoggedInUsername() {
         return org.springframework.security.core.context.SecurityContextHolder.getContext()
                 .getAuthentication().getName();
     }
 
+    private String saveFile(MultipartFile file, String directory) {
+        createDirectoryIfNotExists(directory);
 
-    private String saveFile(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
-        if (originalFilename != null) {
-            // 파일명 특수문자 제거 및 길이 제한
-            originalFilename = originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_");
-            if (originalFilename.length() > 255) {
-                originalFilename = originalFilename.substring(0, 255);
-            }
-        } else {
-            // 파일명이 없는 경우 대비
-            originalFilename = "unnamed_file";
+        originalFilename = (originalFilename != null) ? originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_") : "unnamed_file";
+        if (originalFilename.length() > 255) {
+            originalFilename = originalFilename.substring(0, 255);
         }
 
-        // 고유한 파일명 생성
         String uniqueFilename = UUID.randomUUID() + "_" + originalFilename;
-        String storedFilePath = storageDirectory + uniqueFilename;
+        String storedFilePath = directory + "/" + uniqueFilename;
 
         try {
             file.transferTo(new File(storedFilePath));
@@ -109,14 +115,25 @@ public class FileService {
         return storedFilePath;
     }
 
+    private void createDirectoryIfNotExists(String directoryPath) {
+        Path path = Paths.get(directoryPath);
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+                System.out.println("디렉토리 생성 완료: " + directoryPath);
+            } catch (IOException e) {
+                throw new RuntimeException("디렉토리 생성 실패: " + directoryPath, e);
+            }
+        }
+    }
 
-    private Mono<Map<String, Object>> sendFileToFastAPI(String filePath, Long scoreId) {
+    private Mono<Map<String, Object>> sendFileToFastAPI(String filePath, Long scoreId, String endpoint) {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("file", new FileSystemResource(filePath));
         body.add("scoreId", scoreId);
 
         return webClient.post()
-                .uri("/upload") // FastAPI의 업로드 엔드포인트
+                .uri(endpoint)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .bodyValue(body)
                 .retrieve()
@@ -124,7 +141,6 @@ public class FileService {
                 .doOnSuccess(response -> System.out.println("FastAPI 응답: " + response))
                 .doOnError(error -> System.err.println("FastAPI 서버로 파일 전송 실패: " + error.getMessage()));
     }
-
 
     public com.example.project.domain.file.File getFileById(Long fileId) {
         return fileRepository.findById(fileId)

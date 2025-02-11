@@ -26,22 +26,30 @@ public class FileController {
     private final FileService fileService;
 
     @Value("${file.storage.directory}")
-    private String storageDirectory;
+    private String presentationDirectory;
+
+    @Value("${file.storage.directory2}")
+    private String interviewDirectory;
 
     @GetMapping("/upload")
     public String uploadPage() {
         return "test";
     }
 
-    @PostMapping("/upload/results")
+    @PostMapping("/upload/presentation")
     @ResponseBody
-    public FileDTO.Response uploadFile(@RequestPart MultipartFile file) {
-        return fileService.uploadFile(file);
+    public FileDTO.Response uploadPresentationFile(@RequestPart MultipartFile file) {
+        return fileService.uploadFileForPresentation(file);
+    }
+
+    @PostMapping("/upload/interview")
+    @ResponseBody
+    public FileDTO.Response uploadInterviewFile(@RequestPart MultipartFile file) {
+        return fileService.uploadFileForInterview(file);
     }
 
     @GetMapping("/upload/results/{fileId}")
     public ResponseEntity<Resource> getVideo(@PathVariable Long fileId) {
-        // 파일 정보 조회
         com.example.project.domain.file.File fileEntity = fileService.getFileById(fileId);
         if (fileEntity == null) {
             return ResponseEntity.notFound().build();
@@ -50,7 +58,6 @@ public class FileController {
         String filePath = fileEntity.getFilePath();
         File videoFile = new File(filePath);
 
-        // 파일이 존재하는지 확인
         if (!videoFile.exists()) {
             return ResponseEntity.notFound().build();
         }
@@ -62,13 +69,12 @@ public class FileController {
             Path path = Paths.get(filePath);
             contentType = Files.probeContentType(path);
         } catch (IOException e) {
-            contentType = "video/webm"; // 기본값 설정
+            contentType = "video/webm";
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(contentType != null ? contentType : "video/webm"));
         headers.setContentDispositionFormData("inline", videoFile.getName());
-
 
         return ResponseEntity.ok()
                 .headers(headers)
@@ -79,7 +85,7 @@ public class FileController {
     public String resultPage(@RequestParam("fileId") Long fileId, Model model) {
         com.example.project.domain.file.File fileEntity = fileService.getFileById(fileId);
         if (fileEntity == null) {
-            return "error"; // 파일이 없으면 에러 페이지로 이동
+            return "error";
         }
 
         String videoUrl = "/myresults/upload/results/" + fileId;
