@@ -37,27 +37,27 @@ public class IndexController {
 
     @GetMapping("/test")
     public String testPage() {
-        return "test"; // templates/test.html을 렌더링
+        return "test";
     }
 
     @GetMapping("/result")
     public String result() {
-        return "result"; // result.html 반환
+        return "result";
     }
 
     @GetMapping("/board")
     public String board() {
-        return "board"; // test.html 반환
+        return "board";
     }
 
     @GetMapping("/choice")
     public String choice() {
-        return "choice"; // test.html 반환
+        return "choice";
     }
 
     @GetMapping("/pr_test")
     public String pr_test() {
-        return "pr_test"; // templates/test.html을 렌더링
+        return "pr_test";
     }
 
     @GetMapping("/myresult")

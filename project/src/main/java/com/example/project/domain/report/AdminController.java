@@ -147,9 +147,14 @@ public class AdminController {
         return "admin/report/members";
     }
 
-    @GetMapping("/prView")
-    public String prViewPage(){
+    @GetMapping("/presentation")
+    public String presentationPage(){
         return "admin/report/presentation";
+    }
+
+    @GetMapping("/interview")
+    public String interviewPage(){
+        return "admin/report/interview";
     }
 
     @GetMapping("/statistics")
