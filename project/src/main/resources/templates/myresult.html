@@ -119,6 +119,35 @@
             color: #28a745 !important; /* 초록색 강조 */
             font-weight: bold !important;
         }
+
+        #timeLinks {
+            display: block;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px; /* 간격 추가 */
+            margin-top: 10px;
+        }
+
+        #timeLinks p {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        #timeLinks a {
+            display: inline-block;
+            padding: 6px 12px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: background-color 0.3s ease-in-out;
+            margin-bottom: 10px;
+        }
+
+        #timeLinks a:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -164,7 +193,13 @@
                         <div th:each="score : ${previousScores}" class="video-container">
                             <div th:if="${score.status != 'IN_PROGRESS'}" class="video-container">
                                 <div class="video-thumbnail"
-                                     th:attr="scoreId = ${score.scoreId}, totalscore=${score.totalScore}, motionscore=${score.motionScore}, expressionscore=${score.expressionScore}, languagescore=${score.languageScore}, fileId=${score.fileId}"
+                                     th:attr="scoreId=${score.scoreId},
+                                              totalscore=${score.totalScore},
+                                              motionscore=${score.motionScore},
+                                              expressionscore=${score.expressionScore},
+                                              languagescore=${score.languageScore},
+                                              textscript=${score.script},
+                                              fileId=${score.fileId}"
                                      onclick="openScoreModal(this)">
                                     <video width="300" height="180"
                                            th:src="@{/myresults/upload/results/{fileId}(fileId=${score.fileId})}">
@@ -390,12 +425,14 @@
           const completedVideo = document.getElementById('completedVideo');
 
           if (!evalScore || Object.keys(evalScore).length === 0) {
-            loadingModal.classList.remove('active');
-            completedVideoContainer.classList.remove('active');
+            if (loadingModal && loadingModal.classList.contains("active")) {
+                loadingModal.classList.remove("active");
+            }
 
-            const container = document.getElementById('completedVideoContainer');
-            container.remove();
-            updatePreviousScores(data.previousScores);
+            if (completedVideoContainer && completedVideoContainer.classList.contains("active")) {
+                completedVideoContainer.classList.remove("active");
+                updatePreviousScores(data.previousScores);
+            }
 
             clearInterval(pollingInterval);
             pollingInterval = null;
@@ -434,6 +471,7 @@
                              motionscore="${score.motionScore}"
                              expressionscore="${score.expressionScore}"
                              languagescore="${score.languageScore}"
+                             textscript="${score.script}"
                              fileId="${score.fileId}"
                              onclick="openScoreModal(this)">
                             <video width="300" height="180" src="/myresults/upload/results/${score.fileId}"></video>
@@ -468,6 +506,7 @@
     detailAnalysis.addEventListener('click', function(event) {
 
       const motionScore = event.target.getAttribute('data-score');
+      const scoreId = event.target.getAttribute('data-scoreId');
 
       event.preventDefault();
       summaryContent.style.display = 'none';
@@ -479,7 +518,7 @@
 
       updateChart('motion',Number(motionScore).toFixed(1))
       updateModalContent("motion")
-
+      updateTimes('motion', Number(motionScore).toFixed(1), scoreId)
     });
 
     summaryResult.addEventListener('click', function(event) {
@@ -503,29 +542,40 @@
     motionButton.addEventListener('click', function(event) {
       event.preventDefault();
       const motionScore = event.target.getAttribute('data-score');
+      const scoreId = event.target.getAttribute('data-scoreId');
 
       activateTab(motionButton, motionContent);
 
       updateChart('motion',Number(motionScore).toFixed(1))
       updateModalContent("motion");
+      updateTimes('motion', Number(motionScore).toFixed(1), scoreId)
     });
 
     voiceButton.addEventListener('click', function(event) {
       event.preventDefault();
       const languageScore = event.target.getAttribute('data-score');
+      const timeLinksContainer = document.getElementById("timeLinks");
+<!--      const script = event.target.getAttribute('data-script');-->
+
       activateTab(voiceButton, voiceContent);
 
       updateChart('language',Number(languageScore).toFixed(1))
       updateModalContent("language");
+
+      timeLinksContainer.innerHTML = "";
+
     });
 
     gazeButton.addEventListener('click', function(event) {
       event.preventDefault();
       const expressionScore = event.target.getAttribute('data-score');
+      const scoreId = event.target.getAttribute('data-scoreId');
+
       activateTab(gazeButton, gazeContent);
 
       updateChart('expression',Number(expressionScore).toFixed(1))
       updateModalContent("expression");
+      updateTimes('expression', Number(expressionScore).toFixed(1), scoreId)
     });
 
     function activateTab(button, content) {
@@ -563,12 +613,25 @@
       const languagescore = element.getAttribute('languagescore');
       const scoreId = element.getAttribute('scoreId');
       const fileId = element.getAttribute('fileId');
+<!--      const script = element.getAttribute('script');-->
+
+<!--      console.log(script);-->
 
       document.getElementById("summaryResult").setAttribute("data-score", totalscore);
+
       document.getElementById("detailAnalysis").setAttribute("data-score", motionscore);
+      document.getElementById("detailAnalysis").setAttribute("data-scoreId", scoreId);
+
       document.getElementById("motion").setAttribute("data-score", motionscore);
+      document.getElementById("motion").setAttribute("data-scoreId", scoreId);
+
       document.getElementById("voice").setAttribute("data-score", languagescore);
+<!--      document.getElementById("voice").setAttribute("data-script", script);-->
+
       document.getElementById("gaze").setAttribute("data-score", expressionscore);
+      document.getElementById("gaze").setAttribute("data-scoreId", scoreId);
+
+      $(".text-box").css("display", "block");
 
       const videoElement = document.getElementById('analysisVideo');
       if (videoElement) {
@@ -696,20 +759,106 @@
       });
     }
 
+    function updateTimes(scoreType, score, scoreId) {
+        let frequencyValue = currentData[`${scoreType}Frequency`] || "없음";
+        const timeLinksContainer = document.getElementById("timeLinks");
+
+        console.log("updateTimes 실행됨 - scoreType:", scoreType, "score:", score);
+
+        timeLinksContainer.innerHTML = "";
+
+        if(score<100){
+            $.ajax({
+                url: "/scores/times",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    scoreType: scoreType,
+                    scoreId: scoreId,
+                    frequencyValue: frequencyValue
+                },
+                success: function (times) {
+                    const title = document.createElement("p");
+                    title.innerHTML = `<strong>감점시간</strong>`;
+                    timeLinksContainer.appendChild(title);
+
+                    times.forEach(time => {
+                        const link = document.createElement("a");
+                        link.href = "#";
+                        link.innerText = ` ${time.toFixed(1)}초 `;
+                        link.style.marginRight = "10px";
+                        link.onclick = (event) => {
+                            event.preventDefault();
+                            document.getElementById("analysisVideo").currentTime = time;
+                        };
+                        timeLinksContainer.appendChild(link);
+                    });
+
+                }
+            });
+        }
+
+    }
+
+
     function updateModalContent(scoreType) {
         let scoreValue = Math.round(currentData[`${scoreType}Score`]) || "없음";
         let frequencyValue = currentData[`${scoreType}Frequency`] || "없음";
         let frequencyRatioValue = Math.round(currentData[`${scoreType}FrequencyRatio`]) || "없음";
 
         $(".modalScore").text(scoreValue);
-        $(".modalFrequency").text(frequencyValue);
         $(".modalFrequencyRatio").text(frequencyRatioValue);
 
-        if (scoreType != 'total'){
-            if(scoreValue <=80){
+        if (scoreType == "total") {
+            if (frequencyValue == "language") {
+                $(".modalFrequency").text("언어점수");
+            } else if (frequencyValue == "motion") {
+                $(".modalFrequency").text("모션점수");
+            } else if (frequencyValue == "expression") {
+                $(".modalFrequency").text("표정점수");
+            }
+        } else {
+            if(scoreValue == 100){
+                if (scoreType == "motion") {
+                    $(".motion-content > div.text-container > div:nth-child(2)").css("display", "none");
+                } else if (scoreType == "expression") {
+                    $(".gaze-content > div.text-container > div:nth-child(2)").css("display", "none");
+                } else if (scoreType == "language") {
+                    $(".voice-content > div.text-container > div:nth-child(2)").css("display", "none");
+                }
 
-
-
+            }else{
+                let transValue = frequencyValue;
+                if (scoreType == "motion") {
+                    const motionMapping = {
+                        "handtohead": "머리 만지기",
+                        "handup": "의미없는 팔동작",
+                        "bodyscratching": "몸 긁기",
+                        "nailtouching": "손톱만지기",
+                        "swaying": "몸 흔들기",
+                        "twisting": "몸 꼬기",
+                        "headdown": "머리 숙이기",
+                        "handsbehind": "뒷짐 지기"
+                    };
+                    translatedValue = motionMapping[frequencyValue] || frequencyValue;
+                } else if (scoreType == "language") {
+                    const languageMapping = {
+                        "FIL-B": "간투어(의미없는 발성)",
+                        "REP-B": "반복수정",
+                        "PS-B": "휴지(긴 쉼)",
+                        "WR-B": "발음오류"
+                    };
+                    translatedValue = languageMapping[frequencyValue] || frequencyValue;
+                } else if (scoreType == "expression") {
+                    const expressionMapping = {
+                        "angry": "화난 표정",
+                        "disgust": "찡그린 표정",
+                        "fear": "두려운 표정",
+                        "surprise": "놀란 표정"
+                    };
+                    translatedValue = expressionMapping[frequencyValue] || frequencyValue;
+                }
+                $(".modalFrequency").text(translatedValue);
             }
         }
     }
