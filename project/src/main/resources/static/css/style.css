@@ -9,7 +9,7 @@ body {
 nav {
 
     background-color: white;
-
+    margin-bottom: 0
     padding: 0 20px;
 
     display: flex;
@@ -42,47 +42,78 @@ nav {
 
 }
 
+/* 네비게이션 메뉴 스타일 */
+/* 기본 스타일 */
+/* 기본 스타일 */
 nav ul {
-
     list-style: none;
-
     margin: 0;
-
     padding: 0;
-
     display: flex;
-
     align-items: center;
-
 }
 
 nav ul li {
-
     margin-right: 20px;
-
+    margin-top: 5px;  /* 원하는 만큼 내리기 */
 }
 
 nav ul li a {
-
-    text-decoration: none;
-
+    position: relative; /* 언더바 위치를 위한 relative 설정 */
+    text-decoration: none; /* 기본 밑줄 제거 */
     color: #333;
-
     padding: 10px 15px;
-
-    border-radius: 5px;
-
-    transition: background-color 0.3s;
-
+    transition: background-color 0.3s, color 0.3s;
     font-size: 16px;
-
+    background: none; /* 배경 초기화 */
+    outline: none; /* 클릭 시 생길 수 있는 외곽선 제거 */
+    border-radius: 25px;
+    background-color: #ffffff;
 }
 
-nav ul li a:hover {
-
-    background-color: #eaeaea;
-
+/* 언더바 기본 숨기기 */
+nav ul li a::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    width: 0;
+    height: 6px;
+    background-color: #1B1F3B;
+    border-radius: 6px 6px 0 0;
+    transition: width 0.3s ease-in-out, left 0.3s ease-in-out;
+    opacity: 1;
 }
+
+/* 페이지별로 언더바가 보이도록 하기 */
+
+/* choice.html 페이지 */
+body.choice nav ul li a[href="/choice"]::before {
+    width: 100%;
+    left: 0;
+}
+
+/* myresult.html 페이지 */
+body.myresult nav ul li a[href="/myresult"]::before {
+    width: 100%;
+    left: 0;
+}
+
+/* noticeboard.html 페이지 */
+body.noticeboard nav ul li a[href="/noticeboard"]::before {
+    width: 100%;
+    left: 0;
+}
+
+/* 호버 시 언더바 표시 */
+nav ul li a:hover::before {
+    width: 100%;
+    left: 0;
+}
+
+
+
+
 
 .auth-buttons {
 
@@ -138,6 +169,33 @@ nav ul li a:hover {
 
 }
 
+.logout-button {
+    background-color: #ffffff;
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    padding: 8px 15px;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 14px;
+}
+
+.logout-button:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* 로그아웃 버튼이 마지막 요소일 경우 (예: 로그인/회원가입 버튼과 함께 존재할 때) */
+.logout-button:last-child {
+    background-color: #007bff;
+    color: white;
+}
+
+.logout-button:last-child:hover {
+    background-color: #0056b3;
+}
+
 h1 {
 
     text-align: center;
@@ -158,31 +216,8 @@ h1 {
 
 }
 
-nav ul li a {
 
-    padding: 8px 20px;
 
-    border-radius: 25px;
-
-    border: 1px solid #ccc;
-
-    color: #555;
-
-    background-color: #f9f9f9;
-
-    font-size: 15px;
-
-    transition: all 0.3s ease;
-
-}
-
-nav ul li a:hover {
-
-    background-color: #007bff;
-
-    color: white;
-
-}
 
 @keyframes fadeInUp {
     from {
