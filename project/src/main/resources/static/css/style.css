@@ -106,11 +106,6 @@ body.list nav ul li a[href="/noticeboard"]::before {
     left: 0;
 }
 
-body.received nav ul li a[href="/letters/received"]::before {
-    width: 100%;
-    left: 0;
-}
-
 /* 호버 시 언더바 표시 */
 nav ul li a:hover::before {
     width: 100%;
