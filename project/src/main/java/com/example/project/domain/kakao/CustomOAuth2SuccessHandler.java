@@ -3,6 +3,7 @@ package com.example.project.domain.kakao;
 import com.example.project.domain.user.CustomUserDetails;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -18,10 +19,13 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public CustomOAuth2SuccessHandler(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -43,6 +47,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         User user = userRepository.findByUsername(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + email));
 
+
         CustomUserDetails userDetails = new CustomUserDetails(
                 user.getUsername(),
                 user.getPassword(),
@@ -59,11 +64,15 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
         request.getSession().setMaxInactiveInterval(30 * 60); // 30분 유지
 
-        if ("ADMIN".equals(user.getRole())) {
-            response.sendRedirect("/admin");
-        } else {
-            response.sendRedirect("/");
-        }
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("message", "Login successful");
+        responseData.put("role", user.getRole());
+
+        response.getWriter().write(objectMapper.writeValueAsString(responseData));
     }
 
     @Transactional

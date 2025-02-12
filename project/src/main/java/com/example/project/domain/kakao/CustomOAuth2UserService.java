@@ -1,12 +1,14 @@
 package com.example.project.domain.kakao;
 
 import com.example.project.domain.user.CustomUserDetails;
+import com.example.project.domain.user.CustomUserDetailsService;
 import com.example.project.domain.user.User;
 import com.example.project.domain.user.UserRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -23,9 +25,11 @@ public class CustomOAuth2UserService implements org.springframework.security.oau
 
     private static final Logger logger = LoggerFactory.getLogger(CustomOAuth2UserService.class);
     private final UserRepository userRepository;
+    private final CustomUserDetailsService userDetailsService;
 
-    public CustomOAuth2UserService(UserRepository userRepository) {
+    public CustomOAuth2UserService(UserRepository userRepository, CustomUserDetailsService userDetailsService) {
         this.userRepository = userRepository;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -33,10 +37,8 @@ public class CustomOAuth2UserService implements org.springframework.security.oau
         try {
             OAuth2User oAuth2User = new DefaultOAuth2UserService().loadUser(userRequest);
             Map<String, Object> attributes = oAuth2User.getAttributes();
-            logger.info("🔥 카카오에서 받은 사용자 정보: {}", attributes); // 🔍 추가 로그
 
             if (attributes == null || attributes.isEmpty()) {
-                logger.error("🚨 OAuth2 인증 실패: 카카오 사용자 정보 없음");
                 throw new OAuth2AuthenticationException("카카오에서 사용자 정보를 가져오지 못했습니다.");
             }
 
@@ -46,16 +48,13 @@ public class CustomOAuth2UserService implements org.springframework.security.oau
             String email = kakaoAccount != null ? (String) kakaoAccount.get("email") : null;
             String nickname = properties != null ? (String) properties.get("nickname") : null;
 
-            logger.info("✅ 카카오 로그인 이메일: {}", email); // 🔍 이메일 확인
-            logger.info("✅ 카카오 로그인 닉네임: {}", nickname); // 🔍 닉네임 확인
-
             if (email == null) {
-                logger.error("🚨 OAuth2 인증 실패: 카카오에서 이메일 정보를 제공하지 않음");
                 throw new OAuth2AuthenticationException("카카오 이메일 정보가 없습니다.");
             }
 
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
             User user = userRepository.findByUsername(email).orElseGet(() -> createNewUser(email, nickname));
-            logger.info("🎯 인증된 사용자 정보: {}", user.getUsername());
 
             return new CustomUserDetails(
                     user.getUsername(),
@@ -67,7 +66,6 @@ public class CustomOAuth2UserService implements org.springframework.security.oau
             );
 
         } catch (OAuth2AuthenticationException e) {
-            logger.error("🚨 OAuth2 인증 예외 발생: {}", e.getMessage(), e);
             throw e;
         }
     }

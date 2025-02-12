@@ -44,7 +44,7 @@ public class FileService {
     private String interviewDirectory;
 
     private final WebClient webClient = WebClient.builder()
-            .baseUrl("http://127.0.0.1:8000")
+            .baseUrl("https://fastapi-ai9-25-e7g3g4czh0f3b3au.koreacentral-01.azurewebsites.net")
             .build();
 
     // 프레젠테이션 업로드 처리

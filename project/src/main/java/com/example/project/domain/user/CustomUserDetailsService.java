@@ -26,7 +26,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // 상태 복원 로직
+        user.setLast_login(LocalDateTime.now());
+        userRepository.save(user);
+
         if (user.getState() == 0 && user.getBan_end_time() != null && LocalDateTime.now().isAfter(user.getBan_end_time())) {
             user.setState(1);
             user.setBan_end_time(null);
