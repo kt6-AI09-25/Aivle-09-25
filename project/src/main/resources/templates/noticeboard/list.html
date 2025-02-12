@@ -294,7 +294,10 @@
             </ul>
           </div>
             <!-- 글쓰기 버튼 -->
-            <a href="/noticeboard/new" class="btn">글쓰기</a>
+            <a class="btn" id="writePostButton"
+               th:data-ban-end-time="${user != null and user.ban_end_time != null ? user.ban_end_time : ''}">
+                글쓰기
+            </a>
         </div>
     </div>
 </div>
@@ -322,76 +325,26 @@
 <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2025-02-03 11:05 박청하>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 
 <script>
-    // 검색 버튼 클릭 이벤트
-    document.getElementById('search-button').addEventListener('click', function () {
-      performSearch();
-    });
+    document.addEventListener('DOMContentLoaded', function() {
+        var writePostButton = document.getElementById("writePostButton");
 
-    // 검색어 입력 필드에서 Enter 키를 눌렀을 때 검색 실행
-    document.getElementById('search-query').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        e.preventDefault(); // 엔터키 기본 동작 방지 (폼 제출 등)
-        performSearch(); // 검색 수행
-      }
-    });
+        writePostButton.addEventListener("click", function(event) {
+            event.preventDefault(); // 기본 이동 막기
 
-    // 검색을 수행하는 함수
-    function performSearch() {
-      const filterUrl = document.getElementById('filter-select').value;
-      const query = document.getElementById('search-query').value.trim();
-
-      if (!query) {
-        alert("검색어를 입력하세요.");
-        return;
-      }
-
-      const pagination = document.querySelector('.pagination');
-
-      if (pagination) {
-        pagination.style.visibility = 'hidden'; // 페이지네이션 숨김 (자리 유지)
-      }
-
-      fetch(`${filterUrl}?keyword=${encodeURIComponent(query)}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('서버 요청 중 오류가 발생했습니다.');
-          }
-          return response.json();
-        })
-        .then(data => {
-          data.sort((a, b) => new Date(b.dateWrite) - new Date(a.dateWrite));
-          const tableBody = document.querySelector('table tbody');
-          tableBody.innerHTML = ''; // 기존 데이터 삭제
-
-          if (data.length === 0) {
-            const row = document.createElement('tr');
-            row.innerHTML = `<td colspan="4" style="text-align:center;">검색 결과가 없습니다.</td>`;
-            tableBody.appendChild(row);
-          } else {
-            data.forEach((post, index) => {
-              const row = document.createElement('tr');
-              row.classList.add('clickable-row');
-              row.setAttribute('onclick', `location.href='/noticeboard/${post.postId}'`);
-
-              row.innerHTML = `
-                <td class="number-cell">${index + 1}</td> <!-- 1부터 시작하도록 변경 -->
-                <td class="title-cell nowrap-cell">${post.title}</td>
-                <td class="writer-cell nowrap-cell">${post.writerName}</td>
-                <td class="view-count-cell nowrap-cell">${post.viewCount}</td>
-              `;
-              tableBody.appendChild(row);
+            fetch('/noticeboard/new', { method: 'GET' })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("게시글을 작성할 권한이 없습니다.");
+                }
+                window.location.href = "/noticeboard/new"; // 정상 접근 시 이동
+            })
+            .catch(error => {
+                alert( error.message); // 오류 메시지를 alert로 표시
             });
-          }
-        })
-
-        .catch(error => {
-          console.error('Error:', error);
-          alert('검색 요청 중 오류가 발생했습니다.');
         });
-    }
+    });
 </script>
 
 
 </body>
 </html>
-`
