@@ -196,6 +196,11 @@ html, body {
     color: #a4bff8;
 }
 
+.detail-content:not(.hidden) #interviewmenuBar2 {
+    background-color: #4c80f1 !important; /* 배경색 유지 */
+    color: #a4bff8;
+}
+
 /* 기본 메뉴 아이템 스타일 */
 .menu-bar a {
     text-decoration: none;
@@ -245,6 +250,10 @@ html, body {
 
 /* #menuBar2 내부의 언더바 제거 */
 #menuBar2 a:before {
+    content: none !important; /* 언더바 요소 제거 */
+}
+
+#interviewmenuBar2 a:before {
     content: none !important; /* 언더바 요소 제거 */
 }
 
