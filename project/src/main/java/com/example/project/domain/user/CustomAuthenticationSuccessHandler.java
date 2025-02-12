@@ -28,9 +28,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-        // last_login 업데이트
-        user.setLast_login(LocalDateTime.now());
-        userRepository.save(user);
 
         // JSON 응답 반환
         response.setStatus(HttpServletResponse.SC_OK);
