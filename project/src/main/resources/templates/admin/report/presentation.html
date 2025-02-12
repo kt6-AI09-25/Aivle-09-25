@@ -41,7 +41,8 @@
         }
 
         th {
-            background-color: #f8f8f8;
+          white-space: nowrap;
+          border-bottom: .1px solid #333;
         }
 
         tbody tr:hover {
@@ -668,7 +669,111 @@ async function fetchAverageScores() {
     }
 }
 </script>
+<script>
+    $(document).ready(function () {
+    let currentData = {};
+    let chartInstance = null;
 
+    // 🟢 영어 -> 한글 변환 객체 (언어, 모션, 표정)
+    const frequencyMapping = {
+        // 🔵 언어 오류
+        "FIR-B": "의미없는 발성",
+        "REP-B": "반복 발성",
+        "PS-B": "휴지(긴쉼)",
+        "WR-B": "발음오류",
+
+        // 🔴 모션 오류
+        "handtohead": "머리 만지기",
+        "handup": "팔 접었다 펴기",
+        "bodyscratching": "몸 긁기",
+        "nailtouching": "손톱 만지기",
+        "swaying": "몸 흔들기",
+        "twisting": "몸 꼬기",
+        "headdown": "고개 숙이기",
+        "handsbehind": "뒷짐 지기",
+
+        // 🟣 표정 오류
+        "angry": "화난표정",
+        "fear": "두려운표정",
+        "surprise": "놀란표정",
+        "disgusted": "찡그린표정",
+
+        "expression" : "표정 점수",
+        "language": "언어 점수",
+        "motion"  : "행동 점수"
+    };
+
+    // 🟢 변환 함수
+    function translateFrequency(englishKey) {
+        return frequencyMapping[englishKey] || "알 수 없음";
+    }
+
+    function updateModalContent(scoreType) {
+        let scoreValue = Math.round(currentData[`${scoreType}Score`]) || "없음";
+        let percentileValue = Math.round(currentData[`${scoreType}Percentile`]) || "없음";
+        let frequencyKey = currentData[`${scoreType}Frequency`] || "없음";
+        let frequencyRatioValue = Math.round(currentData[`${scoreType}FrequencyRatio`]) || "없음";
+
+        let translatedFrequency = translateFrequency(frequencyKey); // 한글 변환 적용
+
+        $("#modalTitle").text(scoreType.toUpperCase() + " 점수 상세 조회");
+        $("#modalScore").html(`${scoreValue}`);
+        $("#modalMaxScore").html(` / ${scoreType === "total" ? 300 : 100}점`);
+        $("#modalPercentile").text(percentileValue);
+        $("#modalFrequency").text(translatedFrequency);
+        $("#modalFrequencyRatio").text(frequencyRatioValue);
+
+        if (scoreType === "total") {
+            $("#modalFrequencyRatio").closest("p").hide();
+        } else {
+            $("#modalFrequencyRatio").closest("p").show();
+        }
+
+        updateChart(scoreType);
+    }
+
+    $(document).on("click", ".table-wrapper tbody tr", function () {
+        let scoreId = $(this).data("scoreid");
+
+        if (!scoreId) {
+            alert("scoreId가 존재하지 않습니다.");
+            return;
+        }
+
+        $.ajax({
+            url: "/scores/details2",
+            type: "GET",
+            data: { scoreId: scoreId },
+            dataType: "json",
+            success: function (data) {
+                currentData = data;
+                $("#modalUserId").text(data.userId || "없음");
+                updateModalContent("total");
+                $("#scoreStatModal").fadeIn();
+            },
+            error: function () {
+                alert("점수 데이터를 불러오는 데 실패했습니다.");
+            }
+        });
+    });
+
+    $(document).on("click", ".score-btn", function () {
+        $(".score-btn").removeClass("active");
+        $(this).addClass("active");
+        updateModalContent($(this).data("type"));
+    });
+
+    $(document).on("click", ".stat-close-btn", function () {
+        $("#scoreStatModal").fadeOut();
+    });
+
+    $(document).on("click", function (event) {
+        if ($(event.target).attr("id") === "scoreStatModal") {
+            $("#scoreStatModal").fadeOut();
+        }
+    });
+});
+</script>
 
 
 </body>
