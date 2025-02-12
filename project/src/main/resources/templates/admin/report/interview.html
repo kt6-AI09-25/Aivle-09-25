@@ -41,7 +41,8 @@
         }
 
         th {
-            background-color: #f8f8f8;
+          white-space: nowrap;
+          border-bottom: .1px solid #333;
         }
 
         tbody tr:hover {
@@ -206,7 +207,7 @@
         <li><a href="/admin">메인</a></li>
         <li><a href="/admin/members">회원 관리</a></li>
         <li><a href="/admin/report">게시판 신고 관리</a></li>
-        <li><a href="/admin/presentation">면접 내용 조회</a></li>
+        <li><a href="/admin/presentation">발표 내용 조회</a></li>
         <li><a href="/admin/interview" class="active">면접 내용 조회</a></li>
     </ul>
 
@@ -424,6 +425,34 @@
     });
 
     $(document).ready(function () {
+    // 🟢 영어 -> 한글 변환 객체 (언어, 모션, 표정)
+    const frequencyMapping = {
+        // 🔵 언어 오류
+        "FIR-B": "의미없는 발성",
+        "REP-B": "반복 발성",
+        "PS-B": "휴지(긴쉼)",
+        "WR-B": "발음오류",
+
+        // 🔴 모션 오류
+        "handtohead": "머리 만지기",
+        "handup": "팔 접었다 펴기",
+        "bodyscratching": "몸 긁기",
+        "nailtouching": "손톱 만지기",
+        "swaying": "몸 흔들기",
+        "twisting": "몸 꼬기",
+        "headdown": "고개 숙이기",
+        "handsbehind": "뒷짐 지기",
+
+        // 🟣 표정 오류
+        "angry": "화난표정",
+        "fear": "두려운표정",
+        "surprise": "놀란표정",
+        "disgusted": "찡그린표정",
+
+        "expression": "표정 점수",
+        "language": "언어 점수",
+        "motion": "행동 점수"
+    };
     let currentData = {};
     let chartInstance = null;  // 기존 차트 인스턴스 저장
 
@@ -500,30 +529,31 @@
     });
 
     function updateModalContent(score2Type) {
-        let score2Value = Math.round(currentData[`${score2Type}Score`]) || "없음";
-        let percentileValue = Math.round(currentData[`${score2Type}Percentile`]) || "없음";
-        let frequencyValue = currentData[`${score2Type}Frequency`] || "없음";
-        let frequencyRatioValue = Math.round(currentData[`${score2Type}FrequencyRatio`]) || "없음";
+    let score2Value = Math.round(currentData[`${score2Type}Score`]) || "없음";
+    let percentileValue = Math.round(currentData[`${score2Type}Percentile`]) || "없음";
+    let frequencyKey = currentData[`${score2Type}Frequency`] || "unknown";
+    let frequencyRatioValue = Math.round(currentData[`${score2Type}FrequencyRatio`]) || "100";
 
-        // 점수에 맞는 최대값 추가
-        let maxScore2 = score2Type === "total" ? 300 : 100;
+    // 🟢 영어를 한글로 변환
+    let translatedFrequency = frequencyMapping[frequencyKey] || "시선 처리 미흡";
+    let scoreTypeTitle = frequencyMapping[score2Type] || "총합 점수";
 
 
-        $("#modalTitle").text(score2Type.toUpperCase() + " 점수 상세 조회");
-        $("#modalScore2").html(`${score2Value}`); // 점수는 크게, 파란색 유지
-        $("#modalMaxScore2").html(` / ${maxScore2}점`); // 단위는 작고 회색으로
-        $("#modalPercentile").text(percentileValue);
-        $("#modalFrequency").text(frequencyValue);
-        $("#modalFrequencyRatio").text(frequencyRatioValue);
 
-        if (score2Type === "total") {
-        $("#modalFrequencyRatio").closest("p").hide();
-    } else {
-        $("#modalFrequencyRatio").closest("p").show();
-    }
+    // 🟢 점수에 맞는 최대값 추가
+    let maxScore2 = score2Type === "total" ? 300 : 100;
 
-        updateChart(score2Type);
-    }
+    $("#modalTitle").text(scoreTypeTitle + " 상세 조회");
+    $("#modalScore2").html(`${score2Value}`);
+    $("#modalMaxScore2").html(` / ${maxScore2}점`);
+    $("#modalPercentile").text(percentileValue);
+    $("#modalFrequency").text(translatedFrequency);
+    $("#modalFrequencyRatio").text(frequencyRatioValue);
+
+    $("#modalFrequencyRatio").closest("p").toggle(score2Type !== "total");
+
+    updateChart(score2Type);
+}
 
     function updateChart(score2Type) {
             if (!currentData || !currentData[`${score2Type}Score`]) return;
