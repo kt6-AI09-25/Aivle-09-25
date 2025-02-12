@@ -727,10 +727,12 @@
     /***** 추가: 레이더 차트 렌더링 함수 *****/
     function renderRadarChart(motionScore, expressionScore, languageScore) {
       const ctx = document.getElementById('radarChart').getContext('2d');
+
       // 기존 인스턴스가 있다면 제거하여 중복 방지
       if (window.radarChartInstance) {
         window.radarChartInstance.destroy();
       }
+
       window.radarChartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
@@ -745,12 +747,16 @@
           }]
         },
         options: {
-          scale: {
-            ticks: {
-              beginAtZero: true,
-          min: 0,          // 최소값 0
-          max: 100,        // 최대값 100
-          stepSize: 10
+          scales: {
+            r: {
+              min: 0,       // 최소값 0
+              max: 100,     // 최대값 100
+              ticks: {
+                stepSize: 20,   // 0, 20, 40, 60, 80, 100 으로 값 고정
+                callback: function(value) {
+                  return value;  // 각 tick의 값을 그대로 표시
+                }
+              }
             }
           },
           responsive: true,
