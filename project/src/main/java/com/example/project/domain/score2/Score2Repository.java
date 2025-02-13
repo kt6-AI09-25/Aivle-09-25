@@ -25,7 +25,8 @@ public interface Score2Repository extends JpaRepository<Score2, Long> {
             "LEFT JOIN FETCH s.headTimes " +
             "LEFT JOIN FETCH s.expressionTimes " +
             "LEFT JOIN FETCH s.languageTimes " +
-            "WHERE s.user.id = :userId")
+            "WHERE s.user.id = :userId "+
+            "ORDER BY s.date DESC")
     List<Score2> findByUserIdWithDetails(@Param("userId") Long userId);
 
     // 평균 점수 계산 쿼리

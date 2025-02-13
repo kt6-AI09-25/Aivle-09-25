@@ -214,26 +214,22 @@
             </div>
 
             <!-- 면접영상 섹션 -->
-            <div id="interviewVideos" style="display: none;">
-                <div th:if="${interviewVideos != null and !#lists.isEmpty(interviewVideos)}">
-                    <div th:each="video, iterStat : ${interviewVideos}">
-                        <img th:if="${video.thumbnailUrl != null}"
-                             th:src="@{${video.thumbnailUrl}}"
-                             alt="면접영상 썸네일"
-                             th:attr="data-videoUrl=${video.videoUrl}"
-                             class="video-thumbnail" />
-                        <div th:if="${iterStat.index % 3 == 2}" style="clear: both;"></div>
-                    </div>
-                </div>
+            <div id="interviewVideos">
                 <div th:if="${interviewVideos == null or #lists.isEmpty(interviewVideos)}">
                     <h1 class="no-videos-message">저장된 면접영상이 없습니다.</h1>
-                    <div style="text-align: center; margin: 20px 0;">
-                        <div th:each="score : ${previousScores}" class="video-container">
+                    <div class="video-flex" style="text-align: center; margin: 20px 0;">
+                        <div th:each="score : ${previousScores2}" class="video-container">
                             <div th:if="${score.status != 'IN_PROGRESS'}" class="video-container">
                                 <div class="video-thumbnail"
-                                     th:attr="totalscore=${score.totalScore}, motionscore=${score.motionScore}, fileId=${score.fileId}"
-                                     onclick="openScoreModal(this)">
-                                    <video width="350" height="230"
+                                     th:attr="scoreId=${score.score2Id},
+                                              totalscore=${score.totalScore},
+                                              eyeheadscore=${score.eyeheadScore},
+                                              expressionscore=${score.expressionScore},
+                                              languagescore=${score.languageScore},
+                                              textscript=${score.script},
+                                              fileId=${score.fileId}"
+                                     onclick="openScoreModal2(this)">
+                                    <video width="300" height="180"
                                            th:src="@{/myresults/upload/results/{fileId}(fileId=${score.fileId})}">
                                     </video>
                                 </div>
@@ -244,6 +240,38 @@
                     </div>
                 </div>
             </div>
+
+
+<!--            <div id="interviewVideos" style="display: none;">-->
+<!--                <div th:if="${interviewVideos != null and !#lists.isEmpty(interviewVideos)}">-->
+<!--                    <div th:each="video, iterStat : ${interviewVideos}">-->
+<!--                        <img th:if="${video.thumbnailUrl != null}"-->
+<!--                             th:src="@{${video.thumbnailUrl}}"-->
+<!--                             alt="면접영상 썸네일"-->
+<!--                             th:attr="data-videoUrl=${video.videoUrl}"-->
+<!--                             class="video-thumbnail" />-->
+<!--                        <div th:if="${iterStat.index % 3 == 2}" style="clear: both;"></div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div th:if="${interviewVideos == null or #lists.isEmpty(interviewVideos)}">-->
+<!--                    <h1 class="no-videos-message">저장된 면접영상이 없습니다.</h1>-->
+<!--                    <div style="text-align: center; margin: 20px 0;">-->
+<!--                        <div th:each="score : ${previousScores}" class="video-container">-->
+<!--                            <div th:if="${score.status != 'IN_PROGRESS'}" class="video-container">-->
+<!--                                <div class="video-thumbnail"-->
+<!--                                     th:attr="totalscore=${score.totalScore}, motionscore=${score.motionScore}, fileId=${score.fileId}"-->
+<!--                                     onclick="openScoreModal(this)">-->
+<!--                                    <video width="350" height="230"-->
+<!--                                           th:src="@{/myresults/upload/results/{fileId}(fileId=${score.fileId})}">-->
+<!--                                    </video>-->
+<!--                                </div>-->
+<!--                                <p><strong>날짜:</strong> <span th:text="${#temporals.format(score.date, 'yyyy-MM-dd HH:mm')}"></span></p>-->
+<!--                                <p><strong>작성자:</strong> <span th:text="${score.userId}"></span></p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
 
         <div class="spacer"></div>
@@ -255,9 +283,13 @@
                 <div class="module-titleArea">
                     <h1>분석 결과</h1>
                 </div>
-                <div class="menu-bar" id="menuBar1">
+                <div class="menu-bar hidden" id="menuBar1">
                     <a href="#" id="summaryResult" class="active" >종합결과</a>
                     <a href="#" id="detailAnalysis" >세부분석</a>
+                </div>
+                <div class="menu-bar hidden" id="interviewmenuBar1">
+                    <a href="#" id="summaryResult2" class="active" >종합결과</a>
+                    <a href="#" id="detailAnalysis2" >세부분석</a>
                 </div>
                 <!-- 종합결과 -->
                 <div id="summaryContent" class="summary-content">
@@ -302,6 +334,11 @@
                         <a href="#" id="motion" class="active" >모션점수</a>
                         <a href="#" id="voice" >언어점수</a>
                         <a href="#" id="gaze" >표정점수</a>
+                    </div>
+                    <div class="menu-bar hidden" id="interviewmenuBar2">
+                        <a href="#" id="eyehead" class="active" >시선점수</a>
+                        <a href="#" id="voice2" >언어점수</a>
+                        <a href="#" id="gaze2" >표정점수</a>
                     </div>
                     <div class="modal-body split">
                         <div class="modal-left">
@@ -380,13 +417,21 @@
     const analysisModal = document.getElementById('videoModal');
     const summaryContent = document.getElementById('summaryContent');
     const detailContent = document.getElementById('detailContent');
+    const menuBar1 = document.getElementById('menuBar1');
     const menuBar2 = document.getElementById('menuBar2');
+    const interviewmenuBar1 = document.getElementById('interviewmenuBar1');
+    const interviewmenuBar2 = document.getElementById('interviewmenuBar2');
     const detailAnalysis = document.getElementById('detailAnalysis');
+    const detailAnalysis2 = document.getElementById('detailAnalysis2');
     const summaryResult = document.getElementById('summaryResult');
+    const summaryResult2 = document.getElementById('summaryResult2');
     const analysisModalClose = document.getElementById('analysisModalClose');
     const motionButton = document.getElementById('motion');
     const voiceButton = document.getElementById('voice');
     const gazeButton = document.getElementById('gaze');
+    const eyeheadButton = document.getElementById('eyehead');
+    const voiceButton2 = document.getElementById('voice2');
+    const gazeButton2 = document.getElementById('gaze2');
     const motionContent = document.getElementById('motionContent');
     const voiceContent = document.getElementById('voiceContent');
     const gazeContent = document.getElementById('gazeContent');
@@ -485,13 +530,6 @@
         });
     }
 
-    /***** 기존 모달/차트 로직 *****/
-    function openAnalysisModal() {
-      analysisModal.style.display = 'block';
-      resetToSummary();
-      analysisModal.querySelector('.modal-content').focus();
-    }
-
     // updateSummaryContent() 함수: 점수 정보를 출력한 후 진행률 및 레이더 차트를 업데이트합니다.
     function updateSummaryContent(totalScore, motionScore, expressionScore, languageScore, percentile) {
         let summaryText =
@@ -503,6 +541,19 @@
         updateChart('total',totalScore)
     }
 
+    // 면접용 모달내용 변환
+    function updateSummaryContent2(totalScore, eyeheadscore, expressionScore, languageScore, percentile) {
+        let summaryText =
+            '<h2>총 점수 ' + totalScore + '</h2>'
+        document.getElementById("scoreSummary").innerHTML = summaryText;
+        updateProgress(percentile);
+        // 레이더 차트 업데이트: 점수값을 숫자로 변환하여 전달
+        renderRadarChart(Number(eyeheadscore), Number(expressionScore), Number(languageScore));
+        updateChart2('total',totalScore)
+    }
+
+    //발표용 버튼
+    //세부분석
     detailAnalysis.addEventListener('click', function(event) {
 
       const motionScore = event.target.getAttribute('data-score');
@@ -521,6 +572,7 @@
       updateTimes('motion', Number(motionScore).toFixed(1), scoreId)
     });
 
+    // 종합결과 버튼
     summaryResult.addEventListener('click', function(event) {
 
       const totalScore = event.target.getAttribute('data-score');
@@ -589,6 +641,90 @@
       content.classList.add('active');
     }
 
+    // 면접용 버튼 정의
+    // 세부분석버튼
+    detailAnalysis2.addEventListener('click', function(event) {
+
+      const eyeheadScore = event.target.getAttribute('data-score');
+      const scoreId = event.target.getAttribute('data-scoreId');
+
+      event.preventDefault();
+      summaryContent.style.display = 'none';
+      detailContent.style.display = 'block';
+      interviewmenuBar2.classList.remove('hidden');
+      summaryResult2.classList.remove('active');
+      detailAnalysis2.classList.add('active');
+      activateTab(eyeheadButton, motionContent);
+
+      updateChart2('eyehead',Number(eyeheadScore).toFixed(1))
+      updateModalContent("eyehead")
+    });
+
+    // 종합결과버튼
+    summaryResult2.addEventListener('click', function(event) {
+      const totalScore = event.target.getAttribute('data-score');
+      event.preventDefault();
+      resetToSummary2();
+      updateChart2('total',Number(totalScore).toFixed(1))
+      updateModalContent("total")
+    });
+
+    function resetToSummary2() {
+      summaryContent.style.display = 'block';
+      detailContent.style.display = 'none';
+      interviewmenuBar2.classList.add('hidden');
+      detailAnalysis2.classList.remove('active');
+      summaryResult2.classList.add('active');
+    }
+    //시선분석 버튼
+    eyeheadButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      const eyeheadScore = event.target.getAttribute('data-score');
+      const scoreId = event.target.getAttribute('data-scoreId');
+
+      activateTab2(eyeheadButton, motionContent);
+
+      updateChart2('eyehead',Number(eyeheadScore).toFixed(1))
+      updateModalContent("eyehead");
+    });
+
+    // 언어분석 버튼
+    voiceButton2.addEventListener('click', function(event) {
+      event.preventDefault();
+      const languageScore = event.target.getAttribute('data-score');
+      const timeLinksContainer = document.getElementById("timeLinks");
+
+      activateTab2(voiceButton2, voiceContent);
+
+      updateChart2('language',Number(languageScore).toFixed(1))
+      updateModalContent("language");
+
+    });
+
+    //표정분석 버튼
+    gazeButton2.addEventListener('click', function(event) {
+      event.preventDefault();
+      const expressionScore = event.target.getAttribute('data-score');
+      const scoreId = event.target.getAttribute('data-scoreId');
+
+      activateTab2(gazeButton2, gazeContent);
+
+      updateChart2('expression',Number(expressionScore).toFixed(1))
+      updateModalContent("expression");
+    });
+
+    function activateTab2(button, content) {
+      eyeheadButton.classList.remove('active');
+      voiceButton2.classList.remove('active');
+      gazeButton2.classList.remove('active');
+      motionContent.classList.remove('active');
+      voiceContent.classList.remove('active');
+      gazeContent.classList.remove('active');
+      button.classList.add('active');
+      content.classList.add('active');
+    }
+
+
 
     analysisModalClose.addEventListener('click', () => {
       closeAnalysisModal();
@@ -601,6 +737,7 @@
     function closeAnalysisModal() {
       analysisModal.style.display = 'none';
       resetToSummary();
+      resetToSummary2();
       analysisVideo.pause();
       analysisVideo.src = '';
     }
@@ -613,9 +750,6 @@
       const languagescore = element.getAttribute('languagescore');
       const scoreId = element.getAttribute('scoreId');
       const fileId = element.getAttribute('fileId');
-<!--      const script = element.getAttribute('script');-->
-
-<!--      console.log(script);-->
 
       document.getElementById("summaryResult").setAttribute("data-score", totalscore);
 
@@ -626,12 +760,13 @@
       document.getElementById("motion").setAttribute("data-scoreId", scoreId);
 
       document.getElementById("voice").setAttribute("data-score", languagescore);
-<!--      document.getElementById("voice").setAttribute("data-script", script);-->
 
       document.getElementById("gaze").setAttribute("data-score", expressionscore);
       document.getElementById("gaze").setAttribute("data-scoreId", scoreId);
 
       $(".text-box").css("display", "block");
+      menuBar1.classList.remove('hidden');
+      interviewmenuBar1.classList.add('hidden');
 
       const videoElement = document.getElementById('analysisVideo');
       if (videoElement) {
@@ -652,6 +787,67 @@
         url: "/scores/details2",
         type: "GET",
         data: { scoreId: scoreId },
+        dataType: "json",
+        success: function (data) {
+            currentData = data;
+            updateModalContent("total");
+        },
+        error: function () {
+            alert("점수 데이터를 불러오는 데 실패했습니다.");
+        }
+      });
+
+
+
+      analysisModal.style.display = 'block';
+      resetToSummary();
+    }
+
+    /***** 면접 모달 열기 *****/
+    function openScoreModal2(element) {
+      const totalscore = element.getAttribute('totalscore');
+      const eyeheadscore = element.getAttribute('eyeheadscore');
+      const expressionscore = element.getAttribute('expressionscore');
+      const languagescore = element.getAttribute('languagescore');
+      const scoreId = element.getAttribute('scoreId');
+      const fileId = element.getAttribute('fileId');
+
+      document.getElementById("summaryResult2").setAttribute("data-score", totalscore);
+
+      document.getElementById("detailAnalysis2").setAttribute("data-score", eyeheadscore);
+      document.getElementById("detailAnalysis2").setAttribute("data-scoreId", scoreId);
+
+      document.getElementById("eyehead").setAttribute("data-score", eyeheadscore);
+      document.getElementById("eyehead").setAttribute("data-scoreId", scoreId);
+
+      document.getElementById("voice2").setAttribute("data-score", languagescore);
+
+      document.getElementById("gaze2").setAttribute("data-score", expressionscore);
+      document.getElementById("gaze2").setAttribute("data-scoreId", scoreId);
+
+      $(".text-box").css("display", "block");
+      interviewmenuBar1.classList.remove('hidden');
+      menuBar1.classList.add('hidden');
+
+      const videoElement = document.getElementById('analysisVideo');
+      if (videoElement) {
+        videoElement.src = `/myresults/upload/results/${fileId}`;
+        videoElement.load();
+      }
+      fetch(`/scores2/distribution?totalscore=${totalscore}`)
+        .then(response => response.json())
+        .then(percentile => {
+            updateSummaryContent2(Number(totalscore).toFixed(1), eyeheadscore, expressionscore, languagescore, percentile);
+        })
+        .catch(error => {
+            console.error('데이터 로드 실패:', error);
+            alert('평가 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
+        });
+
+      $.ajax({
+        url: "/scores2/details2",
+        type: "GET",
+        data: { score2Id: scoreId },
         dataType: "json",
         success: function (data) {
             currentData = data;
@@ -822,6 +1018,8 @@
                 $(".modalFrequency").text("모션점수");
             } else if (frequencyValue == "expression") {
                 $(".modalFrequency").text("표정점수");
+            } else if (frequencyValue == "eyehead") {
+                $(".modalFrequency").text("시선점수");
             }
         } else {
             if(scoreValue == 100){
@@ -831,8 +1029,9 @@
                     $(".gaze-content > div.text-container > div:nth-child(2)").css("display", "none");
                 } else if (scoreType == "language") {
                     $(".voice-content > div.text-container > div:nth-child(2)").css("display", "none");
+                } else if (scoreType == "eyehead") {
+                    $(".motion-content > div.text-container > div:nth-child(2)").css("display", "none");
                 }
-
             }else{
                 let transValue = frequencyValue;
                 if (scoreType == "motion") {
@@ -863,6 +1062,8 @@
                         "surprise": "놀란 표정"
                     };
                     translatedValue = expressionMapping[frequencyValue] || frequencyValue;
+                } else if (scoreType == "eyehead") {
+                    $(".motion-content > div.text-container > div:nth-child(2)").css("display", "none");
                 }
                 $(".modalFrequency").text(translatedValue);
             }
@@ -928,6 +1129,70 @@
         });
     }
 
+    function updateChart2(scoreType, score) {
+        let canvas
+        if (scoreType == 'eyehead'){
+            canvas = document.getElementById(`motionChart`).getContext("2d");
+        }else{
+            canvas = document.getElementById(`${scoreType}Chart`).getContext("2d");
+        }
+
+        console.log("updateChart 실행됨 - scoreType:", scoreType, "score:", score);
+
+        if (chartInstance) {
+            console.log("기존 차트 삭제");
+            chartInstance.destroy();
+        }
+
+        $.ajax({
+            url: "/scores2/all",
+            type: "GET",
+            dataType: "json",
+            success: function (scores) {
+                let scoreValues = scores.map(s => Math.round(s[`${scoreType}Score`]));
+
+                let maxScore = scoreType === "total" ? 300 : 100;
+                let labels = Array.from({ length: (maxScore / 5) + 1 }, (_, i) => i * 5);
+                if (!labels.includes(maxScore)) labels.push(maxScore);
+
+                let binnedScores = labels.reduce((acc, label) => {
+                    acc[label] = 0;
+                    return acc;
+                }, {});
+
+                scoreValues.forEach(score => {
+                    let bin = Math.round(score / 5) * 5;
+                    if (bin > maxScore) bin = maxScore;
+                    binnedScores[bin]++;
+                });
+
+
+                let highlightedValue = Math.round(score / 5) * 5;
+
+                chartInstance = new Chart(canvas, {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: scoreType.toUpperCase() + " Score",
+                            data: labels.map(label => binnedScores[label] || 0),
+                            backgroundColor: labels.map(label => (label === highlightedValue ? "red" : "rgba(54, 162, 235, 0.5)")),
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { type: "category" },
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            }
+        });
+    }
+
 </script>
 
 <!-- 추가 스크립트: 썸네일이 있으면 '저장된 발표영상이 없습니다' 메시지 숨기기 -->
@@ -939,6 +1204,14 @@
         const noVideosMsg = presentationSection.querySelector(".no-videos-message");
         if(noVideosMsg){
           noVideosMsg.style.display = "none";
+        }
+      }
+      const interviewSection = document.getElementById("interviewVideos");
+      const thumbnails2 = interviewSection.querySelectorAll(".video-thumbnail");
+      if(thumbnails2.length > 0){
+        const noVideosMsg2 = interviewSection.querySelector(".no-videos-message");
+        if(noVideosMsg2){
+          noVideosMsg2.style.display = "none";
         }
       }
     });
